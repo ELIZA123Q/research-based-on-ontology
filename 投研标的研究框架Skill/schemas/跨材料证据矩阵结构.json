@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "跨材料证据矩阵",
+  "type": "object",
+  "required": ["研究主题", "材料范围", "证据矩阵", "质量提示"],
+  "additionalProperties": false,
+  "properties": {
+    "研究主题": { "type": "string" },
+    "材料范围": {
+      "type": "object",
+      "required": ["材料数量", "独立原始来源数量", "历史样本数量", "来源去重说明"],
+      "additionalProperties": false,
+      "properties": {
+        "材料数量": { "type": "integer", "minimum": 0 },
+        "独立原始来源数量": { "type": "integer", "minimum": 0 },
+        "历史样本数量": { "type": "integer", "minimum": 0 },
+        "来源去重说明": { "type": "string" }
+      }
+    },
+    "证据矩阵": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["候选模板要素", "要素类型", "标准化表述", "独立原始来源", "历史样本", "反证或阻断样本", "适用范围", "候选等级", "缺口"],
+        "additionalProperties": false,
+        "properties": {
+          "候选模板要素": { "type": "string" },
+          "要素类型": { "type": "string", "enum": ["状态变量", "触发类型", "传导逻辑", "验证信号", "阻断条件", "适用范围", "其他"] },
+          "标准化表述": { "type": "string" },
+          "独立原始来源": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["来源名称", "来源类型", "原始事实来源", "发布时间", "证据位置"],
+              "additionalProperties": false,
+              "properties": {
+                "来源名称": { "type": "string" },
+                "来源类型": { "type": "string" },
+                "原始事实来源": { "type": "string" },
+                "发布时间": { "type": "string" },
+                "证据位置": { "type": "string" }
+              }
+            }
+          },
+          "历史样本": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["样本对象", "触发时间", "兑现或失效时间", "验证指标", "结果", "失效原因", "来源位置"],
+              "additionalProperties": false,
+              "properties": {
+                "样本对象": { "type": "string" },
+                "触发时间": { "type": "string" },
+                "兑现或失效时间": { "type": "string" },
+                "验证指标": { "type": "string" },
+                "结果": { "type": "string", "enum": ["兑现", "部分兑现", "未兑现", "反向", "待观察"] },
+                "失效原因": { "type": "string" },
+                "来源位置": { "type": "string" }
+              }
+            }
+          },
+          "反证或阻断样本": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "适用范围": { "type": "string" },
+          "候选等级": { "type": "string", "enum": ["单来源候选", "多来源候选", "历史支持模板候选", "需补来源", "需补历史样本", "应降级", "应剔除"] },
+          "缺口": { "type": "array", "items": { "type": "string" } }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": { "候选等级": { "enum": ["多来源候选", "历史支持模板候选"] } },
+              "required": ["候选等级"]
+            },
+            "then": {
+              "properties": {
+                "独立原始来源": { "minItems": 2 }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "候选等级": { "const": "历史支持模板候选" } },
+              "required": ["候选等级"]
+            },
+            "then": {
+              "properties": {
+                "历史样本": { "minItems": 1 }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "质量提示": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "材料范围": { "properties": { "历史样本数量": { "const": 0 } }, "required": ["历史样本数量"] } },
+        "required": ["材料范围"]
+      },
+      "then": {
+        "properties": {
+          "证据矩阵": {
+            "not": {
+              "contains": {
+                "type": "object",
+                "properties": { "候选等级": { "const": "历史支持模板候选" } },
+                "required": ["候选等级"]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "材料范围": { "properties": { "独立原始来源数量": { "maximum": 1 } }, "required": ["独立原始来源数量"] } },
+        "required": ["材料范围"]
+      },
+      "then": {
+        "properties": {
+          "证据矩阵": {
+            "not": {
+              "contains": {
+                "type": "object",
+                "properties": { "候选等级": { "enum": ["多来源候选", "历史支持模板候选"] } },
+                "required": ["候选等级"]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

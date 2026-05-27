@@ -1,0 +1,241 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "通用投研框架",
+  "type": "object",
+  "required": ["研究范围", "生成依据", "研究对象骨架", "核心状态变量", "常见研究触发", "关键传导逻辑", "验证信号", "阻断条件", "模板影响记录", "待补材料", "待专家校准问题", "可沉淀候选资产", "质量边界"],
+  "additionalProperties": false,
+  "properties": {
+    "研究范围": { "type": "string" },
+    "生成依据": {
+      "type": "object",
+      "required": ["材料数量", "独立来源数量", "历史样本数量", "是否多来源", "是否包含历史样本", "来源覆盖", "历史依据说明", "单来源逻辑处理方式", "证据材料"],
+      "additionalProperties": false,
+      "properties": {
+        "材料数量": { "type": "integer", "minimum": 0 },
+        "独立来源数量": { "type": "integer", "minimum": 0 },
+        "历史样本数量": { "type": "integer", "minimum": 0 },
+        "是否多来源": { "type": "boolean" },
+        "是否包含历史样本": { "type": "boolean" },
+        "来源覆盖": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["来源类型", "材料数量", "代表材料"],
+            "additionalProperties": false,
+            "properties": {
+              "来源类型": { "type": "string" },
+              "材料数量": { "type": "integer", "minimum": 0 },
+              "代表材料": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "历史依据说明": { "type": "string" },
+        "单来源逻辑处理方式": { "type": "string" },
+        "证据材料": { "type": "array", "items": { "type": "string" } }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "是否多来源": { "const": true } },
+            "required": ["是否多来源"]
+          },
+          "then": {
+            "properties": { "独立来源数量": { "minimum": 2 } }
+          }
+        },
+        {
+          "if": {
+            "properties": { "是否包含历史样本": { "const": true } },
+            "required": ["是否包含历史样本"]
+          },
+          "then": {
+            "properties": { "历史样本数量": { "minimum": 1 } }
+          }
+        }
+      ]
+    },
+    "研究对象骨架": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["名称", "对象类型", "角色", "候选状态"],
+        "additionalProperties": false,
+        "properties": {
+          "名称": { "type": "string" },
+          "对象类型": { "type": "string", "enum": ["Industry", "Segment", "Company", "Product", "Material", "Asset", "Theme", "Unknown"] },
+          "角色": { "type": "string" },
+          "候选状态": { "type": "string", "enum": ["可保留候选", "需补来源", "需专家校准", "应降级", "应剔除"] }
+        }
+      }
+    },
+    "核心状态变量": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["变量名称", "观测口径", "适用范围", "历史依据", "证据材料", "候选状态"],
+        "additionalProperties": false,
+        "properties": {
+          "变量名称": { "type": "string" },
+          "观测口径": { "type": "string" },
+          "适用范围": { "type": "string" },
+          "历史依据": { "type": "string" },
+          "证据材料": { "type": "array", "items": { "type": "string" } },
+          "候选状态": { "type": "string", "enum": ["历史支持模板候选", "多来源候选", "单来源候选", "需补历史样本", "需补来源", "需专家校准", "应降级", "应剔除"] }
+        }
+      }
+    },
+    "常见研究触发": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["触发名称", "触发类型", "承接方式", "证据材料"],
+        "additionalProperties": false,
+        "properties": {
+          "触发名称": { "type": "string" },
+          "触发类型": { "type": "string", "enum": ["事件", "状态变化", "政策变化", "市场定价", "主题", "未知"] },
+          "承接方式": { "type": "string" },
+          "证据材料": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "关键传导逻辑": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["来源变量", "目标变量", "方向映射", "滞后窗口", "边界条件", "历史依据", "证据材料", "候选状态"],
+        "additionalProperties": false,
+        "properties": {
+          "来源变量": { "type": "string" },
+          "目标变量": { "type": "string" },
+          "方向映射": { "type": "string" },
+          "滞后窗口": { "type": "string" },
+          "边界条件": { "type": "string" },
+          "历史依据": { "type": "string" },
+          "证据材料": { "type": "array", "items": { "type": "string" } },
+          "候选状态": { "type": "string", "enum": ["历史支持模板候选", "多来源候选", "单来源候选", "需补历史样本", "需补来源", "需专家校准", "应降级", "应剔除"] }
+        }
+      }
+    },
+    "验证信号": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["信号名称", "signalRole", "观察对象", "数据来源", "观察窗口", "预期方向", "关联变量"],
+        "additionalProperties": false,
+        "properties": {
+          "信号名称": { "type": "string" },
+          "signalRole": { "type": "string", "enum": ["validation", "tracking", "catalyst", "weakening", "blocking"] },
+          "观察对象": { "type": "string" },
+          "数据来源": { "type": "string" },
+          "观察窗口": { "type": "string" },
+          "预期方向": { "type": "string" },
+          "关联变量": { "type": "string" }
+        }
+      }
+    },
+    "阻断条件": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["条件描述", "作用对象", "signalRole", "可观察改写", "阈值或窗口", "候选状态"],
+        "additionalProperties": false,
+        "properties": {
+          "条件描述": { "type": "string" },
+          "作用对象": { "type": "string" },
+          "signalRole": { "type": "string", "enum": ["weakening", "blocking"] },
+          "可观察改写": { "type": "string" },
+          "阈值或窗口": { "type": "string" },
+          "候选状态": { "type": "string", "enum": ["候选", "待改写", "待验证", "应剔除"] }
+        }
+      }
+    },
+    "模板影响记录": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["材料标题", "影响类型", "影响对象", "沉淀建议"],
+        "additionalProperties": false,
+        "properties": {
+          "材料标题": { "type": "string" },
+          "影响类型": { "type": "string", "enum": ["新增", "强化", "修正", "削弱", "否定", "待验证"] },
+          "影响对象": { "type": "string" },
+          "沉淀建议": { "type": "string", "enum": ["可保留候选", "需补来源", "需专家校准", "应降级", "应剔除"] }
+        }
+      }
+    },
+    "待补材料": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "待专家校准问题": { "type": "array", "items": { "type": "string" } },
+    "可沉淀候选资产": { "type": "array", "items": { "type": "string" } },
+    "质量边界": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "生成依据": {
+            "properties": { "是否包含历史样本": { "const": false } },
+            "required": ["是否包含历史样本"]
+          }
+        },
+        "required": ["生成依据"]
+      },
+      "then": {
+        "properties": {
+          "核心状态变量": {
+            "not": {
+              "contains": {
+                "type": "object",
+                "properties": { "候选状态": { "const": "历史支持模板候选" } },
+                "required": ["候选状态"]
+              }
+            }
+          },
+          "关键传导逻辑": {
+            "not": {
+              "contains": {
+                "type": "object",
+                "properties": { "候选状态": { "const": "历史支持模板候选" } },
+                "required": ["候选状态"]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "生成依据": {
+            "properties": { "是否多来源": { "const": false } },
+            "required": ["是否多来源"]
+          }
+        },
+        "required": ["生成依据"]
+      },
+      "then": {
+        "properties": {
+          "核心状态变量": {
+            "not": {
+              "contains": {
+                "type": "object",
+                "properties": { "候选状态": { "enum": ["多来源候选", "历史支持模板候选"] } },
+                "required": ["候选状态"]
+              }
+            }
+          },
+          "关键传导逻辑": {
+            "not": {
+              "contains": {
+                "type": "object",
+                "properties": { "候选状态": { "enum": ["多来源候选", "历史支持模板候选"] } },
+                "required": ["候选状态"]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

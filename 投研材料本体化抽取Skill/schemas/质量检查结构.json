@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "质量检查",
+  "type": "object",
+  "required": ["检查对象", "通过结论", "可信度边界", "检查项", "问题清单", "修正建议"],
+  "additionalProperties": false,
+  "properties": {
+    "检查对象": { "type": "string" },
+    "通过结论": { "type": "string", "enum": ["通过", "部分通过", "不通过"] },
+    "可信度边界": {
+      "type": "object",
+      "required": ["最高可标记等级", "材料来源数量", "历史样本数量", "不得越级说明"],
+      "additionalProperties": false,
+      "properties": {
+        "最高可标记等级": { "type": "string", "enum": ["历史支持模板候选", "多来源候选", "单来源候选", "不可沉淀"] },
+        "材料来源数量": { "type": "integer", "minimum": 0 },
+        "历史样本数量": { "type": "integer", "minimum": 0 },
+        "不得越级说明": { "type": "string" }
+      }
+    },
+    "检查项": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["名称", "结果", "严重程度"],
+        "additionalProperties": false,
+        "properties": {
+          "名称": { "type": "string" },
+          "结果": { "type": "string", "enum": ["通过", "不通过", "不适用"] },
+          "严重程度": { "type": "string", "enum": ["高", "中", "低"] },
+          "说明": { "type": "string" }
+        }
+      }
+    },
+    "问题清单": { "type": "array", "items": { "type": "string" } },
+    "修正建议": { "type": "array", "items": { "type": "string" } },
+    "是否可展示": { "type": "boolean" },
+    "是否可沉淀": { "type": "boolean" },
+    "是否需要专家校准": { "type": "boolean" }
+  }
+}

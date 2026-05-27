@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "单篇材料本体化解读",
+  "type": "object",
+  "required": ["材料信息", "本体化抽取", "表达类型区分", "证据", "质量提示", "沉淀建议"],
+  "additionalProperties": false,
+  "properties": {
+    "材料信息": {
+      "type": "object",
+      "required": ["文档标题", "文档类型", "作者或发布主体", "发布时间", "业务时间", "来源位置", "来源形态", "来源可靠性", "缺失字段"],
+      "additionalProperties": false,
+      "properties": {
+        "文档标题": { "type": "string" },
+        "文档类型": { "type": "string" },
+        "作者或发布主体": { "type": "string" },
+        "发布时间": { "type": "string" },
+        "业务时间": { "type": "string" },
+        "来源位置": { "type": "string" },
+        "来源形态": { "type": "string", "enum": ["原始PDF", "官方页面", "券商页面", "转载页面", "AI摘要", "用户提供片段", "未知"] },
+        "来源可靠性": { "type": "string", "enum": ["高", "中", "低", "未知"] },
+        "缺失字段": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "本体化抽取": {
+      "type": "object",
+      "required": ["研究对象", "状态变量", "状态观测", "事件或触发", "传导逻辑", "验证信号", "阻断条件"],
+      "additionalProperties": false,
+      "properties": {
+        "研究对象": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["名称", "对象类型", "证据位置"],
+            "additionalProperties": false,
+            "properties": {
+              "名称": { "type": "string" },
+              "对象类型": { "type": "string", "enum": ["Industry", "Segment", "Company", "Product", "Material", "Asset", "Theme", "Unknown"] },
+              "证据位置": { "type": "string" }
+            }
+          }
+        },
+        "状态变量": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["变量名称", "变量类型", "观测口径", "挂载对象", "适用范围", "候选状态", "证据位置"],
+            "additionalProperties": false,
+            "properties": {
+              "变量名称": { "type": "string" },
+              "变量类型": { "type": "string", "enum": ["定量", "定性", "待拆分"] },
+              "观测口径": { "type": "string" },
+              "挂载对象": { "type": "string" },
+              "适用范围": { "type": "string" },
+              "候选状态": { "type": "string", "enum": ["可保留候选", "待拆分", "需补来源", "需专家校准", "应降级", "应剔除"] },
+              "证据位置": { "type": "string" }
+            }
+          }
+        },
+        "状态观测": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["观测变量", "观测值", "valueType", "observationTime", "来源文档", "证据位置", "处理建议"],
+            "additionalProperties": false,
+            "properties": {
+              "观测变量": { "type": "string" },
+              "观测值": { "type": "string" },
+              "valueType": { "type": "string", "enum": ["actual", "estimated", "forecast_or_guidance_不入观测", "unknown"] },
+              "observationTime": { "type": "string" },
+              "来源文档": { "type": "string" },
+              "证据位置": { "type": "string" },
+              "处理建议": { "type": "string", "enum": ["可作为观测候选", "转为Signal或假设依据", "需补来源", "应剔除"] }
+            }
+          }
+        },
+        "事件或触发": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["标题", "触发类型", "主体", "业务时间", "来源", "证据位置", "候选状态"],
+            "additionalProperties": false,
+            "properties": {
+              "标题": { "type": "string" },
+              "触发类型": { "type": "string", "enum": ["事件", "状态变化", "政策变化", "市场定价", "主题", "未知"] },
+              "主体": { "type": "string" },
+              "业务时间": { "type": "string" },
+              "来源": { "type": "string" },
+              "证据位置": { "type": "string" },
+              "候选状态": { "type": "string", "enum": ["Event候选", "Signal候选", "主题待拆分", "需补来源", "应剔除"] }
+            }
+          }
+        },
+        "传导逻辑": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["来源变量", "目标变量", "方向映射", "预期时间窗口", "边界条件", "来源证据", "证据位置", "置信度"],
+            "additionalProperties": false,
+            "properties": {
+              "来源变量": { "type": "string" },
+              "目标变量": { "type": "string" },
+              "方向映射": { "type": "string" },
+              "预期时间窗口": { "type": "string" },
+              "边界条件": { "type": "string" },
+              "来源证据": { "type": "string" },
+              "证据位置": { "type": "string" },
+              "置信度": { "type": "string", "enum": ["高", "中", "低", "未知"] }
+            }
+          }
+        },
+        "验证信号": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["信号名称", "signalRole", "观察对象", "关联变量", "数据来源", "观察窗口", "预期方向", "对模板的作用", "证据位置", "置信度"],
+            "additionalProperties": false,
+            "properties": {
+              "信号名称": { "type": "string" },
+              "signalRole": { "type": "string", "enum": ["validation", "tracking", "catalyst", "weakening", "blocking"] },
+              "观察对象": { "type": "string" },
+              "关联变量": { "type": "string" },
+              "数据来源": { "type": "string" },
+              "观察窗口": { "type": "string" },
+              "预期方向": { "type": "string" },
+              "对模板的作用": { "type": "string" },
+              "证据位置": { "type": "string" },
+              "置信度": { "type": "string", "enum": ["高", "中", "低", "未知"] }
+            }
+          }
+        },
+        "阻断条件": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["条件描述", "作用对象", "signalRole", "可观察改写", "阈值或窗口", "来源证据", "当前状态", "证据位置"],
+            "additionalProperties": false,
+            "properties": {
+              "条件描述": { "type": "string" },
+              "作用对象": { "type": "string" },
+              "signalRole": { "type": "string", "enum": ["weakening", "blocking"] },
+              "可观察改写": { "type": "string" },
+              "阈值或窗口": { "type": "string" },
+              "来源证据": { "type": "string" },
+              "当前状态": { "type": "string", "enum": ["候选", "待改写", "待验证", "应剔除"] },
+              "证据位置": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "表达类型区分": {
+      "type": "object",
+      "required": ["事实", "预测", "假设", "判断", "推荐语"],
+      "additionalProperties": false,
+      "properties": {
+        "事实": { "type": "array", "items": { "type": "string" } },
+        "预测": { "type": "array", "items": { "type": "string" } },
+        "假设": { "type": "array", "items": { "type": "string" } },
+        "判断": { "type": "array", "items": { "type": "string" } },
+        "推荐语": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "证据": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["原文片段", "证据位置", "对应候选项", "来源文档"],
+        "additionalProperties": false,
+        "properties": {
+          "原文片段": { "type": "string" },
+          "证据位置": { "type": "string" },
+          "对应候选项": { "type": "string" },
+          "来源文档": { "type": "string" }
+        }
+      }
+    },
+    "质量提示": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "沉淀建议": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["对象", "沉淀状态", "原因"],
+        "additionalProperties": false,
+        "properties": {
+          "对象": { "type": "string" },
+          "沉淀状态": { "type": "string", "enum": ["可登记", "可保留候选", "需补来源", "需专家校准", "应降级", "应剔除"] },
+          "原因": { "type": "string" }
+        }
+      }
+    }
+  }
+}

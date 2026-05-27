@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "模板影响评估",
+  "type": "object",
+  "required": ["材料标题", "评估前提", "影响清单"],
+  "additionalProperties": false,
+  "properties": {
+    "材料标题": { "type": "string" },
+    "评估前提": {
+      "type": "object",
+      "required": ["对应通用模板", "是否已有模板", "材料来源数量", "是否包含历史样本", "历史依据说明", "单来源处理"],
+      "additionalProperties": false,
+      "properties": {
+        "对应通用模板": { "type": "string" },
+        "是否已有模板": { "type": "boolean" },
+        "材料来源数量": { "type": "integer", "minimum": 1 },
+        "是否包含历史样本": { "type": "boolean" },
+        "历史依据说明": { "type": "string" },
+        "单来源处理": { "type": "string" }
+      }
+    },
+    "影响清单": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["影响类型", "影响对象", "影响说明", "适用范围", "历史依据", "证据位置", "置信度", "是否单来源", "沉淀建议"],
+        "additionalProperties": false,
+        "properties": {
+          "影响类型": { "type": "string", "enum": ["新增", "强化", "修正", "削弱", "否定", "待验证"] },
+          "影响对象": { "type": "string", "enum": ["研究对象", "状态变量", "触发类型", "传导逻辑", "验证信号", "阻断条件", "适用范围", "其他"] },
+          "影响说明": { "type": "string" },
+          "适用范围": { "type": "string" },
+          "历史依据": { "type": "string" },
+          "证据位置": { "type": "string" },
+          "置信度": { "type": "string", "enum": ["高", "中", "低", "未知"] },
+          "是否单来源": { "type": "boolean" },
+          "沉淀建议": { "type": "string", "enum": ["可保留候选", "需补来源", "需专家校准", "应降级", "应剔除"] }
+        }
+      }
+    }
+  }
+}

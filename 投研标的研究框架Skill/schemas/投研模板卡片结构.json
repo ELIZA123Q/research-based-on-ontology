@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "投研模板卡片",
+  "type": "object",
+  "required": ["模板名称", "模板等级", "适用范围", "不适用范围", "触发条件", "核心变量", "传导路径", "验证信号", "阻断条件", "历史样本", "反例或失效样本", "证据来源", "可信度说明", "待校准问题"],
+  "additionalProperties": false,
+  "properties": {
+    "模板名称": { "type": "string" },
+    "模板等级": { "type": "string", "enum": ["单来源候选", "多来源候选", "历史支持模板候选"] },
+    "适用范围": { "type": "string" },
+    "不适用范围": { "type": "string" },
+    "触发条件": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "核心变量": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "传导路径": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["来源变量", "目标变量", "方向映射", "滞后窗口", "边界条件"],
+        "additionalProperties": false,
+        "properties": {
+          "来源变量": { "type": "string" },
+          "目标变量": { "type": "string" },
+          "方向映射": { "type": "string" },
+          "滞后窗口": { "type": "string" },
+          "边界条件": { "type": "string" }
+        }
+      }
+    },
+    "验证信号": { "type": "array", "items": { "type": "string" } },
+    "阻断条件": { "type": "array", "items": { "type": "string" } },
+    "历史样本": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["样本对象", "触发时间", "兑现或失效时间", "验证指标", "结果", "来源位置"],
+        "additionalProperties": false,
+        "properties": {
+          "样本对象": { "type": "string" },
+          "触发时间": { "type": "string" },
+          "兑现或失效时间": { "type": "string" },
+          "验证指标": { "type": "string" },
+          "结果": { "type": "string", "enum": ["兑现", "部分兑现", "未兑现", "反向", "待观察"] },
+          "来源位置": { "type": "string" }
+        }
+      }
+    },
+    "反例或失效样本": { "type": "array", "items": { "type": "string" } },
+    "证据来源": {
+      "type": "object",
+      "required": ["材料数量", "独立原始来源数量", "历史样本数量", "关键来源"],
+      "additionalProperties": false,
+      "properties": {
+        "材料数量": { "type": "integer", "minimum": 0 },
+        "独立原始来源数量": { "type": "integer", "minimum": 0 },
+        "历史样本数量": { "type": "integer", "minimum": 0 },
+        "关键来源": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "可信度说明": { "type": "string" },
+    "待校准问题": { "type": "array", "items": { "type": "string" } }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "模板等级": { "const": "历史支持模板候选" } },
+        "required": ["模板等级"]
+      },
+      "then": {
+        "properties": {
+          "证据来源": {
+            "properties": {
+              "独立原始来源数量": { "minimum": 2 },
+              "历史样本数量": { "minimum": 1 }
+            }
+          },
+          "历史样本": { "minItems": 1 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "模板等级": { "const": "多来源候选" } },
+        "required": ["模板等级"]
+      },
+      "then": {
+        "properties": {
+          "证据来源": {
+            "properties": {
+              "独立原始来源数量": { "minimum": 2 }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "材料清单",
+  "type": "object",
+  "required": ["关键词", "收集状态", "材料收集计划", "材料", "后续建议"],
+  "additionalProperties": false,
+  "properties": {
+    "关键词": { "type": "string" },
+    "研究范围": { "type": "string" },
+    "收集状态": {
+      "type": "string",
+      "enum": ["已实际收集", "仅规划收集", "用户提供材料整理"]
+    },
+    "材料收集计划": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["材料方向", "优先来源", "需要回答的问题", "预期用途"],
+        "additionalProperties": false,
+        "properties": {
+          "材料方向": { "type": "string" },
+          "优先来源": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "需要回答的问题": { "type": "string" },
+          "预期用途": { "type": "string" }
+        }
+      }
+    },
+    "材料": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["材料标题", "材料类型", "发布主体", "发布时间", "来源位置", "来源形态", "来源可靠性", "覆盖对象", "相关性说明", "是否适合抽取", "不足或缺口"],
+        "additionalProperties": false,
+        "properties": {
+          "材料标题": { "type": "string" },
+          "材料类型": { "type": "string", "enum": ["研报", "公告", "财报", "政策", "新闻", "转写稿", "产业数据", "其他"] },
+          "发布主体": { "type": "string" },
+          "发布时间": { "type": "string" },
+          "来源位置": { "type": "string" },
+          "来源形态": { "type": "string", "enum": ["原始PDF", "官方页面", "券商页面", "转载页面", "AI摘要", "未知"] },
+          "来源可靠性": { "type": "string", "enum": ["高", "中", "低", "未知"] },
+          "覆盖对象": { "type": "array", "items": { "type": "string" } },
+          "相关性说明": { "type": "string" },
+          "是否适合抽取": { "type": "boolean" },
+          "不足或缺口": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "后续建议": { "type": "array", "items": { "type": "string" } }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "收集状态": { "const": "已实际收集" } },
+        "required": ["收集状态"]
+      },
+      "then": {
+        "properties": {
+          "材料": { "minItems": 1 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "收集状态": { "const": "用户提供材料整理" } },
+        "required": ["收集状态"]
+      },
+      "then": {
+        "properties": {
+          "材料": { "minItems": 1 }
+        }
+      }
+    }
+  ]
+}
