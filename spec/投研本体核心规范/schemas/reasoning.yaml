@@ -1,0 +1,491 @@
+schema_name: reasoning
+schema_version: 0.1.0
+namespace: investment_ontology
+status: draft
+depends_on:
+  objects_schema: objects.yaml
+  relations_schema: relations.yaml
+  actions_schema: actions.yaml
+canonical_rule: YAML 是正式机器约束；Markdown 只负责解释和示例。
+description: >
+  投研本体推理域对象类型定义。本文件定义 05_reasoning.yaml bundle 模块所需的推理域对象：
+  InferenceRule（推理规则）、StateChange（状态变化模式）、ConductionTemplate（传导模板）、
+  ScenarioPath（情景路径）等。这些是推理应用层对象，不是投研领域实体（Company、Industry 等），
+  不放入 objects.yaml。推理轨迹记录对象（RuleApplication、ReasoningStep）见 reasoning_trace.yaml。
+
+# ============================================================
+# 设计原则
+# ============================================================
+design_principles:
+  - 推理域对象与领域对象分离：Company/Industry/Event 放入 objects.yaml；InferenceRule/StateChange 放入本文件。
+  - 推理规则可复用：一条 InferenceRule 可以被多次推理运行引用，构成可审计的规则库。
+  - 传导模板可实例化：ConductionTemplate 是 StateVariablePropagation 的推理侧模板，一次定义，多次消费。
+  - 情景路径独立存储：ScenarioPath 表达多情景分支，不与 JudgmentOutput.scenarioTag 混淆。
+
+# ============================================================
+# 时间类型
+# ============================================================
+time_types:
+  business_time: 规则或模板在业务上适用的时间范围。
+  system_time: 规则或模板被创建、修改的系统时间。
+
+# ============================================================
+# ID 前缀
+# ============================================================
+id_prefixes:
+  InferenceRule: IR
+  StateChange: SC
+  ConductionTemplate: CT
+  ScenarioPath: SP
+
+# ============================================================
+# 公共枚举
+# ============================================================
+common_enums:
+  ruleCategory:
+    description: 推理规则的分类维度。
+    values:
+      - event_to_variable        # 事件→状态变量映射规则
+      - variable_to_variable     # 状态变量间传导规则
+      - variable_to_hypothesis   # 状态变量→假设形成规则
+      - hypothesis_to_judgment   # 假设→判断输出规则
+      - judgment_to_impact       # 判断→资产影响推导规则
+      - signal_evaluation        # 信号评估规则
+      - counter_check            # 反证检查规则
+      - market_expectation       # 市场预期检查规则
+      - catalyst_detection       # 催化剂检测规则
+      - blocking_evaluation      # 阻断条件评估规则
+  ruleStatus:
+    values: [draft, active, deprecated, superseded]
+  changeDirection:
+    description: 状态变化的方向性。
+    values: [increase, decrease, stabilize, diverge, unknown]
+  changeMagnitude:
+    values: [large, medium, small, unquantified]
+  templateStatus:
+    values: [draft, active, deprecated]
+  scenarioType:
+    description: 情景路径的类型。
+    values: [base, upside, downside, stress, alternative]
+
+# ============================================================
+# 对象类型定义
+# ============================================================
+
+object_types:
+
+  # —— InferenceRule：可复用的推理规则 ——
+  InferenceRule:
+    zh_name: 推理规则
+    category: reasoning_domain
+    managed_by: industry_owner
+    description: >
+      定义一条可复用的推理规则：在什么条件下、从哪些前提出发、经过什么逻辑、
+      得出什么结论、需要哪些证据支持。InferenceRule 是推理链路的可审计最小单元，
+      同一条规则可被多次 InferenceRun 消费。
+    fields:
+      name:
+        zh_name: 规则名称
+        type: string
+        required: true
+      ruleCategory:
+        zh_name: 规则分类
+        type: enum
+        enum_ref: ruleCategory
+        required: true
+      description:
+        zh_name: 规则描述
+        type: string
+        required: true
+      triggerCondition:
+        zh_name: 触发条件
+        type: string
+        required: true
+        description: 自然语言 + 结构化表达式，描述规则何时被触发。如 "当 StateVariable X 的观测值在 T 时间内变化超过 Y%"。
+      inputObjectTypes:
+        zh_name: 输入对象类型
+        type: array
+        required: true
+        description: 规则消费的对象类型列表，如 [Event, StateVariable]。
+      outputObjectTypes:
+        zh_name: 输出对象类型
+        type: array
+        required: true
+        description: 规则产生的对象类型列表，如 [StateHypothesis, Signal]。
+      requiredRelations:
+        zh_name: 必需关系
+        type: array
+        required: false
+        description: 规则执行时必须存在的关系类型。
+      logicDescription:
+        zh_name: 推理逻辑
+        type: string
+        required: true
+        description: 规则的核心推理逻辑，如 "订单增长 → 营收改善 → 盈利上调"。
+      requiredSignals:
+        zh_name: 所需信号角色
+        type: array
+        required: false
+        description: 规则执行时必须检查的信号角色列表。
+        items:
+          type: object
+          properties:
+            signalRole:
+              type: enum
+              enum: [validation, catalyst, tracking, weakening, blocking]
+            requiredForConclusion:
+              type: boolean
+              description: 此信号是否作为得出结论的必要条件。
+      requiredChecks:
+        zh_name: 必需检查
+        type: array
+        required: false
+        description: 规则执行时必须执行的反证、市场预期、催化剂等检查。
+        items:
+          type: enum
+          enum: [counter_check, market_expectation_check, catalyst_check, evidence_freshness_check, boundary_check]
+      confidenceModifiers:
+        zh_name: 置信度调节
+        type: array
+        required: false
+        description: 什么条件会提高或降低此规则的结论置信度。
+        items:
+          type: object
+          properties:
+            condition:
+              type: string
+            effect:
+              type: enum
+              enum: [increase_confidence, decrease_confidence, block_conclusion]
+            magnitude:
+              type: enum
+              enum: [strong, moderate, weak]
+      ruleStatus:
+        zh_name: 规则状态
+        type: enum
+        enum_ref: ruleStatus
+        required: true
+        default: draft
+      sourceBasis:
+        zh_name: 来源依据
+        type: string
+        required: false
+        description: 规则的来源——历史复盘总结、行业模板、研究员经验等。
+      applicableScope:
+        zh_name: 适用范围
+        type: string
+        required: false
+        description: 规则适用的行业、公司类型或市场条件。
+      supersedesRuleIds:
+        zh_name: 替代的旧规则
+        type: array
+        required: false
+      createdAt:
+        zh_name: 创建时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+      updatedAt:
+        zh_name: 更新时间
+        type: datetime
+        time_type: system_time
+        required: false
+        generated_by: system
+    quality_rules:
+      - InferenceRule 不是投研结论，不输出买卖建议或目标价。
+      - 规则触发条件必须可机器评估，不能仅依赖"研究员判断"类模糊表述。
+      - 规则状态为 deprecated 时，新的 InferenceRun 不得引用此规则。
+      - supersedesRuleIds 中的旧规则必须存在且状态已变更为 deprecated 或 superseded。
+
+  # —— StateChange：状态变化模式 ——
+  StateChange:
+    zh_name: 状态变化模式
+    category: reasoning_domain
+    managed_by: industry_owner
+    description: >
+      定义一种可复用的状态变化模式：某个 StateVariable 在特定条件下发生方向性变化，
+      并可能传导到其他变量。StateChange 是推理规则中"事件→变量"和"变量→变量"环节
+      的结构化表达。
+    fields:
+      name:
+        zh_name: 模式名称
+        type: string
+        required: true
+      sourceVariableId:
+        zh_name: 源状态变量
+        type: object_ref
+        required: true
+        description: 发生变化的状态变量引用。
+      direction:
+        zh_name: 变化方向
+        type: enum
+        enum_ref: changeDirection
+        required: true
+      magnitude:
+        zh_name: 变化幅度
+        type: enum
+        enum_ref: changeMagnitude
+        required: false
+      typicalTriggers:
+        zh_name: 典型触发事件
+        type: array
+        required: false
+        description: 历史上触发此变化的典型事件类型或具体事件 ID。
+      typicalLeadTime:
+        zh_name: 典型前置时间
+        type: string
+        required: false
+        description: 触发事件到状态变化之间的典型时间滞后。
+      affectedVariables:
+        zh_name: 受影响变量
+        type: array
+        required: false
+        description: 此状态变化历史上传导影响的其他 StateVariable。
+        items:
+          type: object
+          properties:
+            variableId:
+              type: object_ref
+            expectedDirection:
+              type: enum
+              enum_ref: changeDirection
+            typicalLag:
+              type: string
+            confidence:
+              type: enum
+              enum: [high, medium, low]
+      historicalFrequency:
+        zh_name: 历史发生频率
+        type: string
+        required: false
+        description: 如 "每轮半导体周期出现 1-2 次"。
+      boundaryConditions:
+        zh_name: 边界条件
+        type: string
+        required: false
+        description: 变化模式失效或反转的边界条件。
+      templateStatus:
+        zh_name: 模板状态
+        type: enum
+        enum_ref: templateStatus
+        required: true
+        default: draft
+      sourceBasis:
+        zh_name: 来源依据
+        type: string
+        required: false
+      createdAt:
+        zh_name: 创建时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+    quality_rules:
+      - StateChange 是模式模板，不是具体观测。具体观测使用 StateVariableObservation。
+      - affectedVariables 中的传导关系应与 StateVariablePropagation 实例保持一致。
+
+  # —— ConductionTemplate：传导模板 ——
+  ConductionTemplate:
+    zh_name: 传导模板
+    category: reasoning_domain
+    managed_by: industry_owner
+    description: >
+      定义一条可复用的变量间传导模板。与 StateVariablePropagation（表达变量层面的因果逻辑）
+      不同，ConductionTemplate 是推理侧模板，表达"在推理过程中，当从变量 A 推导变量 B 时，
+      应检查哪些信号、反证和边界条件"。
+    fields:
+      name:
+        zh_name: 模板名称
+        type: string
+        required: true
+      propagationId:
+        zh_name: 关联传导逻辑
+        type: object_ref
+        required: false
+        description: 关联的 StateVariablePropagation 实例 ID。
+      fromVariableId:
+        zh_name: 源变量
+        type: object_ref
+        required: true
+      toVariableId:
+        zh_name: 目标变量
+        type: object_ref
+        required: true
+      conductionLogic:
+        zh_name: 传导逻辑
+        type: string
+        required: true
+        description: 推理时的传导步骤，如 "先检查 A 的变化幅度是否超过阈值，再判断 B 是否跟随"。
+      requiredValidationSignals:
+        zh_name: 必需验证信号
+        type: array
+        required: false
+        description: 传导成立需要检查的 validation 信号或信号类型。
+      requiredChecks:
+        zh_name: 必需检查
+        type: array
+        required: false
+        items:
+          type: enum
+          enum: [counter_check, market_expectation_check, catalyst_check, evidence_freshness_check, boundary_check]
+      blockingConditions:
+        zh_name: 阻断条件
+        type: array
+        required: false
+        description: 会阻断此传导的条件列表。
+      typicalLagRange:
+        zh_name: 典型时滞范围
+        type: string
+        required: false
+      historicalAccuracy:
+        zh_name: 历史准确率
+        type: string
+        required: false
+        description: 此传导在历史回放中的准确率统计，如 "近 5 年 8/10 次成立"。
+      templateStatus:
+        zh_name: 模板状态
+        type: enum
+        enum_ref: templateStatus
+        required: true
+        default: draft
+      createdAt:
+        zh_name: 创建时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+    quality_rules:
+      - ConductionTemplate 不得绕过 StateVariablePropagation 直接定义变量间因果。
+      - 阻断条件必须具体可检测，不能用"市场情绪变化"等模糊表述。
+
+  # —— ScenarioPath：情景路径 ——
+  ScenarioPath:
+    zh_name: 情景路径
+    category: reasoning_domain
+    managed_by: researcher
+    description: >
+      定义一条从当前状态到未来结果的情景路径。ScenarioPath 比 JudgmentOutput.scenarioTag
+      更丰富：它包含触发条件、关键假设、路径节点、概率估计和反证条件。
+      支持多情景对比推理（base vs upside vs downside）。
+    fields:
+      name:
+        zh_name: 路径名称
+        type: string
+        required: true
+      scenarioType:
+        zh_name: 情景类型
+        type: enum
+        enum_ref: scenarioType
+        required: true
+      description:
+        zh_name: 路径描述
+        type: string
+        required: true
+      triggerConditions:
+        zh_name: 触发条件
+        type: array
+        required: true
+        description: 进入此情景路径需要满足的前置条件。
+      keyAssumptions:
+        zh_name: 关键假设
+        type: array
+        required: true
+        description: 此情景路径依赖的核心假设（StateHypothesis ID 列表）。
+      pathNodes:
+        zh_name: 路径节点
+        type: array
+        required: false
+        description: 路径上的关键状态节点，按时间顺序排列。
+        items:
+          type: object
+          properties:
+            nodeOrder:
+              type: integer
+            variableId:
+              type: object_ref
+            expectedState:
+              type: string
+            expectedTime:
+              type: datetime
+              time_type: business_time
+            validationSignalIds:
+              type: array
+      estimatedProbability:
+        zh_name: 估计概率
+        type: number
+        value_range: [0, 1]
+        required: false
+        description: 研究员对此情景实现概率的估计，非精确量化。
+      falsificationConditions:
+        zh_name: 证伪条件
+        type: array
+        required: true
+        description: 满足任一条件即排除此情景路径。
+      competingPaths:
+        zh_name: 竞争路径
+        type: array
+        required: false
+        description: 与此路径互斥的其他 ScenarioPath ID。
+      terminalJudgmentIds:
+        zh_name: 终点判断
+        type: array
+        required: false
+        description: 此情景路径终点对应的 JudgmentOutput ID 列表。
+      templateStatus:
+        zh_name: 模板状态
+        type: enum
+        enum_ref: templateStatus
+        required: true
+        default: draft
+      createdAt:
+        zh_name: 创建时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+    quality_rules:
+      - ScenarioPath 不是预测，是结构化的条件推理路径。
+      - 每个 ScenarioPath 必须有至少一个 falsificationConditions。
+      - 多情景路径（base/upside/downside）的 triggerConditions 应互斥。
+
+# ============================================================
+# 与 05_reasoning.yaml 的关系
+# ============================================================
+bundle_module_mapping:
+  description: >
+    本文件定义的对象类型对应 05_reasoning.yaml bundle 模块。
+    05_reasoning.yaml 是推理应用视图，组织 InferenceRule、StateChange、
+    ConductionTemplate、ScenarioPath 等实例，供推理 Skill 消费。
+    推理轨迹记录对象（RuleApplication、ReasoningStep）见 reasoning_trace.yaml，
+    归档在 _artifacts/reasoning_runs/ 而非 05_reasoning.yaml。
+
+# ============================================================
+# 下游消费
+# ============================================================
+downstream_consumers:
+  reasoning_skill:
+    use: 读取 InferenceRule 和 ConductionTemplate 实例，驱动推理链路。
+  evaluation:
+    use: 对比 ScenarioPath 预期与实际结果，统计路径准确率。
+  optimization:
+    use: 基于高频使用/低准确率的规则和传导模板，提出本体优化建议。
+  cold_start:
+    use: 行业冷启动时，从行业模板库导入初始推理规则和传导模板。
+
+# ============================================================
+# 机器校验规则
+# ============================================================
+machine_validation_rules:
+  - id: rule_input_output_types_must_exist
+    description: InferenceRule.inputObjectTypes 和 outputObjectTypes 必须引用 objects.yaml 中存在的对象类型。
+  - id: state_change_variables_must_exist
+    description: StateChange.sourceVariableId 和 affectedVariables[].variableId 必须引用存在的 StateVariable 实例。
+  - id: conduction_template_variables_must_exist
+    description: ConductionTemplate.fromVariableId 和 toVariableId 必须引用存在的 StateVariable 实例。
+  - id: scenario_path_assumptions_must_exist
+    description: ScenarioPath.keyAssumptions 中的 StateHypothesis ID 必须存在。
+  - id: deprecated_rule_not_referenced
+    description: ruleStatus=deprecated 的 InferenceRule 不得被新的 InferenceRun 引用。
+  - id: scenario_paths_mutually_exclusive_triggers
+    description: 同一研究对象下 base/upside/downside ScenarioPath 的 triggerConditions 应互斥。

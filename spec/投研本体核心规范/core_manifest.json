@@ -1,0 +1,19 @@
+{
+  "core_name": "touyan-bentiguifan-hexin",
+  "core_version": "2026-06-09.3",
+  "managed_files": {
+    "references/01_投研本体核心说明.md": "104927ba19a58591bdd2b269b46867a8b3326064be0abb18a4a01b430558dc92",
+    "references/02_投研本体建模规格说明.md": "eb1b2d42f07ef1a8b56c756e503796e23a302d20f4d0ab504c1dae0d593f30ca",
+    "references/03_本体Bundle文件契约.md": "b9f9e851f06bc54e5cfda5e9477e493829ae96c38394a0e6b825745c0a672abc",
+    "schemas/actions.yaml": "5248aee48d80e93b2a44623a5147bdc6e4cf9b4553f224eff0b1f196f371e607",
+    "schemas/concepts.yaml": "b5aa129b26092ea6b7dc75f3d0c4150a2bc081b3b54ae46c236445f9186266d4",
+    "schemas/evidence.yaml": "6b6a57386d5c09a6b150fa64e78bef45d53ca6927f4972b33482f2f901281787",
+    "schemas/governance.yaml": "bb36bc7d9811ad3679f70c412d520edbbe7ae914429d2b51b1cf423e036ea141",
+    "schemas/objects.yaml": "ab4395bd7814c3a995f04858e2af1b4a381684c31be83f56ebca0a671168d7e3",
+    "schemas/ontology_bundle.yaml": "d8efb606120876d3b8f9aebf3260370c5e5f57491f227c9557be2f50dccbb86f",
+    "schemas/reasoning.yaml": "fc03b7d593c7c95ccada94fc8900e364d8a2e635d1baa47012d7cc81c50f8964",
+    "schemas/relations.yaml": "ecdd2e7adcade7ecbb354e8b3a9b297fc25a5fbb0f44cc2106934b6a4b7825b3",
+    "schemas/reasoning_trace.yaml": "c2e8be2305fc7d20c6f842680c46198fa51606797957b462a6cfb08c68d094eb"
+  },
+  "manifest_type": "touyan_core_manifest"
+}

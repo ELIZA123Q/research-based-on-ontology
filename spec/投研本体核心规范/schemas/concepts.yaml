@@ -1,0 +1,261 @@
+schema_name: concepts
+schema_version: 0.2.0
+namespace: investment_ontology
+status: draft
+depends_on:
+  objects_schema: objects.yaml
+  relations_schema: relations.yaml
+canonical_rule: YAML 是正式机器约束；Markdown 只负责解释和示例。
+description: >
+  投研本体概念层独立规范。概念层负责定义研究范围、术语口径、边界裁定和概念到业务对象的映射规则。
+  概念层与业务对象层是两层不同的抽象：概念层回答"讨论什么、边界在哪、术语怎么归一"；
+  业务对象层回答"具体是哪个对象、属性是什么、图谱如何连接"。
+  概念对象类型（ConceptScheme、Concept、ConceptBoundary）的字段定义见 schemas/objects.yaml。
+  本文件定义概念层独有的结构规则、生命周期、跨本体对齐和冲突裁决。
+
+# ============================================================
+# 概念层三层结构
+# ============================================================
+concept_layer_hierarchy:
+  description: >
+    概念层采用三级结构，自上而下依次约束研究范围、术语定义和边界决策。
+    Level 1-3 的对象类型字段和枚举见 objects.yaml，此处定义层级之间的关系基数、
+    治理职责和生命周期。
+
+  level_1:
+    type: ConceptScheme
+    role: 概念体系的顶层容器，定义某一行业、主题或研究范围的概念口径集合。
+    cardinality:
+      per_ontology: 每个行业或主题本体最多一个主 ConceptScheme。
+      multi_scheme_rule: 多体系并存时必须声明适用边界（如 semiconductor_main vs semiconductor_sip）。
+    governance:
+      created_by: [industry_owner, system]
+      modified_by: [industry_owner]
+      deprecated_by: [industry_owner]
+    lifecycle:
+      states: [draft, active, deprecated]
+      transitions:
+        - from: draft
+          to: active
+          trigger: 至少包含 3 个 in_scope Concept 且有权威来源绑定
+        - from: active
+          to: deprecated
+          trigger: 被新版本 ConceptScheme 替代或研究范围变更
+
+  level_2:
+    type: Concept
+    role: 用自然语言定义研究范围内的单个术语、主题、技术、环节或相邻概念。
+    relationship_to_level_1:
+      relation: conceptInScheme
+      cardinality: many_to_one
+      required: true
+    cardinality:
+      min_in_scope_per_scheme: 冷启动允许全为 candidate 或 disputed，但至少声明一个候选 in_scope Concept。
+    governance:
+      created_by: [system, researcher, industry_owner]
+      modified_by: [researcher, industry_owner]
+      deprecated_by: [industry_owner]
+    lifecycle:
+      states: [draft, source_supported, reviewed, deprecated]
+      transitions:
+        - from: draft
+          to: source_supported
+          trigger: 绑定至少一个 SourceDocument 权威来源
+        - from: source_supported
+          to: reviewed
+          trigger: 行业负责人确认定义准确、边界清晰
+        - from: [draft, source_supported, reviewed]
+          to: deprecated
+          trigger: 概念不再适用、被合并或范围变更
+
+  level_3:
+    type: ConceptBoundary
+    role: 记录某概念在当前本体中纳入、排除、相邻或交叉的边界判断及依据。
+    relationship_to_level_2:
+      relation: boundaryForConcept
+      cardinality: many_to_many
+      required: true
+    deferred_rule: >
+      暂无法裁定的概念（原 defer 状态）不再作为边界裁定类型存入概念层。
+      统一进入 governance.yaml 的 unresolved_items.unresolved_boundaries，由治理流程集中管理。
+    governance:
+      created_by: [system, researcher, industry_owner]
+      modified_by: [industry_owner]
+    lifecycle:
+      states: [draft, confirmed, deprecated]
+      transitions:
+        - from: draft
+          to: confirmed
+          trigger: 行业负责人裁定边界，依据充分
+        - from: [draft, confirmed]
+          to: deprecated
+          trigger: 边界裁定被新证据推翻或概念本身已 deprecated
+
+# ============================================================
+# 概念到业务对象的映射治理
+# ============================================================
+concept_object_mapping:
+  description: >
+    概念层到业务对象层的映射是本体一致性的关键约束。Concept 通过 conceptMapsToObject
+    关系指向 objects.yaml 中存在的对象实例。映射关系由 conceptMappingRole 枚举约束目的。
+
+  mandatory_mapping_rule:
+    rule: 每个 scopeStatus=in_scope 的 Concept 必须至少有一条 conceptMapsToObject 关系。
+    violation: 无映射的 in_scope Concept 视为「范围已声明但未实例化」，进入 governance.yaml unresolved_items.unmapped_concepts。
+    exemption: scopeStatus 为 out_of_scope、adjacent、disputed、unknown 的 Concept 不强制映射。
+
+  mapping_roles:
+    - defines_scope:
+        description: 概念定义研究范围边界，不映射到单个对象实例。
+        target_optional: true
+    - maps_to_industry:
+        target_type: Industry
+    - maps_to_segment:
+        target_type: Segment
+    - maps_to_product:
+        target_type: Product
+    - maps_to_material:
+        target_type: Material
+    - maps_to_company:
+        target_type: Company
+    - maps_to_asset:
+        target_type: Asset
+    - maps_to_event:
+        target_type: Event
+    - maps_to_variable:
+        target_type: StateVariable
+    - alias_only:
+        description: 仅作为同义词引用，不独立映射。
+        target_optional: true
+
+  cross_type_mapping:
+    description: 一个 Concept 可以同时映射到多种类型的业务对象（如硅光同时映射到 Product 和 Segment）。
+    rule: 每个映射必须独立声明 mappingRole 和 mappingBasis，不得复用一个映射覆盖多种语义。
+
+  scope_status_semantics:
+    description: Concept.scopeStatus 各值的映射期望和推理行为。
+    values:
+      in_scope:
+        mapping_required: true
+        reasoning_behavior: 该概念下的对象纳入推理范围。
+      out_of_scope:
+        mapping_required: false
+        reasoning_behavior: 显式排除，推理 Skill 忽略该概念下的对象。
+      adjacent:
+        mapping_required: false
+        reasoning_behavior: 不主动纳入推理，但可作为跨本体桥接的候选入口。
+      overlap:
+        mapping_required: false
+        reasoning_behavior: 交叉范围内的对象需检查两个本体的边界裁定再决定归属。
+      disputed:
+        mapping_required: false
+        reasoning_behavior: 争议概念不参与推理，进入 governance 待决策队列。
+      unknown:
+        mapping_required: false
+        reasoning_behavior: 待研究概念不参与推理，标记为信息缺口。
+
+# ============================================================
+# 跨本体概念对齐
+# ============================================================
+cross_ontology_alignment:
+  description: >
+    当多个本体（如 semiconductor 和 optical_communication）存在概念交叉时，
+    概念层负责通过 ConceptBoundary 和 conceptOverlapsWith 关系表达对齐策略。
+    本段定义跨本体概念对齐的规则，防止同一术语在不同本体中产生矛盾定义。
+
+  alignment_strategies:
+    - strategy: dominant_definition
+      description: 一个本体为主定义方，另一个本体引用。
+      example: semiconductor 为主定义"硅光"，optical_communication 通过概念引用和 adjacent 标记接入。
+    - strategy: co_defined
+      description: 两个本体共同定义，通过 overlap 和 boundaryForConcept 表达交叉范围。
+      example: "先进封装"同时被 semiconductor 和 packaging 本体定义，通过 overlap 边界声明各自覆盖范围。
+    - strategy: independent
+      description: 两个本体独立定义同名概念，适用语境不同，通过 scopeStatus=disputed 标记差异。
+      rule: 独立定义必须在各自 Concept.definition 中声明"本定义仅适用于 [本体名] 语境"。
+
+  alignment_validation:
+    - id: no_contradictory_definitions
+      description: 同一术语在两个本体中均为 in_scope 时，定义不得互相矛盾。矛盾时至少一方应标记为 disputed。
+    - id: cross_ontology_overlap_recorded
+      description: 被识别为 overlap 的概念必须在两个本体中都有对应的 ConceptBoundary 记录。
+
+# ============================================================
+# 概念冲突裁决
+# ============================================================
+concept_conflict_resolution:
+  description: >
+    当同一研究范围内多个 Concept 出现定义冲突、范围重叠或归属争议时的裁决规则。
+
+  conflict_types:
+    - type: definition_conflict
+      description: 两个 Concept 对同一术语给出不同定义。
+      resolution_order:
+        1. 以 scopeStatus=in_scope 且有权威来源（source_supported 或 reviewed）的定义为准。
+        2. 均为 source_supported 时，以来源权威等级高者为准。
+        3. 来源等级相同时，标记双方为 disputed，进入 governance 队列。
+    - type: scope_overlap_unresolved
+      description: 两个 Concept 的范围重叠但未通过 ConceptBoundary 裁定。
+      resolution: 必须创建 ConceptBoundary（decisionType=overlap 或 include 或 exclude），不得长期悬空。
+    - type: mapping_conflict
+      description: 两个 Concept 声称映射到同一个对象实例但语义矛盾。
+      resolution: 行业负责人裁定其中一个映射降级为 alias_only，或拆分对象实例。
+    - type: cross_ontology_conflict
+      description: 同一术语在不同本体中定义矛盾。
+      resolution: 参见 cross_ontology_alignment.alignment_strategies。
+
+# ============================================================
+# 概念层质量规则
+# ============================================================
+quality_rules:
+  description: 概念层全局质量约束。对象类型级别的 quality_rules 见 objects.yaml 中各 Concept* 类型。
+
+  rules:
+    - id: concept_layer_not_content_dump
+      severity: error
+      description: >
+        概念层只定义研究范围、术语口径和边界裁定，不写入行业百科内容。
+        半导体、光通信、硅光等具体概念实例应进入对应行业本体的 concept_layer 实例文件。
+    - id: core_spec_defines_structure_only
+      severity: error
+      description: 核心规范只定义概念层结构和概念对象类型，不写死任何行业的具体概念实例。
+    - id: concept_definition_vs_object_description
+      severity: warn
+      description: >
+        Concept.definition 只写术语口径（涵盖范围、排除边界、与易混淆术语的区别），
+        不得复制对应 Object.description 的内容。校验时若两者文本高度近似，标记为跨模块复写（WARN）。
+    - id: key_concepts_must_have_source
+      severity: error
+      description: 关键概念（scopeStatus=in_scope 且 conceptType 非 term）必须绑定 SourceDocument。无权威来源时保持 draft 或 disputed。
+    - id: boundary_not_investment_conclusion
+      severity: error
+      description: 边界裁定不得直接生成投资结论；只能约束后续对象生成、检索、评测和推理范围。
+    - id: no_dangling_in_scope_concepts
+      severity: error
+      description: 每个 scopeStatus=in_scope 的 Concept 必须至少有一条 conceptMapsToObject 关系。无映射的进入 governance unresolved_items.unmapped_concepts。
+    - id: definition_must_have_scope_and_exclusion
+      severity: warn
+      description: Concept.definition 必须说明涵盖范围和排除边界。只写"X 是 Y"而无排除边界的定义不完整，标记为 WARN。
+    - id: aliases_must_not_duplicate_other_concept_names
+      severity: error
+      description: Concept.aliases 中的别名不得与同 ConceptScheme 下其他 Concept.name 相同，避免术语解析歧义。
+    - id: no_orphan_boundaries
+      severity: error
+      description: 每个 ConceptBoundary 必须通过 boundaryForConcept 关系连接到存在的 Concept 实例。
+
+# ============================================================
+# 机器校验规则
+# ============================================================
+machine_validation_rules:
+  - id: concept_scheme_cardinality
+    description: 每个行业本体最多一个主 ConceptScheme。多体系并存时每个 scheme 必须声明适用边界。
+  - id: concept_in_scope_must_have_mapping
+    description: 每个 scopeStatus=in_scope 的 Concept 至少有一条 conceptMapsToObject 关系。
+  - id: concept_boundary_must_connect_to_concept
+    description: 每个 ConceptBoundary 的 boundaryForConcept 关系必须指向存在的 Concept 实例。
+  - id: concept_definition_not_copying_object_description
+    description: Concept.definition 文本与对应映射对象 Object.description 的相似度不得高于阈值。
+  - id: concept_aliases_no_collision
+    description: 同一 ConceptScheme 下 Concept.aliases 不得与其他 Concept.name 重复。
+  - id: deferred_concept_not_in_concept_layer
+    description: 暂无法裁定的概念不得以 decisionType=defer 存入概念层，必须进入 governance.yaml unresolved_boundaries。

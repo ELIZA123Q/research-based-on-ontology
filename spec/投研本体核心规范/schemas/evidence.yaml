@@ -1,0 +1,335 @@
+schema_name: evidence
+schema_version: 0.1.0
+namespace: investment_ontology
+status: draft
+depends_on:
+  objects_schema: objects.yaml
+  relations_schema: relations.yaml
+canonical_rule: YAML 是正式机器约束；Markdown 只负责解释和示例。
+description: >
+  投研本体证据层规范。定义 06_evidence.yaml bundle 模块的结构契约：
+  证据摄入管道、证据矩阵、claim-fact-对象映射索引、证据新鲜度过滤规则、
+  证据图谱校验规则。EvidenceEpisode、EvidenceClaim、EvidenceFact 的对象字段
+  定义见 schemas/objects.yaml，本文件定义它们的组织、索引和校验方式。
+
+# ============================================================
+# 证据摄入管道
+# ============================================================
+evidence_ingestion_pipeline:
+  description: >
+    证据从原始材料到正式本体的摄入管道。每个阶段有明确的输入、输出和质量闸门。
+    管道不是单向的——下游反馈（推理缺口、评测失败）可以触发新的摄入。
+
+  stages:
+    - stage: 1_material_intake
+      input: 原始材料（PDF、网页、数据流、历史案例、推理反馈、评测反馈）
+      output: SourceDocument + EvidenceEpisode
+      gate: 来源可信度检查、格式解析、去重
+      actor: [system]
+
+    - stage: 2_claim_extraction
+      input: EvidenceEpisode
+      output: EvidenceClaim（candidate 状态）
+      gate: claim 必须能追溯 episode、来源位置、业务时间
+      actor: [system, researcher]
+      rules:
+        - restricted_item、author_judgment、forecast 类型 claim 不得自动升级。
+        - 每个 claim 记录 sourceStatementType（fact / estimate）。
+        - claim 无法追溯到 episode 或 source document 时 → quarantined 或 rejected。
+
+    - stage: 3_claim_normalization
+      input: EvidenceClaim（candidate）
+      output: EvidenceClaim（active）+ EvidenceFact（candidate）
+      gate: 归一化去重、冲突检测、跨 episode 归并
+      actor: [system]
+      rules:
+        - 多个 claim 描述同一事实时归并为 EvidenceFact。
+        - 矛盾 claim 进入 evidence_conflict_record。
+
+    - stage: 4_fact_validation
+      input: EvidenceFact（candidate）
+      output: EvidenceFact（active / invalidated / superseded）
+      gate: 来源交叉验证、时间有效性检查、一致性检查
+      actor: [system, researcher]
+      rules:
+        - 新事实否定旧事实时，旧事实标记为 invalidated 或 superseded。
+        - 不得物理删除旧事实。
+
+    - stage: 5_ontology_feed
+      input: EvidenceFact（active）+ EvidenceClaim（active）
+      output: PatchRequest → 本体优化 Skill → 正式本体
+      gate: 只有优化 Skill 正式合并后才进入 02_objects.yaml 等主干模块。
+      actor: [system]
+
+# ============================================================
+# 证据矩阵
+# ============================================================
+evidence_matrix:
+  description: >
+    证据矩阵是 06_evidence.yaml 的核心索引结构，以研究对象（Industry、Company 等）
+    和状态变量为轴，组织所有相关的 EvidenceClaim 和 EvidenceFact。
+    推理 Skill 通过证据矩阵快速定位目标对象和变量的可用证据。
+
+  matrix_axes:
+    row_axis:
+      description: 研究对象或状态变量。
+      types: [Industry, Segment, Company, Product, Material, Asset, StateVariable, Event]
+    column_axis:
+      description: 证据维度和时间切片。
+      dimensions:
+        - dimension: fact_observations
+          description: 事实观测类 claim（claimType=fact_observation）
+        - dimension: estimates
+          description: 估算类 claim（claimType=estimate）
+        - dimension: signals
+          description: 信号类 claim（claimType=validation_signal, falsification_condition）
+        - dimension: transmission
+          description: 传导逻辑类 claim（claimType=transmission_logic）
+        - dimension: forecasts
+          description: 预测类 claim（claimType=forecast），受限使用
+        - dimension: author_judgments
+          description: 作者判断类 claim（claimType=author_judgment），受限使用
+
+  cell_structure:
+    description: 矩阵中每个单元格的结构。
+    fields:
+      objectId:
+        type: object_ref
+        required: true
+      dimension:
+        type: enum
+        required: true
+      businessTimeRange:
+        type: time_window
+        required: true
+      claimIds:
+        type: array
+        required: true
+        description: 该单元格包含的 EvidenceClaim ID 列表。
+      factIds:
+        type: array
+        required: false
+        description: 归并后的 EvidenceFact ID 列表。
+      activeClaimCount:
+        type: integer
+        required: true
+      invalidatedClaimCount:
+        type: integer
+        required: true
+      highestReliability:
+        type: enum
+        enum: [high, medium, low]
+        required: true
+      evidenceSummary:
+        type: string
+        required: false
+        description: 该单元格证据的聚合摘要。
+
+# ============================================================
+# Claim-Fact-对象映射索引
+# ============================================================
+claim_object_index:
+  description: >
+    从 EvidenceClaim / EvidenceFact 到本体对象的反向索引。
+    与证据矩阵互补——矩阵以对象为轴，索引以 claim/fact 为轴。
+
+  claim_index_entry:
+    fields:
+      claimId:
+        type: object_ref
+        required: true
+      supportsObjectIds:
+        type: array
+        required: true
+        description: 该 claim 支持的本体对象 ID 列表（通过 claimSupportsObject 关系）。
+      supportsRelationIds:
+        type: array
+        required: false
+        description: 该 claim 支持的关系实例 ID（通过 claimSupportsRelation 关系）。
+      invalidatesClaimIds:
+        type: array
+        required: false
+        description: 该 claim 使之失效的其他 claim ID。
+      triggersPatchIds:
+        type: array
+        required: false
+        description: 该 claim 触发的 PatchRequest ID。
+
+  fact_index_entry:
+    fields:
+      factId:
+        type: object_ref
+        required: true
+      sourceClaimIds:
+        type: array
+        required: true
+      mappedObjectIds:
+        type: array
+        required: false
+        description: 经优化 Skill 合并后对应的正式本体对象 ID。
+
+# ============================================================
+# 证据新鲜度过滤规则
+# ============================================================
+evidence_freshness_filter:
+  description: >
+    推理 Skill 从证据矩阵中选取证据时的新鲜度过滤规则。
+    与 governance.yaml retrieval_policy.freshness_policy 互补——
+    freshness_policy 定义"什么数据需要多新鲜"，本段定义"如何判断一条 claim 是否仍新鲜"。
+
+  freshness_check_fields:
+    - field: validTo
+      rule: validTo 不为空且早于目标 business_time → 已过期，排除。
+    - field: invalidatedAt
+      rule: invalidatedAt 不为空且早于目标 business_time → 已失效，排除。
+    - field: supersededBy
+      rule: supersededBy 不为空 → 被替代，使用替代 claim。
+
+  freshness_scoring:
+    description: 当无法精确判断是否过期时，根据新鲜度得分决定是否降权使用。
+    factors:
+      - factor: time_distance
+        weight: 0.4
+        description: claim 的 observedAt 与目标 business_time 的时间距离。
+      - factor: source_reliability
+        weight: 0.3
+        description: claim 来源的可信度等级。
+      - factor: claim_type
+        weight: 0.2
+        description: fact_observation 新鲜度衰减慢于 forecast。
+      - factor: cross_validation_count
+        weight: 0.1
+        description: 被其他独立来源 claim 交叉验证的次数。
+    threshold:
+      high_confidence: score >= 0.7
+      usable_with_caution: 0.4 <= score < 0.7
+      exclude: score < 0.4
+
+  claim_type_decay:
+    description: 不同类型 claim 的新鲜度半衰期。
+    rules:
+      - claimType: fact_observation
+        half_life: 365 days
+        description: 事实观测相对稳定。
+      - claimType: estimate
+        half_life: 90 days
+        description: 估算值随时间快速折旧。
+      - claimType: forecast
+        half_life: 30 days
+        description: 预测类 claim 衰减最快。
+      - claimType: validation_signal
+        half_life: 90 days
+        description: 信号有效期有限。
+      - claimType: transmission_logic
+        half_life: 180 days
+        description: 传导逻辑相对稳定但需定期复核。
+
+# ============================================================
+# 证据冲突记录
+# ============================================================
+evidence_conflict_record:
+  description: >
+    当两个或多个 EvidenceClaim 对同一事实、对象或关系给出矛盾主张时，
+    记录冲突并进入治理队列。冲突不自动裁决——需人工或优化 Skill 处理。
+
+  conflict_entry:
+    fields:
+      conflictId:
+        type: string
+        required: true
+        pattern: ECF-YYYYMMDD-serial
+      conflictingClaimIds:
+        type: array
+        required: true
+        minItems: 2
+      targetObjectId:
+        type: object_ref
+        required: false
+        description: 冲突涉及的本体对象。
+      conflictType:
+        type: enum
+        enum: [factual, directional, temporal, scoping, attribution]
+        required: true
+        description: >
+          factual — 事实矛盾（A 说是 X，B 说是 Y）；
+          directional — 方向矛盾（A 说上升，B 说下降）；
+          temporal — 时间矛盾（同一事实宣称不同时间）；
+          scoping — 范围矛盾（同一术语适用范围不同）；
+          attribution — 归因矛盾（同一结果归因于不同原因）。
+      resolutionStatus:
+        type: enum
+        enum: [unresolved, resolved_by_source_authority, resolved_by_freshness, resolved_by_manual, deferred]
+        required: true
+        default: unresolved
+      resolutionNote:
+        type: string
+        required: false
+      detectedAt:
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+
+# ============================================================
+# 证据图谱校验规则
+# ============================================================
+evidence_graph_validation:
+  description: 证据图谱的全局校验规则，用于 06_evidence.yaml 模块的完整性检查。
+
+  rules:
+    - id: every_claim_has_episode_or_source
+      severity: error
+      description: 每个 EvidenceClaim 必须通过 claimFromEpisode 追溯到 EvidenceEpisode，或通过 sourceOf 追溯到 SourceDocument。
+
+    - id: every_episode_has_source_or_feedback
+      severity: error
+      description: 每个 EvidenceEpisode 必须有关联的 SourceDocument（source_material 类型），或明确标记为 feedback 类型（reasoning_feedback、evaluation_feedback）。
+
+    - id: every_fact_has_source_claims
+      severity: error
+      description: 每个 EvidenceFact.sourceClaimIds 必须非空且所有 ID 可解析。
+
+    - id: invalidated_claims_retain_history
+      severity: error
+      description: claimStatus=invalidated 或 superseded 的 claim 必须保留完整历史，不得物理删除。
+
+    - id: no_orphan_claims_in_matrix
+      severity: warn
+      description: 证据矩阵中的 claim 必须存在于 evidence_claims.yaml，反之亦然。
+
+    - id: conflict_records_resolved_timely
+      severity: warn
+      description: evidence_conflict_record 中 resolutionStatus=unresolved 超过 30 天的记录应升级到 governance review_queue。
+
+    - id: restricted_items_not_promoted
+      severity: error
+      description: claimType=restricted_item 或 author_judgment 的 claim 不得自动升级为 EvidenceFact。
+
+    - id: claim_freshness_respected
+      severity: warn
+      description: 推理 Skill 选取证据时必须执行 evidence_freshness_filter；使用过期 claim 需在 InferenceRun 中记录理由。
+
+    - id: evidence_matrix_covers_in_scope_concepts
+      severity: warn
+      description: 证据矩阵应覆盖所有 scopeStatus=in_scope 的 Concept 所映射的对象。未覆盖的对象进入 governance unresolved_items.missing_evidence。
+
+# ============================================================
+# 与 06_evidence.yaml 和 _artifacts 的关系
+# ============================================================
+bundle_artifact_mapping:
+  description: >
+    本文件定义的对象和索引对应 06_evidence.yaml bundle 模块和 _artifacts/evidence_graph/ 归档。
+
+  in_bundle_06_evidence:
+    - evidence_matrix（摘要视图）
+    - claim_object_index（摘要视图）
+    - evidence_conflict_records（摘要）
+    - evidence_freshness_summary
+
+  in_artifacts_evidence_graph:
+    - evidence_episodes.yaml（完整）
+    - evidence_claims.yaml（完整）
+    - evidence_facts.yaml（完整）
+    - invalidation_candidates.yaml
+    - evidence_graph_validation_report.md
+    - evidence_conflict_records.yaml（完整）

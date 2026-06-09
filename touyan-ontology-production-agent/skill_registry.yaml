@@ -1,0 +1,248 @@
+skills:
+  material_graph_preprocessing:
+    name: touyan-cailiao-tupu-yuchuli
+    path: skills/02-材料图谱预处理
+    layer: 基础支撑层
+    purpose: 将非结构化投研材料按 Document→Chunk→Entity→Relationship 分层拆解，受 schema 约束抽取候选对象、关系、状态变量、事件和信号，每个候选元素挂接原文证据片段。schema 约束来源采用三级降级：1) 当前 ontology_bundle schema；2) spec/schemas/ 公共规范；3) 内置默认枚举（标记 pending_review）。产出供 04-证据归一消费。
+    input:
+      - research_topic.md
+      - _artifacts/sources/source_materials/
+      - _artifacts/sources/source_registry.json
+      - spec/schemas/ or ontology_bundle_vN/schemas optional
+      - _artifacts/sources/source_quality_assessment.md optional
+    output:
+      - _artifacts/material_graph/material_scope.md
+      - _artifacts/material_graph/document_chunk_index.yaml
+      - _artifacts/material_graph/candidate_objects.yaml
+      - _artifacts/material_graph/candidate_relations.yaml
+      - _artifacts/material_graph/candidate_state_variables.yaml
+      - _artifacts/material_graph/candidate_events_signals.yaml
+      - _artifacts/material_graph/evidence_fragment_index.yaml
+      - _artifacts/material_graph/extraction_quality_report.md
+      - _artifacts/material_graph/pending_review_items.md
+    must_not:
+      - 修改 ontology_bundle
+      - 输出 EvidenceClaim 或 EvidenceFact
+      - 判断本体覆盖等级
+      - 将推测性内容写成确定事实
+      - 输出投资建议
+
+  source_search:
+    name: touyan-source-search-and-data-registry
+    path: skills/01-信息与数据搜索
+    layer: 基础支撑层
+    purpose: 统一搜索、登记、评估政策、公告、财报、研报、新闻、行业数据、历史案例和市场材料来源。
+    output:
+      - _artifacts/sources/source_materials/
+      - _artifacts/sources/source_registry.json
+      - _artifacts/sources/source_search_log.md
+      - _artifacts/sources/source_quality_assessment.md
+    must_not:
+      - 判断本体覆盖等级
+      - 修改 ontology_bundle
+      - 输出发布结论
+      - 将研报预测、评级、目标价或推荐语登记为事实观测
+
+  cold_start:
+    name: touyan-hangye-chanye-bentilengqidong
+    path: skills/03-冷启动
+    layer: 本体生产层
+    purpose: 根据研究主题生成候选 base_ontology_bundle、概念层、骨架和下游任务单。
+    output:
+      - base_ontology_bundle/
+      - _compat/base_ontology.json optional
+      - cold_start_report.md
+      - downstream_task_list.md
+    must_not:
+      - 输出 ontology_bundle_vN/
+      - 输出 _compat/optimized_ontology_vN.json
+      - 生成正式入库结论
+      - 输出买卖建议、目标价、收益率预测或仓位建议
+
+  evidence_episode_normalization:
+    name: touyan-evidence-episode-normalization
+    path: skills/04-证据归一与校验
+    layer: 基础支撑层
+    purpose: 消费材料图谱预处理的候选图谱结构，将来源材料、历史案例、推理反馈、评测反馈或结构化数据归一为 EvidenceEpisode、EvidenceClaim、EvidenceFact 和失效候选。
+    input:
+      - _artifacts/material_graph/ preferred
+      - _artifacts/sources/source_registry.json optional
+      - _artifacts/sources/source_materials/ optional
+      - _artifacts/historical_replay/ optional
+      - _artifacts/reasoning_runs/ optional
+      - _artifacts/evaluation_results/ optional
+    output:
+      - _artifacts/evidence_graph/evidence_episodes.yaml
+      - _artifacts/evidence_graph/evidence_claims.yaml
+      - _artifacts/evidence_graph/evidence_facts.yaml
+      - _artifacts/evidence_graph/invalidation_candidates.yaml
+      - _artifacts/evidence_graph/evidence_graph_validation_report.md
+    must_not:
+      - 修改 ontology_bundle
+      - 判断本体覆盖等级
+      - 输出 patch_ledger.yaml
+      - 生成投资建议
+
+  gap_discovery:
+    name: touyan-benti-quekou-faxian
+    path: skills/05-缺口发现
+    layer: 本体生产层
+    purpose: 发现当前 bundle 的概念、对象、关系、推理、证据和治理缺口。内部包含 evidence_claims 到缺口发现视图的 adapter（原 6-2 逻辑已并入）。
+    input:
+      - base_ontology_bundle/ or ontology_bundle_vN/ or _compat/*.json
+      - _artifacts/evidence_graph/evidence_claims.yaml
+      - _artifacts/sources/source_registry.json
+      - ontology_feedback optional
+      - external_reference_materials/ optional
+    output:
+      - _artifacts/gap_discovery/gap_report.md
+      - _artifacts/gap_discovery/gap_items.json
+      - _artifacts/gap_discovery/optimization_suggestions.md
+      - _artifacts/gap_discovery/candidate_patch_requests.yaml
+      - _artifacts/gap_discovery/restricted_items.md
+    internal_artifacts:
+      - _work/gap_reference_view/          # 内部生成，不对外交付
+    must_not:
+      - 输出 ontology_bundle_vN/
+      - 直接修改本体
+      - 生成最终发布判断
+
+  historical_case_generation:
+    name: touyan-historical-case-generation
+    path: skills/06-历史案例生成
+    layer: 本体生产层
+    purpose: 根据研究主题和真实来源材料生成历史回放案例材料。
+    output:
+      - _artifacts/historical_replay/historical_materials/
+      - _artifacts/historical_replay/historical_case_generation_report.md
+      - _artifacts/historical_replay/replay_task_list.md
+    must_not:
+      - 判断本体是否有效
+      - 输出 replay_report.md
+      - 输出 ontology_bundle_vN/
+      - 用事后结果污染 t0 信息包
+
+  historical_replay:
+    name: touyan-benti-lishi-huifang-xiaoyan
+    path: skills/07-历史回放校验
+    layer: 本体生产层
+    purpose: 基于 bundle 和历史案例材料，校验传导链、阻断条件、时间滞后、误触发、漏触发和资产影响边界。
+    input:
+      - base_ontology_bundle/ or ontology_bundle_vN/ or _compat/*.json
+      - historical_materials/
+      - replay_task_list.md
+    output:
+      - _artifacts/historical_replay/historical_cases.json
+      - _artifacts/historical_replay/replay_report.md
+      - _artifacts/historical_replay/evidence_chain.md
+      - _artifacts/historical_replay/temporal_replay_evidence.yaml
+      - _artifacts/historical_replay/invalidation_candidates.yaml
+    must_not:
+      - 直接修改完整本体
+      - 输出 ontology_bundle_vN/
+      - 生成发布结论
+
+  production_task_merge:
+    name: touyan-production-task-merge
+    path: skills/08-生产任务合并
+    layer: 基础支撑层
+    purpose: 合并缺口发现、历史回放、评测缺陷、推理反馈和用户修订请求，生成 bundle 路径化任务单和 patch_request_queue。
+    output:
+      - _artifacts/task_merge/optimization_task_list.md
+      - _artifacts/task_merge/optimization_task_items.json
+      - _artifacts/task_merge/patch_request_queue.yaml
+      - _artifacts/task_merge/priority_decision.md
+    must_not:
+      - 修改本体
+      - 生成 ontology_bundle_vN/
+      - 将缺少证据的任务标为已完成
+
+  ontology_optimization:
+    name: touyan-benti-youhua
+    path: skills/09-本体优化
+    layer: 本体生产层
+    purpose: 综合吸收补充材料、缺口诊断、历史回放、评测反馈、推理反馈和任务单，生成优化后的完整 bundle。
+    input:
+      - base_ontology_bundle/ or ontology_bundle_vN/ or _compat/*.json
+      - optimization_task_list.md
+      - optimization_task_items.json optional
+      - _artifacts/task_merge/patch_request_queue.yaml optional
+      - _artifacts/evidence_graph/ optional
+    output:
+      - ontology_bundle_vN/
+      - _compat/optimized_ontology_vN.json
+      - docs/production_notes.md
+      - _artifacts/patches/patch_ledger.yaml
+      - _artifacts/patches/patch_merge_report.md
+      - _artifacts/patches/rejected_patch_requests.yaml
+      - _artifacts/task_merge/change_log.md optional
+      - _artifacts/task_merge/unresolved_questions.md optional
+    must_not:
+      - 输出 published_ontology_bundle_vN/
+      - 输出最终验收结论
+      - 输出买卖建议、目标价、收益率预测或仓位建议
+
+  readable_parser:
+    name: touyan-ontology-readable-parser
+    path: skills/10-人类可读解析
+    layer: 交付准备层
+    purpose: 解析候选 ontology_bundle，生成研究员可读的本体说明。
+    input:
+      - ontology_bundle_vN/ preferred
+      - _compat/optimized_ontology_vN.json fallback
+      - docs/production_notes.md optional
+    output:
+      - docs/ontology_guide.md
+    must_not:
+      - 新增原本体不存在的对象、关系、变量、传导步骤、事实、假设、判断或结论
+      - 判断是否发布
+      - 修改 ontology_bundle
+
+  evaluation_input_generation:
+    name: touyan-evaluation-input-generation
+    path: skills/11-评测数据输入生成
+    layer: 交付准备层
+    purpose: 准备交给评测 Skill 的数据输入、来源摘要和评测交接说明，不做评测结论。
+    input:
+      - ontology_bundle_vN/ preferred
+      - _compat/optimized_ontology_vN.json fallback
+      - _artifacts/evidence_graph/ optional
+      - _artifacts/patches/patch_ledger.yaml optional
+      - _artifacts/reasoning_runs/ optional
+    output:
+      - _artifacts/evaluation_results/evaluation_data_inputs/
+      - docs/evaluation_handoff.md
+    must_not:
+      - 输出 allow_publish、conditional_publish、reject_publish 或 insufficient_evidence
+      - 输出 question_level_results
+      - 输出 evaluation_fix_report
+      - 修改评测集
+
+  release_package_builder:
+    name: touyan-release-package-builder
+    path: skills/12-Release组装校验
+    layer: 基础支撑层
+    purpose: 组装并校验可交给评测 Agent 的 release package。负责聚合来源材料元数据生成 source_material_summary.md（原 6-5b 逻辑已并入）。
+    input:
+      - 00_release_manifest.yaml
+      - ontology_bundle_vN/
+      - docs/ontology_guide.md
+      - docs/production_notes.md
+      - docs/evaluation_handoff.md
+      - _artifacts/artifact_manifest.yaml
+      - _artifacts/sources/source_registry.json
+      - _artifacts/sources/source_quality_assessment.md
+      - _artifacts/evidence_graph/ optional
+      - _artifacts/patches/ optional
+      - _artifacts/reasoning_runs/ optional
+      - _compat/optimized_ontology_vN.json optional
+    output:
+      - release_package/
+      - release_package/docs/source_material_summary.md
+      - _artifacts/sources/source_material_summary.md
+      - package_check_report.md optional
+    must_not:
+      - 输出 published_ontology_bundle_vN/
+      - 输出 release_decision.md
+      - 输出 evaluation_result.json
+      - 修改候选本体内容

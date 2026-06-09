@@ -1,0 +1,211 @@
+schema_name: ontology_bundle
+schema_version: 0.1.0
+namespace: investment_ontology
+status: draft
+depends_on:
+  objects_schema: objects.yaml
+  relations_schema: relations.yaml
+  governance_schema: governance.yaml
+  reasoning_trace_schema: reasoning_trace.yaml
+canonical_rule: YAML 是正式机器约束；Markdown 只负责解释和示例。
+description: 投研本体 bundle 级文件契约、容器版本元数据、质量元数据、兼容字段和发布包约束。本文件独立于对象 schema，容器元数据与对象类型定义生命周期不同，分开管理。
+
+ontology_container_metadata:
+  description: 每份 base_ontology、optimized_ontology 或 ontology_bundle 都应携带的容器级版本和质量元数据；它描述本体整体资产，不替代对象实例字段。
+  required_fields:
+    ontology_id:
+      zh_name: 本体 ID
+      type: string
+      required: true
+      description: 稳定本体资产标识，如 semiconductor、ai_chip_product_track。
+    ontology_version:
+      zh_name: 本体版本
+      type: string
+      required: true
+      description: 建议使用语义化版本，如 1.0.0、1.1.0。
+    parent_version:
+      zh_name: 父版本
+      type: string
+      required: false
+      description: 上一版本号；冷启动首版可为空字符串。
+    created_by:
+      zh_name: 创建来源
+      type: string
+      required: true
+      description: 创建本体的 Skill、系统或人工来源。
+    updated_by:
+      zh_name: 更新来源
+      type: string
+      required: true
+      description: 最近一次更新本体的 Skill、系统或人工来源。
+    change_reason:
+      zh_name: 版本变化原因
+      type: string
+      required: true
+      description: 如 cold_start、material_optimization、gap_discovery_optimization、reasoning_feedback_optimization。
+    bundle_type:
+      zh_name: Bundle 类型
+      type: enum
+      enum: [master, industry_extension, company_extension, event_package, evaluation_trace_package, application_workspace]
+      required: true
+      description: >
+        区分本 bundle 在投研本体体系中的角色。
+        master — 通用投研主本体，所有扩展包的语义基座。
+        industry_extension — 行业扩展包（如半导体、创新药），extends 指向 master。
+        company_extension — 公司级扩展包，extends 指向 master 或 industry_extension。
+        event_package — 事件/政策/新闻冷启动候选包，extends 指向 master 或 industry_extension。
+        evaluation_trace_package — 历史回放或评测产生的轨迹包，extends 指向被测本体。
+        application_workspace — 个人或团队工作空间，不得直接修改正式本体。
+    extends:
+      zh_name: 语义扩展基座
+      type: array
+      required: false
+      description: >
+        本 bundle 语义上扩展了哪些 bundle_id。
+        master 类型可留空；其他类型应至少声明一个扩展基座。
+        这与 parent_version 不同——parent_version 是版本继承关系（v1→v2），
+        extends 是语义扩展关系（通用核心→半导体扩展）。
+      items:
+        type: string
+    namespace:
+      zh_name: 命名空间
+      type: string
+      required: true
+      description: 本 bundle 的全局唯一命名空间，用于防止跨 bundle 对象 ID 冲突。建议格式 domain-topic，如 touyan-semiconductor。
+    compatibility:
+      zh_name: 兼容性声明
+      type: object
+      required: true
+      description: 声明本 bundle 依赖的核心 schema 版本和兼容约束。
+      properties:
+        core_schema_version:
+          zh_name: 核心 Schema 版本
+          type: string
+          required: true
+          description: 本 bundle 遵循的 schemas/ 文件版本，如 0.1.0。
+        min_consumer_version:
+          zh_name: 最低消费端版本
+          type: string
+          required: false
+          description: 读取本 bundle 所需的最低 Skill 或 Agent 版本。
+        governance_capabilities:
+          zh_name: 治理能力声明
+          type: array
+          required: false
+          description: 本 bundle 的 07_governance.yaml 提供了哪些结构化治理能力。
+          items:
+            type: enum
+            enum: [retrieval_policy, unresolved_items, review_queue, quality_gates]
+    ontology_quality:
+      zh_name: 本体质量指标
+      type: object
+      required: true
+      description: 用于跟踪版本质量变化，避免以对象和关系规模代替质量。
+      properties:
+        coverage_score:
+          type: number
+          value_range: [0, 1]
+          description: 对当前研究范围内对象、变量、关系、信号、情景和资产映射的覆盖度。
+        evidence_score:
+          type: number
+          value_range: [0, 1]
+          description: 来源、证据等级、事实观测和材料可追溯性的综合质量。
+        temporal_evidence_score:
+          type: number
+          value_range: [0, 1]
+          description: EvidenceEpisode、EvidenceClaim、有效期、失效记录和当前有效证据过滤的质量。
+        patch_audit_score:
+          type: number
+          value_range: [0, 1]
+          description: PatchRequest、PatchLedgerItem、合并理由、拒绝记录和版本演化审计的质量。
+        consistency_score:
+          type: number
+          value_range: [0, 1]
+          description: schema 合法性、关系端点一致性、重复和冲突控制质量。
+        reasoning_score:
+          type: number
+          value_range: [0, 1]
+          description: 本体支持链路推理、反证、情景路径和资产线索表达的能力。
+
+bundle_directory_contract:
+  description: 本体 bundle 的标准目录结构和文件约定。详细说明见 references/03_本体Bundle文件契约.md。
+  canonical_directories:
+    base_ontology_bundle:
+      description: 当前基线本体 bundle，所有任务型 Skill 的默认读写目标。
+    ontology_bundle_vN:
+      description: 带版本号的本体 bundle 目录，N 为正整数，用于版本迭代和回放。
+    release_package:
+      description: 对外发布的 bundle 打包目录，包含完整本体资产和质量报告。
+    _compat:
+      description: 兼容层目录，存放旧式 base_ontology.json / optimized_ontology.json 及其转换脚本。
+    _artifacts:
+      description: 构建产物目录，存放校验报告、diff 摘要、转换日志、evidence graph、patch ledger 和 reasoning run 等自动生成物。
+  allowed_top_level_files:
+    - ontology_bundle_manifest.json
+    - concept_layer.yaml
+    - objects.yaml
+    - relations.yaml
+    - state_variables.yaml
+    - observations.yaml
+    - hypotheses.yaml
+    - signals.yaml
+    - judgments.yaml
+    - asset_impacts.yaml
+    - investment_theses.yaml
+    - source_documents.yaml
+    - evidence_episodes.yaml
+    - evidence_claims.yaml
+    - evidence_facts.yaml
+    - patch_ledger.yaml
+    - inference_runs.yaml
+    - action_audits.yaml
+    - review_records.yaml
+    - governance.yaml
+
+temporal_evidence_contract:
+  description: Graphiti 启发只进入证据与运行时层，不替代 Palantir 本体主干；正式对象、关系、动作和推理语义仍以 ontology_bundle_vN 为准。
+  canonical_location:
+    in_bundle: 06_evidence.yaml
+    in_artifacts: _artifacts/evidence_graph/
+  episode_files:
+    - _artifacts/evidence_graph/evidence_episodes.yaml
+    - _artifacts/evidence_graph/evidence_claims.yaml
+    - _artifacts/evidence_graph/evidence_facts.yaml
+    - _artifacts/evidence_graph/invalidation_candidates.yaml
+    - _artifacts/evidence_graph/evidence_graph_validation_report.md
+  rules:
+    - EvidenceEpisode 表示一次材料、历史案例、推理反馈、评测反馈或结构化数据摄入，不是正式业务对象。
+    - EvidenceClaim 是最小证据主张单元，必须可追溯 episode、来源位置、业务时间和系统摄入时间。
+    - EvidenceFact 是 claim 归并后的结构化事实候选，不能绕过优化 Skill 直接写入正式对象或关系。
+    - 失效事实必须保留历史，通过 invalidatedAt、invalidatedBy、supersedes 或 claimInvalidatesClaim 表达，不得物理删除。
+    - 推理应用默认只使用目标 business_time 下当前有效且未被失效的 claim；历史回放可查询当时曾经有效的 claim。
+
+patch_ledger_contract:
+  description: 本体增量演化使用 append-only patch ledger；完整 ontology_bundle_vN 仍是正式交付和评测入口。
+  canonical_location:
+    in_bundle: 08_optimization_handoff.yaml
+    in_artifacts: _artifacts/patches/
+  files:
+    - _artifacts/patches/patch_ledger.yaml
+    - _artifacts/patches/patch_merge_report.md
+    - _artifacts/patches/rejected_patch_requests.yaml
+  rules:
+    - PatchRequest 可以来自缺口发现、历史回放、评测、推理反馈或人工修订。
+    - PatchRequest 只能表达候选改动；Evidence Graph 不能直接修改正式本体。
+    - 本体优化 Skill 是唯一正式合并者，合并、拒绝、延后或失败都必须追加 PatchLedgerItem。
+    - 每个 patch ledger 项应记录 baseOntologyVersion、baseHash、operation、targetFile、targetPath、targetId、evidenceEpisodeIds、evidenceClaimIds、mergeStatus 和 mergeReason。
+
+inference_run_contract:
+  description: 推理运行记录用于复盘 Agent 如何调用 Palantir 本体主干和 Temporal Evidence Layer。
+  canonical_location: _artifacts/reasoning_runs/
+  file_pattern: inference_run_{id}.yaml
+  rules:
+    - 每次推理必须记录 question、businessTime、ontologyVersion、centerObjects、usedEvidenceClaimIds、excludedInvalidClaimIds、reasoningChain、confidence 和 ontologyFeedback。
+    - 推理反馈需要进入本体生产闭环时，应生成 PatchRequest 或 ontology_feedback，而不是直接改本体。
+
+compatibility_contract:
+  description: 旧式单文件 JSON（base_ontology.json、optimized_ontology.json）与 bundle 目录结构的兼容规则。
+  rules:
+    - 所有任务型 Skill 读写本体时必须优先支持 ontology_bundle_vN/ 或 base_ontology_bundle/，再兼容旧 JSON。
+    - 旧 JSON 的 ontology_container_metadata 字段应与本文件定义一致；不一致时以 bundle 版为准。
+    - _compat/ 目录下的转换脚本负责旧格式到 bundle 格式的迁移，不得在业务 Skill 中内联转换逻辑。

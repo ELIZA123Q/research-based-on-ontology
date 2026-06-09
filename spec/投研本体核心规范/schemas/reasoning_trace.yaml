@@ -1,0 +1,293 @@
+schema_name: reasoning_trace
+schema_version: 0.1.0
+namespace: investment_ontology
+status: draft
+depends_on:
+  objects_schema: objects.yaml
+  relations_schema: relations.yaml
+  actions_schema: actions.yaml
+canonical_rule: YAML 是正式机器约束；Markdown 只负责解释和示例。
+description: 投研推理运行轨迹对象类型定义。本文件定义 RuleApplication、ReasoningStep 等推理过程记录对象。这些是运行轨迹对象，不是投研领域实体（如 Company、Industry、Event），不应放入 objects.yaml 的主对象层。
+
+# ============================================================
+# 设计原则
+# ============================================================
+# 1. 推理轨迹与领域本体分离：Company/Industry/Event 放入 objects.yaml；
+#    RuleApplication/ReasoningStep 放入本文件。
+# 2. 每一次规则调用、每一步推理跳转都应有结构化记录，而非仅存
+#    InferenceRun.reasoningChain 中的文字摘要。
+# 3. 轨迹对象服务于三个下游场景：
+#    - 历史回放：复现 t0 时刻的推理路径
+#    - 推理评测：识别哪条规则、哪个信号导致推理失败
+#    - 本体优化：统计哪些规则高频使用、哪些信号常被漏掉、哪些反证常被忽略
+
+# ============================================================
+# 时间类型（与 objects.yaml 一致）
+# ============================================================
+time_types:
+  business_time: 现实世界中推理所依据事实的发生时间。
+  system_time: 系统执行推理、记录轨迹的时间。
+
+# ============================================================
+# 轨迹对象 ID 前缀
+# ============================================================
+trace_id_prefixes:
+  RuleApplication: RA
+  ReasoningStep: RS
+
+# ============================================================
+# 对象类型定义
+# ============================================================
+
+object_types:
+
+  # —— RuleApplication：单次规则调用记录 ——
+  RuleApplication:
+    zh_name: 规则应用记录
+    category: reasoning_trace
+    managed_by: system
+    description: >
+      记录推理过程中一条 InferenceRule 被调用的完整上下文：
+      触发了哪个 StateChange、消费了哪些 Signal、检查了哪些 Counter、
+      是否满足 MarketExpectation 和 Catalyst 条件、得出了什么结论、
+      引用了哪些证据。这是推理链路可评测、可归因的最小单元。
+    immutable: true
+    fields:
+      rule_id:
+        zh_name: 推理规则 ID
+        type: string
+        required: true
+        description: 指向 05_reasoning.yaml 中的 InferenceRule 实例。
+      inference_run_id:
+        zh_name: 所属推理运行 ID
+        type: object_ref
+        required: true
+        description: 指向 InferenceRun 实例，用于关联同一次推理调用的所有规则应用。
+      step_order:
+        zh_name: 执行顺序
+        type: integer
+        required: true
+        description: 在同一次 InferenceRun 中的执行序号，从 1 开始。
+      input_event_id:
+        zh_name: 输入事件 ID
+        type: object_ref
+        required: false
+        description: 触发此规则的事件实例。
+      input_state_changes:
+        zh_name: 输入状态变化
+        type: array
+        required: false
+        description: 此规则消费的 StateChange 或 StateVariablePropagation 实例 ID 列表。
+      consumed_signals:
+        zh_name: 消费的信号
+        type: array
+        required: false
+        description: 此规则使用的 Signal 实例 ID 列表，含 signalRole。
+        items:
+          type: object
+          properties:
+            signal_id:
+              type: object_ref
+            signal_role:
+              type: enum
+              enum: [validation, catalyst, tracking, weakening, blocking]
+            weight:
+              type: enum
+              enum: [primary, supporting, weak]
+              description: 该信号在此规则应用中的权重。
+      checked_counters:
+        zh_name: 检查的反证
+        type: array
+        required: false
+        description: 此规则检查过的 weakening/blocking Signal 实例 ID 列表及结论。
+        items:
+          type: object
+          properties:
+            counter_id:
+              type: object_ref
+            counter_type:
+              type: enum
+              enum: [weakening, blocking]
+            check_result:
+              type: enum
+              enum: [active_and_valid, inactive, invalidated, superseded, not_applicable]
+            action_taken:
+              type: enum
+              enum: [suppress_conclusion, lower_confidence, noted_only, ignored]
+      market_expectation_checked:
+        zh_name: 市场预期检查
+        type: boolean
+        required: false
+        description: 是否检查了市场预期相关 Signal 或 consensusGap。
+      market_expectation_result:
+        zh_name: 市场预期检查结果
+        type: string
+        required: false
+        description: 市场预期与当前判断的差异简述。
+      catalyst_checked:
+        zh_name: 催化剂检查
+        type: boolean
+        required: false
+        description: 是否检查了 catalyst 类型 Signal。
+      catalyst_result:
+        zh_name: 催化剂检查结果
+        type: string
+        required: false
+        description: 催化剂是否就位、是否已发生、预计何时发生的简述。
+      conclusion:
+        zh_name: 规则结论
+        type: string
+        required: true
+        description: 此规则应用产生的中继结论（不是最终 AssetImpact）。
+      confidence:
+        zh_name: 结论置信度
+        type: enum
+        enum: [high, medium, low]
+        required: true
+      evidence_refs:
+        zh_name: 证据引用
+        type: array
+        required: false
+        description: 支撑此规则结论的 EvidenceClaim 或 EvidenceFact ID 列表。
+      trace_id:
+        zh_name: 轨迹 ID
+        type: string
+        required: true
+        generated_by: system
+        description: 本 RuleApplication 的唯一标识，格式 RA-YYYYMMDD-serial。
+      created_at:
+        zh_name: 创建时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+    quality_rules:
+      - RuleApplication 是推理过程记录，不是正式投研结论或发布判断。
+      - 每个 RuleApplication 必须能追溯到其所属的 InferenceRun。
+      - checked_counters 为空时，应在 conclusion 或 quality_rules 中说明「无反证检查步骤」，避免沉默跳过。
+      - consumed_signals 为空时，推理 Skill 应在 ontology_feedback 中标记可能的信号缺失。
+
+  # —— ReasoningStep：比 RuleApplication 更细粒度的原子推理步 ——
+  ReasoningStep:
+    zh_name: 推理步骤
+    category: reasoning_trace
+    managed_by: system
+    description: >
+      记录推理链中一个原子操作：从哪些对象出发、沿哪条关系跳转、
+      到达了哪些对象、消费了哪些证据、在什么条件下做出了什么中间决策。
+      比 RuleApplication 更细粒度——RuleApplication 记录「一条规则如何被应用」，
+      ReasoningStep 记录「图谱中的一次跳转或一次匹配」。
+      两者互补：ReasoningStep 侧重图谱导航，RuleApplication 侧重规则消费与决策。
+    immutable: true
+    fields:
+      inference_run_id:
+        zh_name: 所属推理运行 ID
+        type: object_ref
+        required: true
+      step_order:
+        zh_name: 步骤序号
+        type: integer
+        required: true
+        description: 在同一次 InferenceRun 中的执行序号。
+      step_type:
+        zh_name: 步骤类型
+        type: enum
+        enum:
+          - concept_resolution      # 概念解析：用户词汇 → Concept → 业务对象
+          - entry_point_match       # 入口匹配：定位起始对象
+          - relation_traversal      # 关系遍历：沿图谱关系跳转
+          - evidence_retrieval      # 证据检索：按时间窗口和权威分级获取 evidence
+          - signal_evaluation       # 信号评估：判断 Signal 是否有效、方向是否一致
+          - counter_check           # 反证检查：检查 weakening/blocking 信号
+          - hypothesis_formation    # 假设形成：基于当前证据形成或更新 StateHypothesis
+          - judgment_formation      # 判断形成：基于假设形成 JudgmentOutput
+          - asset_impact_derivation # 资产影响推导：从判断推导 AssetImpact
+          - gap_detection           # 缺口检测：发现链路中的缺失项
+          - fallback                # 降级处理：主路径失败后的 fallback 操作
+        required: true
+      input_object_ids:
+        zh_name: 输入对象 ID
+        type: array
+        required: false
+        description: 此步骤的起始对象实例。
+      relations_traversed:
+        zh_name: 遍历的关系
+        type: array
+        required: false
+        description: 此步骤中使用的关系类型和实例 ID。
+        items:
+          type: object
+          properties:
+            relation_type:
+              type: string
+            relation_id:
+              type: object_ref
+      output_object_ids:
+        zh_name: 输出对象 ID
+        type: array
+        required: false
+        description: 此步骤到达的目标对象实例。
+      evidence_consumed:
+        zh_name: 消费的证据
+        type: array
+        required: false
+        description: 此步骤使用的 EvidenceClaim 或 EvidenceFact ID。
+      decision:
+        zh_name: 步骤决策
+        type: string
+        required: false
+        description: 此步骤的判断或选择（如「选择关系 A 而非关系 B」「信号有效」「证据不足跳过」）。
+      confidence:
+        zh_name: 步骤置信度
+        type: enum
+        enum: [high, medium, low]
+        required: false
+      rule_application_id:
+        zh_name: 关联规则应用 ID
+        type: object_ref
+        required: false
+        description: 如果此步骤是某次 RuleApplication 的一部分，指向该 RuleApplication。
+      trace_id:
+        zh_name: 轨迹 ID
+        type: string
+        required: true
+        generated_by: system
+        description: 本 ReasoningStep 的唯一标识，格式 RS-YYYYMMDD-serial。
+      created_at:
+        zh_name: 创建时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+    quality_rules:
+      - ReasoningStep 记录图谱导航路径，不替代 RuleApplication 的规则消费语义。
+      - step_type=gap_detection 时必须记录缺失的对象类型、关系类型或证据类型。
+      - step_type=fallback 时必须记录触发降级的原因和降级后的替代路径。
+
+# ============================================================
+# 与 InferenceRun 的关系
+# ============================================================
+# InferenceRun（定义在 objects.yaml）是一次推理调用的顶层容器，
+# 包含 question、businessTime、ontologyVersion、总体 confidence 等。
+# RuleApplication 和 ReasoningStep 是 InferenceRun 的子记录，
+# 通过 inference_run_id 关联。
+#
+# 归档位置：
+#   _artifacts/reasoning_runs/
+#     inference_run_{id}.yaml          # InferenceRun 顶层记录
+#     inference_run_{id}/
+#       rule_applications.yaml          # 该次运行的所有 RuleApplication
+#       reasoning_steps.yaml            # 该次运行的所有 ReasoningStep
+#
+# 推理 Skill 应在每次推理完成后同时生成这三种记录。
+
+# ============================================================
+# 下游消费
+# ============================================================
+downstream_consumers:
+  historical_replay:
+    use: 使用 t0 时刻的 RuleApplication 和 ReasoningStep 复现推理路径，对比 t0 判断与事后结果。
+  evaluation:
+    use: 统计哪些规则、信号、反证的组合导致推理成功或失败；识别系统性弱推理模式。
+  optimization:
+    use: 基于高频使用的规则/关系优化本体结构；基于常被漏掉的信号/反证补充本体缺口。

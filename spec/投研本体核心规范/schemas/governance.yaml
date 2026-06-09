@@ -1,0 +1,475 @@
+schema_name: governance
+schema_version: 0.1.0
+namespace: investment_ontology
+status: draft
+depends_on:
+  objects_schema: objects.yaml
+  relations_schema: relations.yaml
+  actions_schema: actions.yaml
+canonical_rule: YAML 是正式机器约束；Markdown 只负责解释和示例。
+description: 投研本体治理层契约，定义检索策略、质量检查、未解析项、缺证项和人工复核队列的结构。本文件是推理 Skill 检索策略的权威机器可读来源；Markdown 中的遍历描述仅为辅助说明。
+
+# ============================================================
+# retrieval_policy — 推理 Skill 的机器可读检索契约
+# ============================================================
+# 目的：让推理 Skill 不再只依赖 Markdown 散文描述遍历规则，
+# 而是读取本段结构化配置，按统一策略执行、评测和版本对比。
+# 缺失 retrieval_policy 时，推理 Skill 使用自身的默认遍历规则。
+
+retrieval_policy:
+  description: 定义推理 Skill 如何从用户问题出发，沿图结构检索、遍历、验证和生成结论。
+
+  # —— 图入口：用户问题先映射到哪些对象类型 ——
+  entry_points:
+    description: 推理 Skill 解析用户问题后，优先匹配的对象类型和匹配优先级。
+    type: array
+    items:
+      type: object
+      properties:
+        object_type:
+          type: enum
+          enum_ref: all_object_types
+          description: 可作为检索入口的对象类型。
+        match_priority:
+          type: integer
+          description: 匹配优先级，1 最高。
+        match_strategy:
+          type: enum
+          enum: [exact_name, alias_match, concept_map, keyword_vector, composite]
+          description: 如何从用户输入匹配到该类型的实例。
+        required_context:
+          type: array
+          description: 使用该入口前必须确认的上下文（如 industry、company）。
+    cardinality: 1..*
+
+  # —— 图遍历顺序：从入口对象沿哪些关系逐步展开 ——
+  traversal_order:
+    description: 有序的遍历阶段列表。每个阶段定义从当前对象类型沿哪些关系跳转到下一层对象。
+    type: array
+    items:
+      type: object
+      properties:
+        stage:
+          type: integer
+          description: 遍历阶段序号，从 1 开始。
+        name:
+          type: string
+          description: 阶段名称，如 event_to_prototype。
+        from_types:
+          type: array
+          items: string
+          description: 当前阶段起点的对象类型。
+        via_relations:
+          type: array
+          items: string
+          description: 从起点出发使用的关系类型。
+        to_types:
+          type: array
+          items: string
+          description: 遍历到达的目标对象类型。
+        required:
+          type: boolean
+          description: 是否必须成功遍历到此阶段才能继续。
+        on_failure:
+          type: enum
+          enum: [skip_and_continue, abort_with_gap, use_fallback, observation_only]
+          description: 此阶段遍历失败时的处理方式。
+    cardinality: 1..*
+
+  # —— 必查项：推理链路中必须检查的信号、反证和状态 ——
+  required_checks:
+    description: 在推理链路的每个关键节点，必须执行的结构化检查。
+    type: array
+    items:
+      type: object
+      properties:
+        check_id:
+          type: string
+          description: 检查项唯一标识。
+        check_type:
+          type: enum
+          enum: [signal_check, counter_check, market_expectation_check, catalyst_check, evidence_freshness_check, boundary_check]
+          description: 检查类型。
+        at_stage:
+          type: integer
+          description: 在哪个遍历阶段执行此检查。
+        target_relation:
+          type: string
+          description: 检查时需要检索的关系类型。
+        required_for_conclusion:
+          type: boolean
+          description: 此项检查通过是否作为得出结论的必要条件。
+        on_missing:
+          type: enum
+          enum: [block_conclusion, lower_confidence, record_gap, observation_only]
+          description: 检查未通过时的处理方式。
+
+  # —— 来源权威分级 ——
+  source_authority_ranking:
+    description: 证据来源的可信度分层。推理 Skill 在选取 evidence claim 时应优先使用高权威来源。
+    type: object
+    properties:
+      high:
+        description: 可独立作为事实依据的来源。
+        source_types: [company_announcement, financial_report, regulator_document, exchange_filing, court_document]
+      medium:
+        description: 需要交叉验证才可作为事实依据的来源。
+        source_types: [sell_side_report, industry_database, credit_rating_report, consulting_report, academic_paper]
+      low:
+        description: 仅作为线索或参考，不得单独作为事实依据的来源。
+        source_types: [media_news, social_content, ai_summary, forum_post, unverified_leak]
+
+  # —— 时效策略：不同类型数据的新鲜度要求 ——
+  freshness_policy:
+    description: 推理 Skill 在选取 evidence 时应考虑的时效约束。
+    type: object
+    properties:
+      high_freshness:
+        description: 必须在推理 business_time 附近（如 7 天内）的数据。
+        applies_to: [market_price_signal, trading_volume, order_announcement, earnings_release, policy_change]
+      medium_freshness:
+        description: 应在一定时间窗口内（如 90 天）的数据。
+        applies_to: [industry_data_update, company_guidance, sell_side_estimate, macro_indicator]
+      low_freshness:
+        description: 相对稳定，不要求高频更新的数据。
+        applies_to: [industry_structure, product_specification, technology_roadmap, company_profile, regulation_framework]
+
+  # —— 降级策略：检索失败或信息不足时的处理 ——
+  fallback_policy:
+    description: 当检索策略无法完整执行时的降级规则。
+    type: array
+    items:
+      type: object
+      properties:
+        condition:
+          type: string
+          description: 触发降级的条件。
+        action:
+          type: enum
+          enum: [observation_only, partial_chain_with_gaps, concept_level_only, abort_with_feedback, ask_user_for_clarification]
+          description: 降级后的处理方式。
+        max_confidence:
+          type: enum
+          enum: [low]
+          description: 降级模式下的最大置信度。
+
+  # —— 阻断规则：触发时抑制或限制推理结论 ——
+  blocking_rules:
+    description: 在某些条件下推理结论必须被抑制或降级。
+    type: array
+    items:
+      type: object
+      properties:
+        rule_id:
+          type: string
+          description: 阻断规则唯一标识。
+        condition:
+          type: string
+          description: 触发阻断的条件表达式。
+        effect:
+          type: enum
+          enum: [suppress_conclusion, observation_only, require_manual_review, lower_confidence_to_low, block_asset_impact]
+          description: 阻断后的效果。
+
+# ============================================================
+# unresolved_items — 07_governance.yaml 的未解析项契约
+# ============================================================
+unresolved_items:
+  description: 本体内所有暂未决策、未映射、未完成的内容集中管理于此。
+  categories:
+    - name: unmapped_concepts
+      description: scopeStatus=in_scope 但没有 conceptMapsToObject 映射的 Concept。
+    - name: unresolved_boundaries
+      description: 暂无法裁定的概念边界（原 defer 状态）。
+    - name: dangling_relations
+      description: 关系端点无法解析到 02_objects.yaml 中已存在实例的关系。
+    - name: missing_evidence
+      description: 对象或关系缺少可追溯来源的证据引用。
+    - name: orphan_claims
+      description: 无法追溯到 EvidenceEpisode 或 SourceDocument 的 EvidenceClaim。
+    - name: conflicting_claims
+      description: 多个 EvidenceClaim 对同一事实给出矛盾主张。
+
+# ============================================================
+# review_queue — 人工复核队列契约
+# ============================================================
+review_queue:
+  description: 需要人工审核确认的待处理项。
+  item_types:
+    - type: admission_review
+      description: 新候选对象、关系或证据是否可正式入库。
+    - type: state_upgrade_review
+      description: Hypothesis/JudgmentOutput/InvestmentThesis 状态升级是否合理。
+    - type: signal_status_review
+      description: Signal 的 weakening/withdrawn/invalidated 状态变更。
+    - type: retrospect_review
+      description: 历史回放复盘结论。
+
+# ============================================================
+# quality_gates — 质量门禁
+# ============================================================
+quality_gates:
+  description: 本体在发布、评测或推理使用前必须通过的检查项。
+  gates:
+    - gate_id: concept_object_mapping
+      description: 所有 in_scope Concept 必须有 conceptMapsToObject 映射。
+      severity: error
+    - gate_id: evidence_backlink
+      description: 所有非 candidate 对象必须有可追溯证据链。
+      severity: error
+    - gate_id: relation_endpoint_resolution
+      description: 所有关系端点必须能解析到存在的对象实例。
+      severity: error
+    - gate_id: no_duplicate_ids
+      description: 无重复实例 ID。
+      severity: error
+    - gate_id: state_machine_validity
+      description: 所有对象状态在其定义的状态机内有效。
+      severity: error
+    - gate_id: signal_role_relation_compatibility
+      description: Signal.signalRole 与其使用的关系类型兼容。
+      severity: error
+
+# ============================================================
+# governance_actions — 治理动作
+# ============================================================
+# 治理动作定义本体的维护、升级、降级、裁决和审计流程。
+# 这些动作补充 actions.yaml 中的对象 CRUD 和状态变更动作，
+# 专注于跨层治理决策（三层权限边界间的升降级）、
+# 未解析项裁决、质量门禁重检和审核队列管理。
+# 治理动作的审计通过 ActionAudit（定义见 objects.yaml）记录。
+
+governance_actions:
+  description: >
+    治理动作是本体长期健康运行的操作接口。与 actions.yaml 中的领域动作不同，
+    治理动作关注的是本体结构本身的演化——什么内容升入本体层、什么降级到应用层、
+    什么未解析项如何裁决、质量门禁不通过如何修复。
+
+  action_categories:
+    layer_management:
+      description: 三层权限边界之间的内容升降级。
+    unresolved_resolution:
+      description: 未解析项的裁决和清理。
+    quality_gate_remediation:
+      description: 质量门禁不通过后的修复和重检。
+    review_queue_management:
+      description: 审核队列的批量操作和优先级管理。
+
+  # —— 具体治理动作 ——
+
+  actions:
+
+    # === 层级管理 ===
+    ProposeLayerPromotion:
+      zh_name: 提议内容升级
+      category: layer_management
+      actor_roles: [researcher, industry_owner]
+      trigger: researcher_initiated
+      description: >
+        提议将应用层或行业扩展层中稳定复用的内容升级到上一层。
+        升级前需回答：跨行业通用性、是否无法用现有结构表达、是否影响已有结构、
+        是否有清晰定义和禁止用法。
+      target_content:
+        types: [Concept, StateVariable, StateVariablePropagation, Signal, InferenceRule, ConductionTemplate]
+      field_inputs:
+        required: [targetId, currentLayer, proposedLayer, promotionRationale, reuseEvidence]
+        optional: [crossIndustryApplicability, impactAssessment, prohibitedUsage]
+      preconditions:
+        - type: content_is_stable
+          description: 内容在 currentLayer 中被多人、多次、稳定复用。
+        - type: promotion_criteria_met
+          description: 四个升级问题已明确回答。
+      outputs:
+        creates: ReviewRecord（reviewType=admission, reviewResult=pending）
+        creates: ActionAudit
+      followup: ApproveLayerPromotion 或 RejectLayerPromotion
+
+    ApproveLayerPromotion:
+      zh_name: 批准内容升级
+      category: layer_management
+      actor_roles: [reviewer]
+      trigger: system_prompt_reviewer_confirm
+      description: 审核通过内容从低层升级到高层。
+      target_type: ReviewRecord
+      state_transition:
+        field: reviewResult
+        from: [pending]
+        to: approved
+      field_inputs:
+        required: [reviewNotes]
+      outputs:
+        updates: 被审核对象 governanceLayer → proposedLayer
+        updates: ReviewRecord
+        creates: ActionAudit
+
+    RejectLayerPromotion:
+      zh_name: 拒绝内容升级
+      category: layer_management
+      actor_roles: [reviewer]
+      trigger: system_prompt_reviewer_confirm
+      target_type: ReviewRecord
+      state_transition:
+        field: reviewResult
+        from: [pending]
+        to: rejected
+      field_inputs:
+        required: [reviewNotes, rejectReason]
+      outputs:
+        updates: ReviewRecord
+        creates: ActionAudit
+
+    ProposeLayerDemotion:
+      zh_name: 提议内容降级
+      category: layer_management
+      actor_roles: [industry_owner]
+      trigger: researcher_initiated
+      description: >
+        提议将长期无人使用、填充率低、只被单一行业使用、与已有结构重复
+        或维护成本高于使用价值的内容降级或废弃。
+      target_content:
+        types: [Concept, StateVariable, StateVariablePropagation, Signal, InferenceRule]
+      field_inputs:
+        required: [targetId, currentLayer, proposedAction, demotionRationale]
+        optional: [migrationPlan, affectedDownstreamIds]
+      preconditions:
+        - type: demotion_criteria_met
+          description: 满足降级或废弃评估标准（低频使用、单一行业、重复、成本>价值）。
+      outputs:
+        creates: ReviewRecord（reviewType=admission）
+        creates: ActionAudit
+
+    # === 未解析项裁决 ===
+    ResolveUnmappedConcept:
+      zh_name: 裁决未映射概念
+      category: unresolved_resolution
+      actor_roles: [industry_owner]
+      trigger: system_prompt_industry_owner_confirm
+      description: >
+        对 unresolved_items.unmapped_concepts 中的 in_scope Concept 进行裁决：
+        创建 conceptMapsToObject 映射、标记为 out_of_scope、或拆分为多个概念。
+      target_content:
+        types: [Concept]
+      field_inputs:
+        required: [conceptId, resolutionType]
+        optional: [targetObjectIds, newScopeStatus, resolutionNote]
+      resolution_types:
+        - map_to_existing: 映射到已存在的对象实例 → 创建 conceptMapsToObject 关系
+        - create_new_object: 创建新的业务对象并映射 → 触发 Create[ObjectType] 动作
+        - change_scope: 修改 scopeStatus（如 in_scope → adjacent）
+        - split_concept: 拆分为多个子概念后分别映射
+        - defer_with_reason: 延后并记录原因
+      outputs:
+        updates: Concept 映射或 scopeStatus
+        removes_from: unresolved_items.unmapped_concepts
+        creates: ActionAudit
+
+    ResolveDanglingRelation:
+      zh_name: 裁决悬空关系
+      category: unresolved_resolution
+      actor_roles: [industry_owner]
+      trigger: system_prompt_industry_owner_confirm
+      description: >
+        对 unresolved_items.dangling_relations 中端点无法解析的关系进行裁决：
+        修复端点、删除关系、或标记对象为 missing。
+      field_inputs:
+        required: [relationId, resolutionType, resolutionNote]
+      resolution_types:
+        - fix_endpoint: 更新关系端点指向正确对象
+        - create_missing_object: 创建缺失的对象实例
+        - mark_as_template_only: 保留为模板关系，不参与推理
+        - deprecate_relation: 废弃该关系实例
+      outputs:
+        updates: 关系端点或状态
+        removes_from: unresolved_items.dangling_relations
+        creates: ActionAudit
+
+    ResolveConflictingClaims:
+      zh_name: 裁决证据冲突
+      category: unresolved_resolution
+      actor_roles: [researcher, reviewer]
+      trigger: researcher_initiated_reviewer_confirm
+      description: >
+        对 unresolved_items.conflicting_claims 中的矛盾证据进行裁决。
+      field_inputs:
+        required: [conflictId, resolutionType, winningClaimIds, resolutionNote]
+      resolution_types:
+        - source_authority: 以来源权威等级高者为准
+        - freshness: 以时间更近者为准
+        - manual_override: 人工裁定
+        - defer: 延后等待更多证据
+      outputs:
+        updates: EvidenceClaim claimStatus（败方 invalidated）
+        updates: evidence_conflict_record resolutionStatus
+        removes_from: unresolved_items.conflicting_claims
+        creates: ActionAudit
+      followup: 败方 claim 的 invalidatedBy 指向胜方 claim
+
+    # === 质量门禁重检 ===
+    TriggerQualityGateRecheck:
+      zh_name: 触发质量门禁重检
+      category: quality_gate_remediation
+      actor_roles: [system]
+      trigger: system_auto
+      description: >
+        当本体发生变更（对象新增/修改、关系变更、patch 合并）后，
+        系统自动触发相关质量门禁的重检。
+      trigger_conditions:
+        - 本体优化 Skill 合并 PatchLedgerItem 后
+        - 对象或关系创建/修改/废弃后
+        - 概念映射变更后
+      gates_to_recheck:
+        - concept_object_mapping
+        - evidence_backlink
+        - relation_endpoint_resolution
+        - no_duplicate_ids
+        - state_machine_validity
+        - signal_role_relation_compatibility
+      outputs:
+        creates: quality_gate_recheck_report
+        creates: ActionAudit
+      on_failure: 失败的门禁项进入 governance review_queue，阻止 release。
+
+    # === 审核队列管理 ===
+    PrioritizeReviewItem:
+      zh_name: 调整审核项优先级
+      category: review_queue_management
+      actor_roles: [industry_owner]
+      trigger: researcher_initiated
+      description: 手动提升或降低 review_queue 中某审核项的优先级。
+      field_inputs:
+        required: [reviewItemId, newPriority, reason]
+      outputs:
+        updates: review_queue item priority
+        creates: ActionAudit
+
+    BatchApproveLowRiskReviews:
+      zh_name: 批量批准低风险审核
+      category: review_queue_management
+      actor_roles: [industry_owner]
+      trigger: researcher_initiated
+      description: >
+        对语义风险低（semanticRisk=low）且无冲突的审核项批量批准。
+        不得对 semanticRisk=high 或 core_change_required 的项目使用批处理。
+      field_inputs:
+        required: [reviewItemIds, batchRationale]
+      preconditions:
+        - type: all_items_low_risk
+          description: 所有被批处理的项目 semanticRisk=low。
+        - type: no_conflicts
+          description: 项目之间无互相依赖或冲突。
+      outputs:
+        batch_approves: ReviewRecord（reviewResult=approved）
+        creates: ActionAudit（batch）
+
+# ============================================================
+# 治理动作与 actions.yaml 的关系
+# ============================================================
+governance_action_audit_policy:
+  description: >
+    治理动作的审计遵循 actions.yaml 的 audit_policy：
+    - 每个治理动作执行后创建 ActionAudit。
+    - 需要审核的治理动作（ProposeLayerPromotion、ResolveConflictingClaims 等）
+      同时创建 ReviewRecord。
+    - 治理动作的 ActionAudit.targetObject 指向被治理的对象（Concept、Relation 等）。
+    - governance_actions 中的动作不应绕过 actions.yaml 中定义的领域动作直接修改对象状态。
+      例如 ProposeLayerPromotion 修改 governanceLayer 时必须通过标准的 Update 类动作执行字段变更。
