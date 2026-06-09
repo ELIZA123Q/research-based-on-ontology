@@ -1,0 +1,440 @@
+# 投研本体缺口发现输出结构（YAML 版）
+# 本文件约束“缺口发现结果交接块”YAML 的输出结构，替代原 JSON schema
+
+# === 枚举定义 ===
+
+enum_coverage_status:
+  - fully_covered
+  - partially_covered
+  - weakly_covered
+  - not_covered
+  - conflicting
+  - out_of_scope
+
+enum_gap_type:
+  - object_gap
+  - state_variable_gap
+  - relation_gap
+  - signal_gap
+  - scenario_path_gap
+  - asset_mapping_gap
+  - schema_gap
+
+enum_operation:
+  - add
+  - split
+  - merge
+  - downgrade
+  - supplement_evidence
+  - revise_relation
+  - add_blocking_signal
+  - defer
+  - reject
+
+enum_target_layer:
+  - object
+  - state_variable
+  - relation
+  - signal
+  - inference_path
+  - scenario_path
+  - asset_mapping
+  - schema
+
+enum_evidence_level:
+  - single_report
+  - multi_source
+  - historical_case
+  - expert_confirmed
+  - ontology_feedback
+  - no_evidence
+
+enum_priority:
+  - high
+  - medium
+  - low
+
+enum_trigger_reason:
+  - post_cold_start_check
+  - post_optimization_check
+  - reasoning_feedback
+  - external_logic_review
+  - historical_review
+  - other
+
+enum_ontology_source_type:
+  - base_ontology
+  - optimized_ontology
+  - ontology_bundle
+  - manual_ontology
+  - other
+
+enum_source_type:
+  - excellent_report
+  - deep_research
+  - expert_interview
+  - conference_call
+  - field_research
+  - news_event
+  - investment_review
+  - reasoning_feedback
+  - other
+
+enum_source_reliability:
+  - high
+  - medium
+  - low
+
+enum_logic_type:
+  - fact_observation
+  - analysis_assumption
+  - transmission_logic
+  - validation_signal
+  - falsification_condition
+  - asset_mapping
+  - author_judgment
+  - forecast_or_rating_or_target_price
+
+# === 顶层结构 ===
+
+top_level_fields:
+  - gap_discovery_context
+  - logic_extraction
+  - ontology_coverage_assessment
+  - gap_recommendations
+  - candidate_patch_requests
+  - optimization_plan
+  - handoff_block
+  - optimization_handoff
+  - compliance_check
+
+# === 质量分数 ===
+# 类型: number, 范围: 0.0 ~ 1.0
+
+# === gap_discovery_context ===
+gap_discovery_context:
+  required:
+    - discovery_id
+    - generated_at
+    - trigger_reason
+    - input_ontology
+    - input_sources
+    - research_scope
+    - ontology_quality_before
+    - limitations
+  properties:
+    discovery_id: "string"
+    generated_at: "string (ISO 8601)"
+    trigger_reason: "enum_trigger_reason"
+    input_ontology:
+      required:
+        - ontology_id
+        - ontology_version
+        - ontology_source_type
+        - source_skill
+        - object_count
+        - relation_count
+        - scope
+        - known_limitations
+      properties:
+        ontology_id: "string"
+        ontology_version: "string"
+        parent_version: "string (可选)"
+        ontology_source_type: "enum_ontology_source_type"
+        source_skill: "string"
+        object_count: "integer >= 0"
+        relation_count: "integer >= 0"
+        scope: "string"
+        known_limitations: "string[]"
+    input_sources:
+      minItems: 1
+      items:
+        required:
+          - source_id
+          - source_type
+          - title_or_summary
+          - publisher_or_origin
+          - publish_time
+          - source_location
+          - source_reliability
+          - role_in_gap_discovery
+        properties:
+          source_id: "string"
+          evidence_episode_ids: "string[] (可选)"
+          evidence_claim_ids: "string[] (可选)"
+          source_type: "enum_source_type"
+          title_or_summary: "string"
+          publisher_or_origin: "string"
+          publish_time: "string"
+          source_location: "string"
+          source_reliability: "enum_source_reliability"
+          role_in_gap_discovery: "string"
+    research_scope: "string"
+    ontology_quality_before:
+      required:
+        - coverage_score
+        - evidence_score
+        - consistency_score
+        - reasoning_score
+      properties:
+        coverage_score: "number 0.0~1.0"
+        evidence_score: "number 0.0~1.0"
+        consistency_score: "number 0.0~1.0"
+        reasoning_score: "number 0.0~1.0"
+    limitations: "string[]"
+
+# === logic_extraction ===
+logic_extraction:
+  required:
+    - extraction_summary
+    - fact_observations
+    - analysis_assumptions
+    - transmission_logics
+    - validation_signals
+    - falsification_conditions
+    - asset_mappings
+    - author_judgments
+    - forecast_rating_target_price_items
+    - excluded_or_restricted_items
+  properties:
+    extraction_summary: "string"
+    fact_observations: "logicItem[]"
+    analysis_assumptions: "logicItem[]"
+    transmission_logics: "logicItem[]"
+    validation_signals: "logicItem[]"
+    falsification_conditions: "logicItem[]"
+    asset_mappings: "logicItem[]"
+    author_judgments: "logicItem[]"
+    forecast_rating_target_price_items: "logicItem[]"
+    excluded_or_restricted_items:
+      items:
+        required: [item, reason]
+        properties:
+          item: "string"
+          reason: "string"
+
+logicItem:
+  required:
+    - logic_id
+    - logic_type
+    - summary
+    - source_refs
+    - can_be_ontology_candidate
+    - restriction
+  optional:
+    - evidence_episode_ids
+    - evidence_claim_ids
+    - claim_validity
+    - claim_status
+    - source_reliability
+    - business_time
+  properties:
+    logic_id: "string"
+    logic_type: "enum_logic_type"
+    summary: "string"
+    source_refs: "string[]"
+    can_be_ontology_candidate: "boolean"
+    restriction: "string"
+
+# === ontology_coverage_assessment ===
+ontology_coverage_assessment:
+  required:
+    - coverage_summary
+    - coverage_items
+    - weak_coverage_patterns
+    - conflicts
+    - out_of_scope_items
+  properties:
+    coverage_summary: "string"
+    coverage_items:
+      minItems: 1
+      items:
+        required:
+          - assessment_id
+          - logic_id
+          - coverage_status
+          - matched_ontology_items
+          - missing_or_weak_parts
+          - reason
+        properties:
+          assessment_id: "string"
+          logic_id: "string"
+          coverage_status: "enum_coverage_status"
+          matched_ontology_items: "string[]"
+          missing_or_weak_parts: "string[]"
+          reason: "string"
+    weak_coverage_patterns: "string[]"
+    conflicts: "string[]"
+    out_of_scope_items: "string[]"
+
+# === gap_recommendations ===
+gap_recommendations:
+  minItems: 1
+  items:
+    required:
+      - gap_id
+      - gap_type
+      - operation
+      - target_layer
+      - current_coverage_status
+      - source_logic_basis
+      - suggested_change
+      - evidence_level
+      - priority
+      - expected_benefit
+      - risk
+      - scope_boundary
+      - defer_or_reject_reason
+      - handoff_requirement
+    properties:
+      gap_id: "string"
+      gap_type: "enum_gap_type"
+      operation: "enum_operation"
+      target_layer: "enum_target_layer"
+      current_coverage_status: "enum_coverage_status"
+      source_logic_basis: "string"
+      suggested_change: "string"
+      evidence_level: "enum_evidence_level"
+      priority: "enum_priority"
+      expected_benefit: "string"
+      risk: "string"
+      scope_boundary: "string"
+      defer_or_reject_reason: "string"
+      handoff_requirement: "string"
+      evidence_episode_ids: "string[] (可选)"
+      evidence_claim_ids: "string[] (可选)"
+      target_file: "string (可选，bundle 文件名)"
+      target_path: "string (可选，bundle 内路径)"
+      target_id: "string (可选，目标对象/关系/变量/信号 ID)"
+
+# === candidate_patch_requests ===
+candidate_patch_requests:
+  minItems: 0
+  items:
+    required:
+      - patch_request_id
+      - source_gap_ids
+      - target_layer
+      - suggested_operation
+      - reason
+      - semantic_risk
+      - review_status
+    properties:
+      patch_request_id: "string"
+      source_gap_ids: "string[]"
+      evidence_episode_ids: "string[]"
+      evidence_claim_ids: "string[]"
+      target_layer: "enum_target_layer"
+      target_file: "string"
+      target_path: "string"
+      target_id: "string"
+      suggested_operation: "enum_operation"
+      reason: "string"
+      semantic_risk: "low|medium|high|core_change_required"
+      review_status: "pending|approved|rejected|supplementRequired|merged|superseded"
+
+# === optimization_plan ===
+optimization_plan:
+  minItems: 1
+  items:
+    required:
+      - plan_id
+      - next_round
+      - source_gap_ids
+      - optimization_goal
+      - target_gaps
+      - suggested_operations
+      - suggested_materials
+      - required_materials
+      - minimum_evidence_level
+      - priority
+      - owner_role
+      - stop_condition
+      - continue_or_stop_condition
+      - quality_expected_delta
+    properties:
+      plan_id: "string"
+      next_round: "string"
+      source_gap_ids: "string[] (min 1)"
+      optimization_goal: "string"
+      target_gaps: "string[]"
+      suggested_operations: "enum_operation[]"
+      suggested_materials: "string[]"
+      required_materials: "string[]"
+      minimum_evidence_level: "enum_evidence_level"
+      priority: "enum_priority"
+      owner_role: "string"
+      stop_condition: "string"
+      continue_or_stop_condition: "string"
+      quality_expected_delta:
+        required:
+          - coverage_score
+          - evidence_score
+          - consistency_score
+          - reasoning_score
+        properties:
+          coverage_score: "number"
+          evidence_score: "number"
+          consistency_score: "number"
+          reasoning_score: "number"
+
+# === handoff_block（内嵌在 YAML 中的交接摘要） ===
+handoff_block:
+  required:
+    - block_type
+    - handoff_version
+    - target_skill
+    - source_discovery_id
+    - handoff_summary
+    - payload_refs
+    - priority_gap_ids
+    - optimization_plan_ids
+    - deferred_or_rejected_gap_ids
+    - evidence_requirements
+    - execution_constraints
+    - must_not_do
+  properties:
+    block_type: "固定 'gap_discovery_ai_handoff'"
+    handoff_version: "string"
+    target_skill: "固定 'touyan-benti-youhua'"
+    source_discovery_id: "string"
+    handoff_summary: "string (非空)"
+    payload_refs: "string[] (至少 gap_recommendations 和 optimization_plan)"
+    priority_gap_ids: "string[]"
+    optimization_plan_ids: "string[] (至少 1 项)"
+    deferred_or_rejected_gap_ids: "string[]"
+    evidence_requirements: "string[] (至少 1 项)"
+    execution_constraints: "string[] (至少 1 项)"
+    must_not_do: "string[] (至少 1 项)"
+
+# === optimization_handoff（兼容旧协议） ===
+optimization_handoff:
+  required:
+    - target_skill
+    - handoff_payload
+    - execution_notes
+    - must_not_do
+  properties:
+    target_skill: "固定 'touyan-benti-youhua'"
+    handoff_payload: "string[]"
+    execution_notes: "string[]"
+    must_not_do: "string[]"
+
+# === compliance_check ===
+compliance_check:
+  required:
+    - noBuySellAdvice
+    - noTargetPrice
+    - noReturnForecast
+    - noPositionAdvice
+    - forecastRatingTargetPriceNotMappedAsFact
+    - schemaGapNotAutoApplied
+    - optimizationPlanDoesNotModifyOntologyDirectly
+  properties:
+    noBuySellAdvice: "boolean (must be true)"
+    noTargetPrice: "boolean (must be true)"
+    noReturnForecast: "boolean (must be true)"
+    noPositionAdvice: "boolean (must be true)"
+    forecastRatingTargetPriceNotMappedAsFact: "boolean (must be true)"
+    schemaGapNotAutoApplied: "boolean (must be true)"
+    optimizationPlanDoesNotModifyOntologyDirectly: "boolean (must be true)"

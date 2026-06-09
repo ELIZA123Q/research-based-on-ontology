@@ -1,0 +1,1026 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "投研本体历史回放校验输出",
+  "type": "object",
+  "required": [
+    "historical_validation_context",
+    "assertion_decomposition",
+    "historical_case_set",
+    "case_replays",
+    "ontology_diagnostics",
+    "validation_recommendations",
+    "ontology_health",
+    "optimization_plan",
+    "optimization_handoff",
+    "compliance_check",
+    "readable_report"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "operation": {
+      "type": "string",
+      "enum": [
+        "add",
+        "update",
+        "strengthen",
+        "keep",
+        "deprecate",
+        "reject"
+      ]
+    },
+    "planOperation": {
+      "type": "string",
+      "enum": [
+        "add",
+        "split",
+        "merge",
+        "downgrade",
+        "supplement_evidence",
+        "revise_relation",
+        "add_blocking_signal",
+        "defer",
+        "reject"
+      ]
+    },
+    "evidenceLevel": {
+      "type": "string",
+      "enum": [
+        "no_evidence",
+        "single_source_candidate",
+        "multi_source_supported",
+        "official_source_supported",
+        "review_confirmed"
+      ]
+    },
+    "planEvidenceLevel": {
+      "type": "string",
+      "enum": [
+        "single_report",
+        "multi_source",
+        "historical_case",
+        "expert_confirmed",
+        "ontology_feedback",
+        "no_evidence"
+      ]
+    },
+    "planPriority": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "confidenceLevel": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "caseType": {
+      "type": "string",
+      "enum": [
+        "positive_trigger",
+        "negative_failure",
+        "boundary_case",
+        "holdout_case"
+      ]
+    },
+    "replayResult": {
+      "type": "string",
+      "enum": [
+        "supported",
+        "partially_supported",
+        "blocked",
+        "contradicted",
+        "not_covered",
+        "unable_to_assess"
+      ]
+    },
+    "recommendationAction": {
+      "type": "string",
+      "enum": [
+        "keep",
+        "strengthen",
+        "split",
+        "narrow_scope",
+        "add_blocker",
+        "add_relation",
+        "downgrade",
+        "deprecate",
+        "reject",
+        "needs_more_cases"
+      ]
+    },
+    "skill2OperationHint": {
+      "type": "string",
+      "enum": [
+        "add",
+        "update",
+        "strengthen",
+        "keep",
+        "deprecate",
+        "reject"
+      ]
+    },
+    "sourceItem": {
+      "type": "object",
+      "required": [
+        "source_id",
+        "title",
+        "publisher",
+        "publish_time",
+        "source_type",
+        "source_location",
+        "reliability"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "source_id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "publisher": {
+          "type": "string"
+        },
+        "publish_time": {
+          "type": "string"
+        },
+        "business_time": {
+          "type": "string"
+        },
+        "source_type": {
+          "type": "string"
+        },
+        "source_location": {
+          "type": "string"
+        },
+        "reliability": {
+          "$ref": "#/$defs/confidenceLevel"
+        }
+      }
+    },
+    "scopeType": {
+      "type": "string",
+      "enum": [
+        "industry",
+        "supply_chain",
+        "product_track",
+        "company_research",
+        "policy_theme",
+        "macro_theme",
+        "event_theme",
+        "uncertain"
+      ]
+    }
+  },
+  "properties": {
+    "historical_validation_context": {
+      "type": "object",
+      "required": [
+        "validation_id",
+        "audit_timestamp",
+        "ontology_context",
+        "validation_scope",
+        "methodology_notes",
+        "summary"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "validation_id": {
+          "type": "string"
+        },
+        "audit_timestamp": {
+          "type": "string"
+        },
+        "ontology_context": {
+          "type": "object",
+          "required": [
+            "ontology_inputs",
+            "primary_scope_type",
+            "object_count",
+            "relation_count",
+            "hypothesis_count",
+            "signal_count",
+            "scope"
+          ],
+          "additionalProperties": true,
+          "properties": {
+            "ontology_inputs": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "ontology_id",
+                  "ontology_name",
+                  "ontology_origin",
+                  "conforms_to"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "ontology_id": {
+                    "type": "string"
+                  },
+                  "ontology_name": {
+                    "type": "string"
+                  },
+                  "ontology_version": {
+                    "type": "string"
+                  },
+                  "ontology_origin": {
+                    "type": "string",
+                    "enum": [
+                      "cold_start",
+                      "material_optimization",
+                      "manual_curation",
+                      "external_system",
+                      "unknown"
+                    ]
+                  },
+                  "conforms_to": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "object_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "relation_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "hypothesis_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "signal_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "scope": {
+              "type": "string"
+            },
+            "notes": {
+              "type": "string"
+            },
+            "primary_scope_type": {
+              "$ref": "#/$defs/scopeType"
+            },
+            "composition_type": {
+              "type": "string",
+              "enum": [
+                "single_ontology",
+                "multi_ontology",
+                "asset_portfolio_context",
+                "material_driven_context",
+                "unknown"
+              ]
+            },
+            "legacy_type_mapping": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        },
+        "validation_scope": {
+          "type": "object",
+          "required": [
+            "focus_areas",
+            "included_components",
+            "excluded_components"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "focus_areas": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "included_components": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "excluded_components": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "methodology_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "summary": {
+          "type": "string"
+        }
+      }
+    },
+    "assertion_decomposition": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "assertion_id",
+          "ontology_component_ids",
+          "assertion_type",
+          "testable_claim",
+          "expected_evidence"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "assertion_id": {
+            "type": "string"
+          },
+          "ontology_component_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "assertion_type": {
+            "type": "string",
+            "enum": [
+              "object_validity",
+              "variable_observability",
+              "relation_validity",
+              "propagation_validity",
+              "hypothesis_explanatory_power",
+              "signal_validity",
+              "blocker_validity",
+              "asset_impact_boundary"
+            ]
+          },
+          "testable_claim": {
+            "type": "string"
+          },
+          "expected_evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "historical_case_set": {
+      "type": "object",
+      "required": [
+        "selection_strategy",
+        "sample_matrix",
+        "sources",
+        "selection_bias_controls",
+        "case_count_by_type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "selection_strategy": {
+          "type": "string"
+        },
+        "sample_matrix": {
+          "type": "object",
+          "required": [
+            "event_types",
+            "variable_directions",
+            "chain_positions",
+            "subject_types",
+            "time_stages",
+            "outcome_types"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "event_types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "variable_directions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "chain_positions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "subject_types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "time_stages": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "outcome_types": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sourceItem"
+          }
+        },
+        "selection_bias_controls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "case_count_by_type": {
+          "type": "object",
+          "required": [
+            "positive_trigger",
+            "negative_failure",
+            "boundary_case",
+            "holdout_case"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "positive_trigger": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "negative_failure": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "boundary_case": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "holdout_case": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    "case_replays": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "case_id",
+          "case_type",
+          "linked_assertion_ids",
+          "t0",
+          "t0_available_information",
+          "expected_chain_at_t0",
+          "validation_window",
+          "actual_outcome",
+          "confounding_factors",
+          "replay_result",
+          "leakage_guardrail",
+          "evidence_refs"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "case_id": {
+            "type": "string"
+          },
+          "case_type": {
+            "$ref": "#/$defs/caseType"
+          },
+          "linked_assertion_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "t0": {
+            "type": "string"
+          },
+          "t0_available_information": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "expected_chain_at_t0": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "validation_window": {
+            "type": "string"
+          },
+          "actual_outcome": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "confounding_factors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "replay_result": {
+            "$ref": "#/$defs/replayResult"
+          },
+          "leakage_guardrail": {
+            "type": "string"
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ontology_diagnostics": {
+      "type": "object",
+      "required": [
+        "diagnostic_findings",
+        "metric_scores"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "diagnostic_findings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "finding_id",
+              "finding_type",
+              "affected_components",
+              "severity",
+              "evidence_case_ids",
+              "diagnosis"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "finding_id": {
+                "type": "string"
+              },
+              "finding_type": {
+                "type": "string",
+                "enum": [
+                  "over_generalized_relation",
+                  "missing_blocker",
+                  "missing_relation",
+                  "variable_too_coarse",
+                  "weak_signal",
+                  "temporal_mismatch",
+                  "evidence_gap",
+                  "asset_jump",
+                  "conflicting_ontology_scope"
+                ]
+              },
+              "affected_components": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "severity": {
+                "$ref": "#/$defs/severity"
+              },
+              "evidence_case_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "diagnosis": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "metric_scores": {
+          "type": "object",
+          "required": [
+            "chain_hit_rate",
+            "direction_accuracy",
+            "propagation_completion_rate",
+            "false_positive_rate",
+            "false_negative_rate",
+            "confidence_calibration",
+            "evidence_coverage_rate",
+            "lag_error_assessment"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "chain_hit_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "direction_accuracy": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "propagation_completion_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "false_positive_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "false_negative_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "confidence_calibration": {
+              "$ref": "#/$defs/confidenceLevel"
+            },
+            "evidence_coverage_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "lag_error_assessment": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "validation_recommendations": {
+      "type": "object",
+      "required": [
+        "recommendations"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "recommendations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "recommendation_id",
+              "action",
+              "target_components",
+              "rationale",
+              "supporting_case_ids",
+              "skill2_operation_hint",
+              "priority"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "recommendation_id": {
+                "type": "string"
+              },
+              "action": {
+                "$ref": "#/$defs/recommendationAction"
+              },
+              "target_components": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "rationale": {
+                "type": "string"
+              },
+              "supporting_case_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "skill2_operation_hint": {
+                "$ref": "#/$defs/skill2OperationHint"
+              },
+              "priority": {
+                "type": "string",
+                "enum": [
+                  "P0",
+                  "P1",
+                  "P2"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "ontology_health": {
+      "type": "object",
+      "required": [
+        "overall_score",
+        "dimension_scores",
+        "qualified_for_reasoning",
+        "critical_issues",
+        "recommendation_summary"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "overall_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dimension_scores": {
+          "type": "object",
+          "required": [
+            "explanatory_power",
+            "completeness",
+            "falsifiability",
+            "granularity",
+            "transferability",
+            "evidence_coverage",
+            "temporal_consistency",
+            "compliance"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "explanatory_power": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "completeness": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "falsifiability": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "granularity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "transferability": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence_coverage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "temporal_consistency": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "compliance": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "qualified_for_reasoning": {
+          "type": "boolean"
+        },
+        "critical_issues": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommendation_summary": {
+          "type": "string"
+        }
+      }
+    },
+    "optimization_plan": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "plan_id",
+          "next_round",
+          "source_diagnostic_ids",
+          "optimization_goal",
+          "target_gaps",
+          "suggested_operations",
+          "suggested_materials",
+          "required_materials",
+          "minimum_evidence_level",
+          "priority",
+          "owner_role",
+          "stop_condition",
+          "continue_or_stop_condition",
+          "quality_expected_delta"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "plan_id": {
+            "type": "string"
+          },
+          "next_round": {
+            "type": "string"
+          },
+          "source_diagnostic_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "optimization_goal": {
+            "type": "string"
+          },
+          "target_gaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "target_file": {
+            "type": "string",
+            "description": "建议写入或检查的 bundle 文件，如 ontology_bundle_vN/05_reasoning.yaml。"
+          },
+          "target_path": {
+            "type": "string",
+            "description": "bundle 文件内部路径。"
+          },
+          "target_id": {
+            "type": "string",
+            "description": "目标对象、关系、变量、信号、证据或治理项 ID。"
+          },
+          "legacy_path": {
+            "type": "string",
+            "description": "旧 JSON 路径，可选。"
+          },
+          "suggested_operations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/planOperation"
+            }
+          },
+          "suggested_materials": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "required_materials": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "minimum_evidence_level": {
+            "$ref": "#/$defs/planEvidenceLevel"
+          },
+          "priority": {
+            "$ref": "#/$defs/planPriority"
+          },
+          "owner_role": {
+            "type": "string"
+          },
+          "stop_condition": {
+            "type": "string"
+          },
+          "continue_or_stop_condition": {
+            "type": "string"
+          },
+          "quality_expected_delta": {
+            "type": "object",
+            "required": [
+              "coverage_score",
+              "evidence_score",
+              "consistency_score",
+              "reasoning_score"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "coverage_score": {
+                "type": "number"
+              },
+              "evidence_score": {
+                "type": "number"
+              },
+              "consistency_score": {
+                "type": "number"
+              },
+              "reasoning_score": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "optimization_handoff": {
+      "type": "object",
+      "required": [
+        "target_skill",
+        "handoff_payload",
+        "execution_notes",
+        "must_not_do"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "target_skill": {
+          "type": "string",
+          "const": "touyan-benti-youhua"
+        },
+        "handoff_payload": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "execution_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "must_not_do": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "compliance_check": {
+      "type": "object",
+      "required": [
+        "no_optimized_ontology_output",
+        "no_direct_ontology_modification",
+        "t0_leakage_controlled",
+        "historical_cases_not_cherry_picked",
+        "forecast_rating_target_price_not_mapped_to_fact",
+        "no_trading_advice"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "no_optimized_ontology_output": {
+          "type": "boolean"
+        },
+        "no_direct_ontology_modification": {
+          "type": "boolean"
+        },
+        "t0_leakage_controlled": {
+          "type": "boolean"
+        },
+        "historical_cases_not_cherry_picked": {
+          "type": "boolean"
+        },
+        "forecast_rating_target_price_not_mapped_to_fact": {
+          "type": "boolean"
+        },
+        "no_trading_advice": {
+          "type": "boolean"
+        }
+      }
+    },
+    "readable_report": {
+      "type": "string",
+      "description": "人类可读的历史回放校验报告（Markdown 格式），采用四段式结构：身份背景（引用块）→ 结论概览（健康度判断 + 紧凑表格）→ 分析详情（案例分析 + 指标与诊断，详情折叠）→ 下一步行动（三列表格，最多 5 条）。面向投研人员和本体维护者，正文 800-1500 字，详情使用 <details> 标签折叠。"
+    }
+  }
+}

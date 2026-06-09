@@ -1,0 +1,380 @@
+{
+  "gap_discovery_context": {
+    "discovery_id": "GAP-20260602-001",
+    "generated_at": "2026-06-02T10:00:00+08:00",
+    "trigger_reason": "external_logic_review",
+    "input_ontology": {
+      "ontology_id": "ai_chip_product_track",
+      "ontology_version": "1.1.0",
+      "parent_version": "1.0.0",
+      "ontology_source_type": "optimized_ontology",
+      "source_skill": "touyan-benti-youhua",
+      "object_count": 86,
+      "relation_count": 124,
+      "scope": "AI芯片设计产品赛道，覆盖订单、收入、费用率、国产算力和资产预期差。",
+      "known_limitations": [
+        "对先进封装和高带宽内存等上游瓶颈只保留泛化供应链占位。",
+        "资产映射已有市场预期差字段，但缺少估值锚和已定价状态的可执行材料需求。"
+      ]
+    },
+    "input_sources": [
+      {
+        "source_id": "SRC-GAP-001",
+        "source_type": "excellent_report",
+        "title_or_summary": "示例AI算力产业链深度研究材料",
+        "publisher_or_origin": "示例研究机构",
+        "publish_time": "2026-05-20",
+        "source_location": "用户提供材料摘要",
+        "source_reliability": "medium",
+        "role_in_gap_discovery": "用于抽取AI需求外溢到先进封装、高带宽内存和供应链瓶颈的研究逻辑。"
+      },
+      {
+        "source_id": "SRC-GAP-002",
+        "source_type": "reasoning_feedback",
+        "title_or_summary": "投研推理命中不足反馈",
+        "publisher_or_origin": "touyan-tuili.ontology_feedback",
+        "publish_time": "2026-06-01",
+        "source_location": "上一轮推理结果",
+        "source_reliability": "medium",
+        "role_in_gap_discovery": "提示当前本体无法把AI芯片需求变化传导到先进封装瓶颈。"
+      }
+    ],
+    "research_scope": "检查当前AI芯片产品赛道本体是否覆盖上游瓶颈、供应链约束和资产预期差逻辑。",
+    "ontology_quality_before": {
+      "coverage_score": 0.68,
+      "evidence_score": 0.61,
+      "consistency_score": 0.86,
+      "reasoning_score": 0.64
+    },
+    "limitations": [
+      "样例材料不是正式来源，只能形成缺口发现和下一轮材料需求。",
+      "缺口发现 Skill 不直接确认新增对象或关系成立。"
+    ]
+  },
+  "logic_extraction": {
+    "extraction_summary": "材料中的核心增量逻辑不是单纯AI芯片订单增长，而是AI算力需求通过封装产能、高带宽内存供给和交付周期约束，影响收入兑现节奏与资产预期差。",
+    "fact_observations": [
+      {
+        "logic_id": "LOG-FACT-001",
+        "logic_type": "fact_observation",
+        "summary": "材料提到AI算力服务器交付受上游封装与内存供给约束，需要回溯公告、产业数据或公司披露验证。",
+        "source_refs": ["SRC-GAP-001#p12"],
+        "can_be_ontology_candidate": true,
+        "restriction": "当前仅为单篇材料线索，不得直接写成 StateVariableObservation。"
+      }
+    ],
+    "analysis_assumptions": [
+      {
+        "logic_id": "LOG-ASM-001",
+        "logic_type": "analysis_assumption",
+        "summary": "AI芯片设计公司收入兑现不仅取决于客户订单，还取决于封装和高带宽内存等上游瓶颈是否缓解。",
+        "source_refs": ["SRC-GAP-001#p18", "SRC-GAP-002#feedback"],
+        "can_be_ontology_candidate": true,
+        "restriction": "可沉淀为候选 StateHypothesis 或传导链待补证。"
+      }
+    ],
+    "transmission_logics": [
+      {
+        "logic_id": "LOG-TRANS-001",
+        "logic_type": "transmission_logic",
+        "summary": "AI算力需求提升 -> 封装产能利用率和内存供给紧张 -> 交付周期拉长或订单兑现延后 -> 收入确认节奏变化。",
+        "source_refs": ["SRC-GAP-001#p20"],
+        "can_be_ontology_candidate": true,
+        "restriction": "需要本体优化 Skill 补充 Segment/Product/StateVariablePropagation 和材料证据。"
+      }
+    ],
+    "validation_signals": [
+      {
+        "logic_id": "LOG-SIG-001",
+        "logic_type": "validation_signal",
+        "summary": "封装产能扩张、内存供货周期、服务器交付周期和客户验收节奏可作为验证信号。",
+        "source_refs": ["SRC-GAP-001#p24"],
+        "can_be_ontology_candidate": true,
+        "restriction": "可转成 validation/tracking Signal 候选，但事实值需后续材料支持。"
+      }
+    ],
+    "falsification_conditions": [
+      {
+        "logic_id": "LOG-FAL-001",
+        "logic_type": "falsification_condition",
+        "summary": "若封装和内存供应恢复但收入确认仍未改善，则订单质量或客户需求可能才是主要约束。",
+        "source_refs": ["SRC-GAP-001#p29"],
+        "can_be_ontology_candidate": true,
+        "restriction": "可作为 blocking 或 weakening 信号候选。"
+      }
+    ],
+    "asset_mappings": [
+      {
+        "logic_id": "LOG-AST-001",
+        "logic_type": "asset_mapping",
+        "summary": "市场对AI芯片收入兑现的预期可能已经部分反映，但对上游瓶颈缓解节奏的预期差仍需估值锚和一致预期材料验证。",
+        "source_refs": ["SRC-GAP-001#p35"],
+        "can_be_ontology_candidate": true,
+        "restriction": "只能进入 asset_impact_clues 或市场预期材料需求，不得形成正式资产结论。"
+      }
+    ],
+    "author_judgments": [
+      {
+        "logic_id": "LOG-JDG-001",
+        "logic_type": "author_judgment",
+        "summary": "作者认为供应链瓶颈缓解是AI芯片公司收入确认节奏的关键观察点。",
+        "source_refs": ["SRC-GAP-001#summary"],
+        "can_be_ontology_candidate": true,
+        "restriction": "只能作为研究判断线索，不得当作事实观测。"
+      }
+    ],
+    "forecast_rating_target_price_items": [
+      {
+        "logic_id": "LOG-FRC-001",
+        "logic_type": "forecast_or_rating_or_target_price",
+        "summary": "材料中的盈利预测、评级和目标价信息不进入事实层。",
+        "source_refs": ["SRC-GAP-001#valuation"],
+        "can_be_ontology_candidate": false,
+        "restriction": "仅可作为 source_viewpoint 或市场预期线索，禁止映射为 StateVariableObservation。"
+      }
+    ],
+    "excluded_or_restricted_items": [
+      {
+        "item": "单篇材料中的盈利预测和目标价",
+        "reason": "不属于事实观测，也不构成本体优化的直接证据。"
+      }
+    ]
+  },
+  "ontology_coverage_assessment": {
+    "coverage_summary": "当前本体对AI芯片订单和费用率已有部分覆盖，但对上游瓶颈、交付周期和资产预期差的细分表达较弱。",
+    "coverage_items": [
+      {
+        "assessment_id": "COV-001",
+        "logic_id": "LOG-TRANS-001",
+        "coverage_status": "weakly_covered",
+        "matched_ontology_items": ["SV-customer-order-visibility", "SV-revenue-growth"],
+        "missing_or_weak_parts": ["缺先进封装瓶颈变量", "缺高带宽内存供给变量", "缺交付周期到收入确认的中间传导"],
+        "reason": "现有本体能表达订单到收入，但无法表达上游瓶颈导致收入兑现延后的机制。"
+      },
+      {
+        "assessment_id": "COV-002",
+        "logic_id": "LOG-SIG-001",
+        "coverage_status": "partially_covered",
+        "matched_ontology_items": ["SIG-order-validation"],
+        "missing_or_weak_parts": ["缺封装产能扩张跟踪信号", "缺内存供货周期跟踪信号"],
+        "reason": "已有订单验证信号，但信号粒度仍停留在公司订单层。"
+      },
+      {
+        "assessment_id": "COV-003",
+        "logic_id": "LOG-AST-001",
+        "coverage_status": "partially_covered",
+        "matched_ontology_items": ["asset_impact_clues.market_expectation_gap"],
+        "missing_or_weak_parts": ["缺估值锚材料需求", "缺已定价状态字段的证据要求"],
+        "reason": "资产预期差字段存在，但缺少可执行材料计划。"
+      }
+    ],
+    "weak_coverage_patterns": [
+      "泛化供应链占位无法表达先进封装和高带宽内存的不同约束。",
+      "订单到收入链路缺少交付、验收和上游瓶颈中介。"
+    ],
+    "conflicts": [],
+    "out_of_scope_items": [
+      "材料中对短期市场价格弹性的表述不纳入当前产品赛道本体。"
+    ]
+  },
+  "gap_recommendations": [
+    {
+      "gap_id": "GAP-001",
+      "gap_type": "state_variable_gap",
+      "operation": "add",
+      "target_layer": "state_variable",
+      "current_coverage_status": "weakly_covered",
+      "source_logic_basis": "LOG-TRANS-001 指出上游瓶颈会影响订单兑现和收入确认。",
+      "suggested_change": "新增封装产能紧张度、高带宽内存供给紧张度、交付周期三个候选状态变量。",
+      "evidence_level": "single_report",
+      "priority": "high",
+      "expected_benefit": "提高AI芯片需求到收入兑现链路的解释力。",
+      "risk": "单篇材料可能夸大上游瓶颈作用，需要公告、产业数据或多来源材料验证。",
+      "scope_boundary": "仅限AI芯片设计产品赛道的供应链兑现逻辑，不扩展到所有半导体环节。",
+      "defer_or_reject_reason": "",
+      "handoff_requirement": "本体优化 Skill 需搜索封装产能、内存供给、交付周期和客户验收材料后再新增或保留候选变量。"
+    },
+    {
+      "gap_id": "GAP-002",
+      "gap_type": "relation_gap",
+      "operation": "revise_relation",
+      "target_layer": "relation",
+      "current_coverage_status": "weakly_covered",
+      "source_logic_basis": "LOG-TRANS-001 需要从订单能见度拆到上游瓶颈和收入确认节奏。",
+      "suggested_change": "把客户订单能见度 -> 收入增速的泛化传导拆为上游瓶颈 -> 交付周期 -> 收入确认节奏。",
+      "evidence_level": "ontology_feedback",
+      "priority": "high",
+      "expected_benefit": "减少直接从订单跳到收入的推理跳跃。",
+      "risk": "如果材料无法证明中介链条，应保留原链路并把拆分关系写入下一轮缺口。",
+      "scope_boundary": "只处理与AI芯片交付和收入确认相关的传导链。",
+      "defer_or_reject_reason": "",
+      "handoff_requirement": "优化 Skill 需检验关系端点是否已存在，缺端点时先补对象和状态变量。"
+    },
+    {
+      "gap_id": "GAP-003",
+      "gap_type": "asset_mapping_gap",
+      "operation": "supplement_evidence",
+      "target_layer": "asset_mapping",
+      "current_coverage_status": "partially_covered",
+      "source_logic_basis": "LOG-AST-001 指出资产预期差需要估值锚和已定价状态材料。",
+      "suggested_change": "为资产影响线索补充一致预期、估值分位、公告前后市场反应和已定价状态材料需求。",
+      "evidence_level": "single_report",
+      "priority": "medium",
+      "expected_benefit": "避免把供应链瓶颈缓解直接写成资产结论。",
+      "risk": "资产价格反应可能受多因素影响，不能替代基本面证据。",
+      "scope_boundary": "仅形成资产影响线索和材料需求，不形成交易判断。",
+      "defer_or_reject_reason": "",
+      "handoff_requirement": "优化 Skill 需将相关内容降级为 asset_impact_clues，待市场预期材料补足。"
+    },
+    {
+      "gap_id": "GAP-004",
+      "gap_type": "schema_gap",
+      "operation": "defer",
+      "target_layer": "schema",
+      "current_coverage_status": "partially_covered",
+      "source_logic_basis": "材料涉及瓶颈缓解概率和多情景时间窗口，但 V1 核心规范已有情景路径可暂时承载。",
+      "suggested_change": "暂不修改核心 schema，先用 scenario_paths 和 confidence 表达。",
+      "evidence_level": "single_report",
+      "priority": "low",
+      "expected_benefit": "保留未来规范层优化线索。",
+      "risk": "过早改核心规范会引入大范围同步成本。",
+      "scope_boundary": "仅作为规范层观察项，不进入本轮本体优化。",
+      "defer_or_reject_reason": "证据不足且可由现有情景路径暂时表达。",
+      "handoff_requirement": "本轮不交给优化 Skill 执行，只记录在剩余缺口中。"
+    }
+  ],
+  "optimization_plan": [
+    {
+      "plan_id": "OPT-GAP-001",
+      "next_round": "round_2",
+      "source_gap_ids": ["GAP-001", "GAP-002"],
+      "optimization_goal": "补齐AI芯片需求到上游瓶颈、交付周期和收入确认节奏的中介链条。",
+      "target_gaps": [
+        "封装产能紧张度状态变量",
+        "高带宽内存供给紧张度状态变量",
+        "交付周期到收入确认节奏传导关系"
+      ],
+      "suggested_operations": ["add", "revise_relation", "supplement_evidence"],
+      "suggested_materials": [
+        "封装产能扩张公告或产业数据",
+        "内存供给周期材料",
+        "客户交付和验收节奏材料",
+        "公司收入确认和订单兑现披露"
+      ],
+      "required_materials": [
+        "封装产能扩张公告或产业数据",
+        "内存供给周期材料",
+        "客户交付和验收节奏材料",
+        "公司收入确认和订单兑现披露"
+      ],
+      "minimum_evidence_level": "multi_source",
+      "priority": "high",
+      "owner_role": "ontology_optimization_skill",
+      "stop_condition": "若无法获得独立来源支持上游瓶颈到交付周期的传导，则只保留为 low confidence 候选并进入下一轮缺口。",
+      "continue_or_stop_condition": "获得多来源材料后执行 add/revise_relation；否则降级为候选缺口并等待更多来源。",
+      "quality_expected_delta": {
+        "coverage_score": 0.08,
+        "evidence_score": 0.05,
+        "consistency_score": 0.02,
+        "reasoning_score": 0.1
+      }
+    },
+    {
+      "plan_id": "OPT-GAP-002",
+      "next_round": "round_2",
+      "source_gap_ids": ["GAP-003"],
+      "optimization_goal": "补充资产预期差和估值锚材料需求，避免资产影响链路跳跃。",
+      "target_gaps": [
+        "一致预期材料",
+        "估值分位材料",
+        "公告前后市场反应材料",
+        "已定价状态说明"
+      ],
+      "suggested_operations": ["supplement_evidence"],
+      "suggested_materials": [
+        "一致预期数据",
+        "估值比较材料",
+        "资产价格表现和成交数据",
+        "重要公告或行业数据窗口"
+      ],
+      "required_materials": [
+        "一致预期数据",
+        "估值比较材料",
+        "资产价格表现和成交数据",
+        "重要公告或行业数据窗口"
+      ],
+      "minimum_evidence_level": "multi_source",
+      "priority": "medium",
+      "owner_role": "ontology_optimization_skill",
+      "stop_condition": "若缺少市场预期材料，不得升级为 AssetImpact，只能保留 asset_impact_clues。",
+      "continue_or_stop_condition": "材料齐备后补充资产影响线索和定价状态；材料不足时保留为下一轮证据缺口。",
+      "quality_expected_delta": {
+        "coverage_score": 0.03,
+        "evidence_score": 0.06,
+        "consistency_score": 0.02,
+        "reasoning_score": 0.04
+      }
+    }
+  ],
+  "handoff_block": {
+    "block_type": "gap_discovery_ai_handoff",
+    "handoff_version": "1.0",
+    "target_skill": "touyan-benti-youhua",
+    "source_discovery_id": "GAP-20260602-001",
+    "handoff_summary": "将 AI 芯片上游瓶颈、交付周期和资产预期差弱覆盖问题交给本体优化 Skill 做材料驱动修复。",
+    "payload_refs": [
+      "gap_discovery_context.input_ontology",
+      "logic_extraction",
+      "ontology_coverage_assessment",
+      "gap_recommendations",
+      "optimization_plan",
+      "compliance_check"
+    ],
+    "priority_gap_ids": ["GAP-001", "GAP-002"],
+    "optimization_plan_ids": ["OPT-GAP-001", "OPT-GAP-002"],
+    "deferred_or_rejected_gap_ids": ["GAP-004"],
+    "evidence_requirements": [
+      "OPT-GAP-001 执行前至少需要封装产能、内存供给、交付验收和收入确认的多来源材料。",
+      "OPT-GAP-002 执行前至少需要一致预期、估值比较、资产表现和重要公告窗口材料。",
+      "GAP-004 为 schema_gap，本轮只记录，不进入核心规范修改。"
+    ],
+    "execution_constraints": [
+      "缺口发现结果只能证明当前本体表达能力不足，不能替代事实证据。",
+      "新增变量和关系必须先通过材料搜索、证据评估和质量检查。",
+      "若材料不足，相关变化只能保留为候选项并写入下一轮计划。"
+    ],
+    "must_not_do": [
+      "不得跳过材料搜索直接修改完整本体。",
+      "不得自动应用 schema_gap 或修改核心规范。",
+      "不得输出投资建议、价格结论或交易执行类内容。"
+    ]
+  },
+  "optimization_handoff": {
+    "target_skill": "touyan-benti-youhua",
+    "handoff_payload": [
+      "gap_discovery_context.input_ontology",
+      "gap_recommendations",
+      "optimization_plan"
+    ],
+    "execution_notes": [
+      "将 optimization_plan 作为 next_optimization_plan 或等价优化任务输入。",
+      "优化 Skill 需要重新做材料搜索、证据评估和质量检查。",
+      "本轮 schema_gap 仅记录，不修改核心规范。"
+    ],
+    "must_not_do": [
+      "不得把单篇研报预测映射为 StateVariableObservation。",
+      "不得直接输出交易执行类内容。",
+      "不得把本缺口发现结果当作已执行的 optimized_ontology。"
+    ]
+  },
+  "compliance_check": {
+    "noBuySellAdvice": true,
+    "noTargetPrice": true,
+    "noReturnForecast": true,
+    "noPositionAdvice": true,
+    "forecastRatingTargetPriceNotMappedAsFact": true,
+    "schemaGapNotAutoApplied": true,
+    "optimizationPlanDoesNotModifyOntologyDirectly": true
+  },
+  "readable_report": "# 本体缺口发现报告\n\n> **报告**：本体缺口发现报告\n\n当前本体对 AI 芯片订单、费用率和收入兑现已有部分覆盖，但对上游瓶颈、交付周期和资产预期差表达不足。最关键缺口是订单到收入之间缺少先进封装、高带宽内存和交付周期等中介链路。\n\n| 项目 | 结果 |\n| --- | --- |\n| 缺口总数 | 4 个 |\n| 高优先级缺口 | 2 个 |\n| 建议交接 | 本体优化 Skill |\n\n## 关键缺口\n\n- 上游瓶颈变量缺失，导致 AI 芯片收入兑现链路过粗。\n- 订单到收入传导缺少交付周期和收入确认节奏中介。\n- 资产影响线索缺少一致预期、估值锚和已定价状态材料。\n\n## 下一步\n\n| 优先级 | 行动 | 目标 |\n| --- | --- | --- |\n| P0 | 补封装与内存供给材料 | 建立中介变量和关系 |\n| P0 | 修正订单到收入传导 | 降低推理跳跃 |\n| P1 | 补预期和估值材料 | 约束资产线索边界 |"
+}

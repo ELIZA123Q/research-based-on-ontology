@@ -1,0 +1,968 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/touyan/ontology-gap-discovery.schema.json",
+  "title": "投研本体缺口发现输出结构",
+  "type": "object",
+  "required": [
+    "gap_discovery_context",
+    "logic_extraction",
+    "ontology_coverage_assessment",
+    "gap_recommendations",
+    "optimization_plan",
+    "handoff_block",
+    "optimization_handoff",
+    "compliance_check",
+    "readable_report"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "coverageStatus": {
+      "type": "string",
+      "enum": [
+        "fully_covered",
+        "partially_covered",
+        "weakly_covered",
+        "not_covered",
+        "conflicting",
+        "out_of_scope"
+      ]
+    },
+    "gapType": {
+      "type": "string",
+      "enum": [
+        "object_gap",
+        "state_variable_gap",
+        "relation_gap",
+        "signal_gap",
+        "scenario_path_gap",
+        "asset_mapping_gap",
+        "schema_gap"
+      ]
+    },
+    "operation": {
+      "type": "string",
+      "enum": [
+        "add",
+        "split",
+        "merge",
+        "downgrade",
+        "supplement_evidence",
+        "revise_relation",
+        "add_blocking_signal",
+        "defer",
+        "reject"
+      ]
+    },
+    "targetLayer": {
+      "type": "string",
+      "enum": [
+        "object",
+        "state_variable",
+        "relation",
+        "signal",
+        "inference_path",
+        "scenario_path",
+        "asset_mapping",
+        "schema"
+      ]
+    },
+    "evidenceLevel": {
+      "type": "string",
+      "enum": [
+        "single_report",
+        "multi_source",
+        "historical_case",
+        "expert_confirmed",
+        "ontology_feedback",
+        "no_evidence"
+      ]
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "sourceItem": {
+      "type": "object",
+      "required": [
+        "source_id",
+        "source_type",
+        "title_or_summary",
+        "publisher_or_origin",
+        "publish_time",
+        "source_location",
+        "source_reliability",
+        "role_in_gap_discovery"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "type": "string"
+        },
+        "source_type": {
+          "type": "string",
+          "enum": [
+            "excellent_report",
+            "deep_research",
+            "expert_interview",
+            "conference_call",
+            "field_research",
+            "news_event",
+            "investment_review",
+            "reasoning_feedback",
+            "other"
+          ]
+        },
+        "title_or_summary": {
+          "type": "string"
+        },
+        "publisher_or_origin": {
+          "type": "string"
+        },
+        "publish_time": {
+          "type": "string"
+        },
+        "source_location": {
+          "type": "string"
+        },
+        "source_reliability": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "role_in_gap_discovery": {
+          "type": "string"
+        },
+        "evidence_episode_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_claim_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "logicItem": {
+      "type": "object",
+      "required": [
+        "logic_id",
+        "logic_type",
+        "summary",
+        "source_refs",
+        "can_be_ontology_candidate",
+        "restriction"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "logic_id": {
+          "type": "string"
+        },
+        "logic_type": {
+          "type": "string",
+          "enum": [
+            "fact_observation",
+            "analysis_assumption",
+            "transmission_logic",
+            "validation_signal",
+            "falsification_condition",
+            "asset_mapping",
+            "author_judgment",
+            "forecast_or_rating_or_target_price"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "can_be_ontology_candidate": {
+          "type": "boolean"
+        },
+        "restriction": {
+          "type": "string"
+        },
+        "evidence_episode_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_claim_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "claim_validity": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "claim_status": {
+          "type": "string"
+        },
+        "source_reliability": {
+          "type": "string"
+        },
+        "business_time": {
+          "type": "string"
+        }
+      }
+    },
+    "qualityScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    }
+  },
+  "properties": {
+    "gap_discovery_context": {
+      "type": "object",
+      "required": [
+        "discovery_id",
+        "generated_at",
+        "trigger_reason",
+        "input_ontology",
+        "input_sources",
+        "research_scope",
+        "ontology_quality_before",
+        "limitations"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "discovery_id": {
+          "type": "string"
+        },
+        "generated_at": {
+          "type": "string"
+        },
+        "trigger_reason": {
+          "type": "string",
+          "enum": [
+            "post_cold_start_check",
+            "post_optimization_check",
+            "reasoning_feedback",
+            "external_logic_review",
+            "historical_review",
+            "other"
+          ]
+        },
+        "input_ontology": {
+          "type": "object",
+          "required": [
+            "ontology_id",
+            "ontology_version",
+            "ontology_source_type",
+            "source_skill",
+            "object_count",
+            "relation_count",
+            "scope",
+            "known_limitations"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "ontology_id": {
+              "type": "string"
+            },
+            "ontology_version": {
+              "type": "string"
+            },
+            "parent_version": {
+              "type": "string"
+            },
+            "ontology_source_type": {
+              "type": "string",
+              "enum": [
+                "base_ontology",
+                "optimized_ontology",
+                "ontology_bundle",
+                "manual_ontology",
+                "other"
+              ]
+            },
+            "source_skill": {
+              "type": "string"
+            },
+            "object_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "relation_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "scope": {
+              "type": "string"
+            },
+            "known_limitations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "input_sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/sourceItem"
+          }
+        },
+        "research_scope": {
+          "type": "string"
+        },
+        "ontology_quality_before": {
+          "type": "object",
+          "required": [
+            "coverage_score",
+            "evidence_score",
+            "consistency_score",
+            "reasoning_score"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "coverage_score": {
+              "$ref": "#/$defs/qualityScore"
+            },
+            "evidence_score": {
+              "$ref": "#/$defs/qualityScore"
+            },
+            "consistency_score": {
+              "$ref": "#/$defs/qualityScore"
+            },
+            "reasoning_score": {
+              "$ref": "#/$defs/qualityScore"
+            }
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "logic_extraction": {
+      "type": "object",
+      "required": [
+        "extraction_summary",
+        "fact_observations",
+        "analysis_assumptions",
+        "transmission_logics",
+        "validation_signals",
+        "falsification_conditions",
+        "asset_mappings",
+        "author_judgments",
+        "forecast_rating_target_price_items",
+        "excluded_or_restricted_items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "extraction_summary": {
+          "type": "string"
+        },
+        "fact_observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/logicItem"
+          }
+        },
+        "analysis_assumptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/logicItem"
+          }
+        },
+        "transmission_logics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/logicItem"
+          }
+        },
+        "validation_signals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/logicItem"
+          }
+        },
+        "falsification_conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/logicItem"
+          }
+        },
+        "asset_mappings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/logicItem"
+          }
+        },
+        "author_judgments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/logicItem"
+          }
+        },
+        "forecast_rating_target_price_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/logicItem"
+          }
+        },
+        "excluded_or_restricted_items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "item",
+              "reason"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "item": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "ontology_coverage_assessment": {
+      "type": "object",
+      "required": [
+        "coverage_summary",
+        "coverage_items",
+        "weak_coverage_patterns",
+        "conflicts",
+        "out_of_scope_items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "coverage_summary": {
+          "type": "string"
+        },
+        "coverage_items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "assessment_id",
+              "logic_id",
+              "coverage_status",
+              "matched_ontology_items",
+              "missing_or_weak_parts",
+              "reason"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "assessment_id": {
+                "type": "string"
+              },
+              "logic_id": {
+                "type": "string"
+              },
+              "coverage_status": {
+                "$ref": "#/$defs/coverageStatus"
+              },
+              "matched_ontology_items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "missing_or_weak_parts": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "weak_coverage_patterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "out_of_scope_items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "gap_recommendations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "gap_id",
+          "gap_type",
+          "operation",
+          "target_layer",
+          "current_coverage_status",
+          "source_logic_basis",
+          "suggested_change",
+          "evidence_level",
+          "priority",
+          "expected_benefit",
+          "risk",
+          "scope_boundary",
+          "defer_or_reject_reason",
+          "handoff_requirement"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "gap_id": {
+            "type": "string"
+          },
+          "gap_type": {
+            "$ref": "#/$defs/gapType"
+          },
+          "operation": {
+            "$ref": "#/$defs/operation"
+          },
+          "target_layer": {
+            "$ref": "#/$defs/targetLayer"
+          },
+          "current_coverage_status": {
+            "$ref": "#/$defs/coverageStatus"
+          },
+          "source_logic_basis": {
+            "type": "string"
+          },
+          "suggested_change": {
+            "type": "string"
+          },
+          "evidence_level": {
+            "$ref": "#/$defs/evidenceLevel"
+          },
+          "priority": {
+            "$ref": "#/$defs/priority"
+          },
+          "expected_benefit": {
+            "type": "string"
+          },
+          "risk": {
+            "type": "string"
+          },
+          "scope_boundary": {
+            "type": "string"
+          },
+          "defer_or_reject_reason": {
+            "type": "string"
+          },
+          "handoff_requirement": {
+            "type": "string"
+          },
+          "evidence_episode_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidence_claim_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "target_file": {
+            "type": "string"
+          },
+          "target_path": {
+            "type": "string"
+          },
+          "target_id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "candidate_patch_requests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "patch_request_id",
+          "source_gap_ids",
+          "target_layer",
+          "suggested_operation",
+          "reason",
+          "semantic_risk",
+          "review_status"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "patch_request_id": {
+            "type": "string"
+          },
+          "source_gap_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidence_episode_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidence_claim_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "target_layer": {
+            "$ref": "#/$defs/targetLayer"
+          },
+          "target_file": {
+            "type": "string"
+          },
+          "target_path": {
+            "type": "string"
+          },
+          "target_id": {
+            "type": "string"
+          },
+          "suggested_operation": {
+            "$ref": "#/$defs/operation"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "semantic_risk": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "core_change_required"]
+          },
+          "review_status": {
+            "type": "string",
+            "enum": ["pending", "approved", "rejected", "supplementRequired", "merged", "superseded"]
+          }
+        }
+      }
+    },
+    "optimization_plan": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "plan_id",
+          "next_round",
+          "source_gap_ids",
+          "optimization_goal",
+          "target_gaps",
+          "suggested_operations",
+          "suggested_materials",
+          "required_materials",
+          "minimum_evidence_level",
+          "priority",
+          "owner_role",
+          "stop_condition",
+          "continue_or_stop_condition",
+          "quality_expected_delta"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "plan_id": {
+            "type": "string"
+          },
+          "next_round": {
+            "type": "string"
+          },
+          "source_gap_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "optimization_goal": {
+            "type": "string"
+          },
+          "target_gaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "target_file": {
+            "type": "string",
+            "description": "建议写入或检查的 bundle 文件，如 ontology_bundle_vN/05_reasoning.yaml。"
+          },
+          "target_path": {
+            "type": "string",
+            "description": "bundle 文件内部路径。"
+          },
+          "target_id": {
+            "type": "string",
+            "description": "目标对象、关系、变量、信号、证据或治理项 ID。"
+          },
+          "legacy_path": {
+            "type": "string",
+            "description": "旧 JSON 路径，可选。"
+          },
+          "suggested_operations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/operation"
+            }
+          },
+          "suggested_materials": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "required_materials": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "minimum_evidence_level": {
+            "$ref": "#/$defs/evidenceLevel"
+          },
+          "priority": {
+            "$ref": "#/$defs/priority"
+          },
+          "owner_role": {
+            "type": "string"
+          },
+          "stop_condition": {
+            "type": "string"
+          },
+          "continue_or_stop_condition": {
+            "type": "string"
+          },
+          "quality_expected_delta": {
+            "type": "object",
+            "required": [
+              "coverage_score",
+              "evidence_score",
+              "consistency_score",
+              "reasoning_score"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "coverage_score": {
+                "type": "number"
+              },
+              "evidence_score": {
+                "type": "number"
+              },
+              "consistency_score": {
+                "type": "number"
+              },
+              "reasoning_score": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "handoff_block": {
+      "type": "object",
+      "description": "给后续 AI / Skill 读取的缺口发现交接块。它是机器交接入口，必须汇总本轮重点缺口、优化计划、材料证据门槛、执行约束和禁止事项；不得只写见报告或见上文。",
+      "required": [
+        "block_type",
+        "handoff_version",
+        "target_skill",
+        "source_discovery_id",
+        "handoff_summary",
+        "payload_refs",
+        "priority_gap_ids",
+        "optimization_plan_ids",
+        "deferred_or_rejected_gap_ids",
+        "evidence_requirements",
+        "execution_constraints",
+        "must_not_do"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "block_type": {
+          "type": "string",
+          "const": "gap_discovery_ai_handoff"
+        },
+        "handoff_version": {
+          "type": "string"
+        },
+        "target_skill": {
+          "type": "string",
+          "const": "touyan-benti-youhua"
+        },
+        "source_discovery_id": {
+          "type": "string"
+        },
+        "handoff_summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload_refs": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "string"
+          }
+        },
+        "priority_gap_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "optimization_plan_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "deferred_or_rejected_gap_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_requirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "execution_constraints": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "must_not_do": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "optimization_handoff": {
+      "type": "object",
+      "required": [
+        "target_skill",
+        "handoff_payload",
+        "execution_notes",
+        "must_not_do"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "target_skill": {
+          "type": "string",
+          "const": "touyan-benti-youhua"
+        },
+        "handoff_payload": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "execution_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "must_not_do": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "compliance_check": {
+      "type": "object",
+      "required": [
+        "noBuySellAdvice",
+        "noTargetPrice",
+        "noReturnForecast",
+        "noPositionAdvice",
+        "forecastRatingTargetPriceNotMappedAsFact",
+        "schemaGapNotAutoApplied",
+        "optimizationPlanDoesNotModifyOntologyDirectly"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "noBuySellAdvice": {
+          "type": "boolean",
+          "const": true
+        },
+        "noTargetPrice": {
+          "type": "boolean",
+          "const": true
+        },
+        "noReturnForecast": {
+          "type": "boolean",
+          "const": true
+        },
+        "noPositionAdvice": {
+          "type": "boolean",
+          "const": true
+        },
+        "forecastRatingTargetPriceNotMappedAsFact": {
+          "type": "boolean",
+          "const": true
+        },
+        "schemaGapNotAutoApplied": {
+          "type": "boolean",
+          "const": true
+        },
+        "optimizationPlanDoesNotModifyOntologyDirectly": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    },
+    "readable_report": {
+      "type": "string",
+      "description": "人类可读的缺口发现报告（Markdown 格式），采用四段式结构：身份背景（引用块）→ 结论概览（覆盖充分度判断 + 紧凑表格）→ 分析详情（覆盖分析 + 关键缺口逐条，详情折叠）→ 下一步行动（三列表格，最多 5 条）。面向投研人员和本体维护者，正文 800-1500 字，详情使用 <details> 标签折叠。"
+    }
+  }
+}

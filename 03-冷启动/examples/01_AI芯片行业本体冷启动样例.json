@@ -1,0 +1,1839 @@
+{
+  "research_context": {
+    "focus_name": "AI芯片设计",
+    "focus_type": "product_track",
+    "primary_research_question": "AI芯片设计环节的订单兑现、毛利率稳定和研发费用率收敛是否能共同形成盈利拐点。",
+    "user_input_summary": "用户关注AI芯片设计环节的收入兑现和费用率收敛是否能形成盈利拐点。",
+    "candidate_entities": [
+      {
+        "anchor_type": "industry",
+        "name": "半导体",
+        "role": "上位行业锚点"
+      },
+      {
+        "anchor_type": "product_track",
+        "name": "AI芯片设计",
+        "role": "本次冷启动焦点"
+      },
+      {
+        "anchor_type": "company",
+        "name": "寒武纪",
+        "role": "后续材料验证样例"
+      },
+      {
+        "anchor_type": "asset",
+        "name": "AI芯片上市公司股票",
+        "role": "资产影响线索承接对象"
+      }
+    ],
+    "asset_clues": [
+      "AI芯片上市公司股票"
+    ],
+    "confidence": 0.82,
+    "needs_confirmation": [
+      "是否只覆盖国产AI芯片设计，还是同时覆盖晶圆代工、HBM、先进封装等上游环节",
+      "是否需要指定具体公司作为后续材料抽取对象"
+    ],
+    "impacted_industries": [
+      "半导体",
+      "数据中心算力基础设施"
+    ],
+    "focus_description": "围绕AI芯片设计产品赛道，搭建订单、产品、供应链、盈利兑现和资产预期差的冷启动候选本体。"
+  },
+  "ontology_scope": {
+    "scope_type": "product_track",
+    "scope_reason": "围绕AI芯片设计产品赛道的冷启动，重点刻画订单、产品、研发投入、盈利兑现和资产定价线索。",
+    "default_assumption": "本次冷启动默认聚焦产品赛道，以AI芯片设计环节为锚点。",
+    "alternative_scope_types": [
+      {
+        "scope_type": "supply_chain",
+        "rationale": "AI芯片商业化高度依赖晶圆代工、先进封装和HBM供应链，若研究重心转向上游约束，可切换至供应链模板。"
+      }
+    ],
+    "boundary_notes": [
+      "不生成正式投资结论",
+      "不生成目标价或仓位建议",
+      "不把没有来源材料的行业经验写成已确认观测"
+    ]
+  },
+  "candidate_research_paths": [
+    {
+      "primary_industry": "半导体",
+      "segments": [
+        "AI芯片设计",
+        "智能算力加速卡"
+      ],
+      "scope_type": "product_track",
+      "rationale": "用户明确提到AI芯片，研究问题聚焦产品赛道内设计公司订单、收入、费用率和盈利兑现。",
+      "confidence": 0.82,
+      "default_assumption": true,
+      "needs_confirmation": [
+        "是否只覆盖国产AI芯片设计公司",
+        "是否纳入晶圆代工、HBM、先进封装等上游约束"
+      ]
+    },
+    {
+      "primary_industry": "数据中心算力基础设施",
+      "segments": [
+        "智能算力加速卡",
+        "服务器和云厂商采购"
+      ],
+      "scope_type": "supply_chain",
+      "rationale": "若用户重点关注算力采购和交付兑现，研究范围可能应扩展到数据中心算力链条。",
+      "confidence": 0.48,
+      "default_assumption": false,
+      "needs_confirmation": [
+        "是否把云厂商资本开支和服务器集成商纳入本体范围"
+      ]
+    }
+  ],
+  "template_application": {
+    "selected_template_id": "product_track_adoption_replacement_monetization_v1",
+    "selected_reason": "用户关注AI芯片设计这一产品赛道，核心问题是产品订单、商业化收入、费用率收敛和资产预期差，符合产品赛道模板的采用、替代和商业化主线。",
+    "confidence": 0.85,
+    "primary_research_question": "AI芯片设计环节的订单兑现、毛利率稳定和研发费用率收敛是否能共同形成盈利拐点。",
+    "reference_models": [
+      {
+        "model_name": "Gartner Hype Cycle",
+        "source_url": "https://www.gartner.com/en/research/methodologies/gartner-hype-cycle",
+        "authority_type": "recognized_practitioner_framework",
+        "authority_reason": "Gartner 的技术成熟度和市场预期框架适合约束产品赛道冷启动，避免把市场热度、产品发布和商业化兑现混为一谈。",
+        "mapped_template_modules": [
+          "variable_pack",
+          "propagation_pack",
+          "signal_pack",
+          "blocking_pack",
+          "material_pack"
+        ],
+        "mapped_output_fields": [
+          "base_ontology.state_variables",
+          "propagation_templates",
+          "template_signals",
+          "blocking_templates",
+          "material_gap_list"
+        ],
+        "logic_guardrails": [
+          "不得把产品发布直接等同于主流采用或收入兑现。",
+          "必须区分技术成熟度、市场预期差、客户验证和量产商业化。"
+        ]
+      },
+      {
+        "model_name": "Rogers Diffusion of Innovations",
+        "source_url": "https://www.simonandschuster.com/books/Diffusion-of-Innovations-5th-Edition/Everett-M-Rogers/9780743222099",
+        "authority_type": "academic_classic",
+        "authority_reason": "Rogers 创新扩散框架是解释创新采用者类别、采用速度和扩散过程的学术经典，适合约束产品赛道的客户采用阶段。",
+        "mapped_template_modules": [
+          "object_backbone",
+          "variable_pack",
+          "propagation_pack",
+          "signal_pack"
+        ],
+        "mapped_output_fields": [
+          "base_ontology.objects",
+          "base_ontology.state_variables",
+          "propagation_templates",
+          "template_signals"
+        ],
+        "logic_guardrails": [
+          "不得把早期客户验证直接等同于主流客户采用。",
+          "必须补充渗透率、复购/续约、交付验收和客户扩散证据。"
+        ]
+      },
+      {
+        "model_name": "ASCM SCOR Model",
+        "source_url": "https://scor.ascm.org/",
+        "authority_type": "professional_body",
+        "authority_reason": "ASCM SCOR 为供应链流程拆解提供专业参考，适合约束本样例中 AI 芯片供应链定制模块的交付和上游依赖变量。",
+        "mapped_template_modules": [
+          "variable_pack",
+          "propagation_pack",
+          "blocking_pack",
+          "material_pack"
+        ],
+        "mapped_output_fields": [
+          "base_ontology.state_variables",
+          "propagation_templates",
+          "blocking_templates",
+          "material_collection_plan"
+        ],
+        "logic_guardrails": [
+          "不得把上游国产替代直接等同于交付韧性。",
+          "必须检查供应响应、良率、交付周期、库存缓冲和替代供应。"
+        ]
+      }
+    ],
+    "template_id": "product_track_adoption_replacement_monetization_v1",
+    "template_version": "v1",
+    "file_path": "references/03_冷启动模板库.md",
+    "applied_module_ids": [
+      "object_backbone",
+      "variable_pack",
+      "propagation_pack",
+      "signal_pack",
+      "material_pack"
+    ],
+    "inherited_modules": [
+      {
+        "module_type": "object_backbone",
+        "module_name": "产品赛道-技术路线-客户-公司-上游依赖-资产对象骨架",
+        "template_source": "references/03_冷启动模板库.md#product_track_adoption_replacement_monetization_v1",
+        "applied_to_output_fields": [
+          "base_ontology.objects",
+          "base_ontology.relations"
+        ]
+      },
+      {
+        "module_type": "variable_pack",
+        "module_name": "产品性能、客户采用、订单交付、毛利率、替代强度、商业化变量包",
+        "template_source": "references/03_冷启动模板库.md#product_track_adoption_replacement_monetization_v1",
+        "applied_to_output_fields": [
+          "base_ontology.state_variables",
+          "template_hypotheses"
+        ]
+      },
+      {
+        "module_type": "propagation_pack",
+        "module_name": "性能/成本改善到客户采用、订单、收入和资产预期差的传导包",
+        "template_source": "references/03_冷启动模板库.md#product_track_adoption_replacement_monetization_v1",
+        "applied_to_output_fields": [
+          "propagation_templates",
+          "judgment_templates",
+          "scenario_paths"
+        ]
+      },
+      {
+        "module_type": "signal_pack",
+        "module_name": "产品发布、客户定点、中标、量产、价格和质量问题信号包",
+        "template_source": "references/03_冷启动模板库.md#product_track_adoption_replacement_monetization_v1",
+        "applied_to_output_fields": [
+          "template_signals",
+          "blocking_templates"
+        ]
+      },
+      {
+        "module_type": "material_pack",
+        "module_name": "产品手册、客户验证、公司公告、招投标、财报和一致预期材料包",
+        "template_source": "references/03_冷启动模板库.md#product_track_adoption_replacement_monetization_v1",
+        "applied_to_output_fields": [
+          "material_collection_plan",
+          "material_gap_list"
+        ]
+      }
+    ],
+    "customized_modules": [
+      {
+        "module_name": "AI芯片供应链约束补充模块",
+        "customization_reason": "AI芯片商业化高度受晶圆代工、先进封装、HBM、EDA/IP和出口管制影响，需要从 supply_chain 模板补充上游约束。",
+        "customization_summary": "增加供应链约束强度变量、供应链研报材料计划，以及供应链对交付、成本和收入确认的阻断条件。"
+      },
+      {
+        "module_name": "盈利拐点资产预期差模块",
+        "customization_reason": "用户研究问题明确关注收入兑现和费用率收敛是否形成盈利拐点，并需要承接资产线索。",
+        "customization_summary": "增加市场预期差变量、asset_impact_clues 和一致预期/估值材料任务。"
+      }
+    ],
+    "trimmed_modules": [
+      {
+        "module_name": "正式产品性能参数观测",
+        "omission_reason": "当前没有产品手册、测试报告或客户验证原文，冷启动阶段不得生成已确认性能观测。",
+        "mvo_impact": "不影响MVO；作为下游材料缺口保留。"
+      }
+    ],
+    "anti_random_check": [
+      {
+        "check": "模板匹配",
+        "result": "pass",
+        "note": "scope_type 为 product_track，selected_template_id 为产品赛道模板。"
+      },
+      {
+        "check": "模块可追溯",
+        "result": "pass",
+        "note": "对象、变量、传导、信号和材料计划均能追溯到产品赛道模板或明确的供应链定制模块。"
+      },
+      {
+        "check": "无空白生成",
+        "result": "pass",
+        "note": "新增的供应链约束和资产预期差均说明了定制原因，没有脱离模板任意扩展。"
+      }
+    ]
+  },
+  "template_composition": {
+    "composition_type": "single_template_with_customizations",
+    "primary_template_id": "product_track_adoption_replacement_monetization_v1",
+    "supplementary_template_ids": [
+      "supply_chain_bottleneck_profit_allocation_v1"
+    ],
+    "supplementary_reason": "AI芯片商业化需要从供应链模板补充上游晶圆代工、先进封装和HBM约束。",
+    "cross_template_modules": [
+      {
+        "module_name": "供应链约束强度变量",
+        "source_template_id": "supply_chain_bottleneck_profit_allocation_v1",
+        "integrated_into": "variable_pack"
+      }
+    ]
+  },
+  "template_pressure_test": {
+    "selected_template_id": "product_track_adoption_replacement_monetization_v1",
+    "excluded_templates": [],
+    "exclusion_reasons": [],
+    "boundary_test_notes": "用户研究问题直接指向产品赛道订单兑现和盈利拐点，产品赛道模板匹配度高。供应链模板仅作定制模块补充，非主模板。"
+  },
+  "template_candidate_list": [],
+  "base_ontology": {
+    "ontology_metadata": {
+      "ontology_id": "ai_chip_product_track",
+      "ontology_version": "1.0.0",
+      "parent_version": "",
+      "created_by": "touyan-hangye-chanye-bentilengqidong",
+      "updated_by": "touyan-hangye-chanye-bentilengqidong",
+      "change_reason": "cold_start",
+      "ontology_quality": {
+        "coverage_score": 0.52,
+        "evidence_score": 0.12,
+        "consistency_score": 0.82,
+        "reasoning_score": 0.48
+      }
+    },
+    "industry_context": {
+      "primary_industry": "半导体",
+      "segments": [
+        "AI芯片设计",
+        "智能算力加速卡"
+      ],
+      "companies": [
+        "寒武纪"
+      ],
+      "products": [
+        "训练芯片",
+        "推理芯片",
+        "智能加速卡"
+      ],
+      "materials": [],
+      "assets": [
+        "AI芯片上市公司股票"
+      ],
+      "themes": [
+        "国产算力",
+        "订单兑现",
+        "研发费用率收敛",
+        "出口管制"
+      ],
+      "research_question": "AI芯片设计环节的收入兑现和费用率收敛是否能形成盈利拐点。",
+      "confidence": 0.82,
+      "need_user_confirmation": [
+        "是否只覆盖国产AI芯片设计，还是同时覆盖晶圆代工、HBM、先进封装等上游环节",
+        "是否需要指定具体公司作为后续材料抽取对象"
+      ],
+      "regions": [],
+      "business_time_range": "",
+      "industry_calibration_loaded": [
+        "generic_only"
+      ],
+      "notes": "冷启动候选本体，待 后续材料驱动优化 基于材料进行专业化补充"
+    },
+    "base_ontology_reference": {
+      "provided": true,
+      "version_or_name": "cold_start_v1",
+      "scope": "product_track",
+      "source": "touyan-hangye-chanye-bentilengqidong",
+      "notes": "冷启动候选本体。所有条目 recordStatus=candidate、evidenceLevel=no_evidence，需由 后续材料驱动优化 基于材料进行专业化补充和证据升级。"
+    },
+    "concept_layer": {
+      "concept_scheme": {
+        "id": "CS-AI-CHIP-001",
+        "name": "AI芯片产品赛道概念体系",
+        "scopeName": "AI芯片产品赛道",
+        "schemeVersion": "0.1.0",
+        "description": "约束AI芯片冷启动本体的术语、范围和边界。",
+        "authorityPolicy": "冷启动阶段优先引用公司公告、招股书、年报、政策和行业报告；无权威来源时保持draft或candidate。"
+      },
+      "concepts": [
+        {
+          "id": "CON-AI-CHIP-001",
+          "name": "AI芯片",
+          "definition": "面向人工智能训练或推理任务的专用或通用加速芯片及相关产品线。",
+          "conceptType": "product_or_technology",
+          "scopeStatus": "in_scope",
+          "definitionStatus": "draft",
+          "source_refs": [
+            "template:product_track_adoption_replacement_monetization_v1"
+          ],
+          "aliases": [
+            "AI加速芯片",
+            "智能计算芯片"
+          ]
+        },
+        {
+          "id": "CON-AI-CHIP-002",
+          "name": "先进封装",
+          "definition": "影响AI芯片算力、带宽、良率和交付能力的封装技术与产能约束。",
+          "conceptType": "supply_chain_scope",
+          "scopeStatus": "overlap",
+          "definitionStatus": "draft",
+          "source_refs": [
+            "template:supply_chain_bottleneck_profit_allocation_v1"
+          ]
+        }
+      ],
+      "concept_relations": [
+        {
+          "id": "REL-CON-AI-CHIP-001",
+          "type": "conceptInScheme",
+          "sourceId": "CON-AI-CHIP-001",
+          "targetId": "CS-AI-CHIP-001",
+          "properties": {
+            "schemeRole": "primary"
+          },
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "template:product_track_adoption_replacement_monetization_v1"
+          ]
+        },
+        {
+          "id": "REL-CON-AI-CHIP-002",
+          "type": "conceptMapsToObject",
+          "sourceId": "CON-AI-CHIP-001",
+          "targetId": "segment_ai_chip_design",
+          "properties": {
+            "mappingRole": "maps_to_segment"
+          },
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "template:product_track_adoption_replacement_monetization_v1"
+          ]
+        }
+      ],
+      "boundary_decisions": [
+        {
+          "id": "CB-AI-CHIP-001",
+          "title": "AI芯片产品赛道边界",
+          "decisionType": "include",
+          "decisionText": "本体纳入AI芯片产品、公司、供应链约束和商业化验证变量；不直接纳入整机云服务或下游应用运营。",
+          "appliesToConceptIds": [
+            "CON-AI-CHIP-001"
+          ],
+          "source_refs": [
+            "template:product_track_adoption_replacement_monetization_v1"
+          ]
+        },
+        {
+          "id": "CB-AI-CHIP-002",
+          "title": "先进封装边界",
+          "decisionType": "overlap",
+          "decisionText": "先进封装不作为本轮产品赛道主对象，但当其影响AI芯片交付、良率、成本或性能时纳入传导链路。",
+          "appliesToConceptIds": [
+            "CON-AI-CHIP-002"
+          ],
+          "source_refs": [
+            "template:supply_chain_bottleneck_profit_allocation_v1"
+          ]
+        }
+      ]
+    },
+    "source_documents": [],
+    "evidence_claims": [],
+    "objects": [
+      {
+        "operation": "keep",
+        "id": "industry_semiconductor",
+        "type": "Industry",
+        "governanceLayer": "industry_extension",
+        "fields": {
+          "name": "半导体",
+          "role": "上位行业",
+          "candidate_status": "seed_candidate",
+          "evidence_status": "no_material_yet"
+        },
+        "evidenceRefs": [],
+        "extractionConfidence": 0.5,
+        "reviewNote": "用于承接AI芯片设计、晶圆代工、封装测试等环节。",
+        "source_name": "半导体",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "operation": "keep",
+        "id": "segment_ai_chip_design",
+        "type": "Segment",
+        "governanceLayer": "industry_extension",
+        "fields": {
+          "name": "AI芯片设计",
+          "role": "本次本体核心环节",
+          "candidate_status": "user_provided",
+          "evidence_status": "user_statement_only"
+        },
+        "evidenceRefs": [],
+        "extractionConfidence": 0.5,
+        "reviewNote": "用户关注对象，后续需用研报、公告和财报确认边界。",
+        "source_name": "AI芯片设计",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "operation": "keep",
+        "id": "company_cambricon_placeholder",
+        "type": "Company",
+        "governanceLayer": "industry_extension",
+        "fields": {
+          "name": "寒武纪",
+          "role": "公司样例占位",
+          "candidate_status": "example_placeholder",
+          "evidence_status": "needs_source_document"
+        },
+        "evidenceRefs": [],
+        "extractionConfidence": 0.5,
+        "reviewNote": "仅作为后续材料收集方向，不代表已完成事实抽取。",
+        "source_name": "寒武纪",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "operation": "keep",
+        "id": "product_ai_accelerator",
+        "type": "Product",
+        "governanceLayer": "industry_extension",
+        "fields": {
+          "name": "智能加速卡",
+          "role": "产品形态",
+          "candidate_status": "seed_candidate",
+          "evidence_status": "no_material_yet"
+        },
+        "evidenceRefs": [],
+        "extractionConfidence": 0.5,
+        "reviewNote": "可进一步拆为训练、推理、云端、边缘端等产品线。",
+        "source_name": "智能加速卡",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "operation": "keep",
+        "id": "asset_ai_chip_equity",
+        "type": "Asset",
+        "governanceLayer": "industry_extension",
+        "fields": {
+          "name": "AI芯片上市公司股票",
+          "role": "资产影响承接对象",
+          "candidate_status": "seed_candidate",
+          "evidence_status": "no_material_yet"
+        },
+        "evidenceRefs": [],
+        "extractionConfidence": 0.5,
+        "reviewNote": "只用于后续承接资产影响线索，不输出交易建议。",
+        "source_name": "AI芯片上市公司股票",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      }
+    ],
+    "relations": [
+      {
+        "operation": "keep",
+        "id": "rel_segment_to_industry",
+        "type": "segmentBelongsToIndustry",
+        "sourceId": "segment_ai_chip_design",
+        "targetId": "industry_semiconductor",
+        "properties": {
+          "relationStrength": "strong"
+        },
+        "evidenceRefs": [],
+        "extractionConfidence": 0.5,
+        "source_name": "relation_rel_segment_to_industry",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "operation": "keep",
+        "id": "rel_company_to_segment",
+        "type": "companyParticipatesInSegment",
+        "sourceId": "company_cambricon_placeholder",
+        "targetId": "segment_ai_chip_design",
+        "properties": {
+          "evidenceNeeded": "公司公告、招股书、财报或业务介绍"
+        },
+        "evidenceRefs": [],
+        "extractionConfidence": 0.5,
+        "source_name": "relation_rel_company_to_segment",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "operation": "keep",
+        "id": "rel_product_to_segment",
+        "type": "productBelongsToSegment",
+        "sourceId": "product_ai_accelerator",
+        "targetId": "segment_ai_chip_design",
+        "properties": {
+          "productRole": "算力硬件承载"
+        },
+        "evidenceRefs": [],
+        "extractionConfidence": 0.5,
+        "source_name": "relation_rel_product_to_segment",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      }
+    ],
+    "state_variables": [
+      {
+        "objectId": "sv_customer_order_visibility",
+        "name": "大客户订单能见度",
+        "operation": "keep",
+        "currentStatus": "industry_template_candidate",
+        "note": "why_it_matters: 决定收入兑现节奏和产能、库存、现金流安排。; typical_sources: 重大合同公告, 招投标公告, 财报订单披露, 调研纪要",
+        "source_name": "大客户订单能见度",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "objectId": "sv_revenue_growth",
+        "name": "收入增速",
+        "operation": "keep",
+        "currentStatus": "industry_template_candidate",
+        "note": "why_it_matters: 验证订单和产品出货是否转化为财务结果。; typical_sources: 财报, 业绩预告, 经营数据公告",
+        "source_name": "收入增速",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "objectId": "sv_gross_margin",
+        "name": "毛利率",
+        "operation": "keep",
+        "currentStatus": "industry_template_candidate",
+        "note": "why_it_matters: 反映产品定价、成本、良率、产品结构和竞争格局。; typical_sources: 财报, 招股书, 公司公告",
+        "source_name": "毛利率",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "objectId": "sv_rd_expense_ratio",
+        "name": "研发费用率",
+        "operation": "keep",
+        "currentStatus": "industry_template_candidate",
+        "note": "why_it_matters: 高研发投入行业中，费用率收敛是盈利拐点的重要前置变量。; typical_sources: 财报, 业绩说明会, 研发项目披露",
+        "source_name": "研发费用率",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "objectId": "sv_supply_chain_constraint",
+        "name": "供应链约束强度",
+        "operation": "keep",
+        "currentStatus": "needs_material_validation",
+        "note": "why_it_matters: 上游约束可能影响交付、成本和收入确认。; typical_sources: 产业链研报, 政策文件, 供应商公告, 新闻",
+        "source_name": "供应链约束强度",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "objectId": "sv_market_expectation_gap",
+        "name": "市场预期差",
+        "operation": "keep",
+        "currentStatus": "industry_template_candidate",
+        "note": "why_it_matters: 同样的基本面变化是否影响资产表现，取决于是否已被市场定价。; typical_sources: 一致预期, 股价表现, 估值比较, 卖方研报",
+        "source_name": "市场预期差",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      }
+    ],
+    "state_observations": [],
+    "propagation_templates": [
+      {
+        "objectId": "prop_sv_customer_order_visibility_to_sv_revenue_growth",
+        "templateName": "大客户订单能见度 → 收入增速",
+        "operation": "keep",
+        "verified_steps": [],
+        "missing_steps": [
+          "订单金额和交付条款",
+          "验收或收入确认政策",
+          "客户集中度和履约进度"
+        ],
+        "source_name": "大客户订单能见度 → 收入增速",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "objectId": "prop_sv_revenue_growth_to_sv_rd_expense_ratio",
+        "templateName": "收入增速 → 研发费用率",
+        "operation": "keep",
+        "verified_steps": [],
+        "missing_steps": [
+          "研发人员数量",
+          "研发项目阶段",
+          "研发费用绝对额和资本化政策"
+        ],
+        "source_name": "收入增速 → 研发费用率",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "objectId": "prop_sv_gross_margin_to_sv_market_expectation_gap",
+        "templateName": "毛利率 → 市场预期差",
+        "operation": "keep",
+        "verified_steps": [],
+        "missing_steps": [
+          "产品结构",
+          "价格和成本拆分",
+          "一致预期或市场预期锚"
+        ],
+        "source_name": "毛利率 → 市场预期差",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      }
+    ],
+    "hypotheses": [
+      {
+        "objectId": "hyp_order_to_revenue_template",
+        "title": "订单兑现驱动收入增长",
+        "operation": "keep",
+        "status": "up/template_candidate",
+        "supportingSignals": [],
+        "reviewNote": "basis: 大客户订单能见度提升，并经过交付、验收和收入确认后，收入增速可能上行。; falsification: 订单披露后超过交付窗口仍未体现为发出商品、验收或收入确认。",
+        "source_name": "订单兑现驱动收入增长",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "objectId": "hyp_rd_ratio_decline_template",
+        "title": "收入放量带动研发费用率收敛",
+        "operation": "keep",
+        "status": "down/template_candidate",
+        "supportingSignals": [],
+        "reviewNote": "basis: 收入规模扩大且研发费用绝对额增速放缓时，研发费用率可能下降。; falsification: 收入增长同时研发费用绝对额继续快速扩张，费用率未连续下降。",
+        "source_name": "收入放量带动研发费用率收敛",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      }
+    ],
+    "signals": [
+      {
+        "objectId": "sig_订单转收入验证信号",
+        "title": "订单转收入验证信号",
+        "signalRole": "validation",
+        "operation": "keep",
+        "target": "hyp_order_to_revenue_template",
+        "source_name": "订单转收入验证信号",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "objectId": "sig_研发费用率季度跟踪",
+        "title": "研发费用率季度跟踪",
+        "signalRole": "tracking",
+        "operation": "keep",
+        "target": "hyp_rd_ratio_decline_template",
+        "source_name": "研发费用率季度跟踪",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "objectId": "sig_超预期大客户采购公告",
+        "title": "超预期大客户采购公告",
+        "signalRole": "catalyst",
+        "operation": "keep",
+        "target": "judgment_profit_inflection_template",
+        "source_name": "超预期大客户采购公告",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "objectId": "sig_交付延期或验收失败",
+        "title": "交付延期或验收失败",
+        "signalRole": "blocking",
+        "operation": "keep",
+        "target": "hyp_order_to_revenue_template",
+        "source_name": "交付延期或验收失败",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      }
+    ],
+    "events": [
+      {
+        "objectId": "evt_重大订单或中标公告",
+        "title": "重大订单或中标公告",
+        "operation": "keep",
+        "anchorOrScope": "大客户订单能见度, 收入增速, 市场预期差",
+        "reviewNote": "description: 客户采购、框架协议或招投标结果披露。; sources: 上市公司公告, 政府或客户招投标平台, 新闻",
+        "source_name": "重大订单或中标公告",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "objectId": "evt_财报或业绩预告披露",
+        "title": "财报或业绩预告披露",
+        "operation": "keep",
+        "anchorOrScope": "收入增速, 毛利率, 研发费用率",
+        "reviewNote": "description: 收入、毛利率、费用率、现金流和订单进展更新。; sources: 季度报告, 年度报告, 业绩预告",
+        "source_name": "财报或业绩预告披露",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "objectId": "evt_出口管制或国产算力政策变化",
+        "title": "出口管制或国产算力政策变化",
+        "operation": "keep",
+        "anchorOrScope": "供应链约束强度, 大客户订单能见度, 市场预期差",
+        "reviewNote": "description: 政策改变供给约束、国产替代节奏或客户采购倾向。; sources: 政策文件, 监管公告, 产业新闻",
+        "source_name": "出口管制或国产算力政策变化",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      }
+    ],
+    "judgment_outputs": [
+      {
+        "objectId": "judgment_profit_inflection_template",
+        "title": "收入兑现与费用率收敛驱动盈利拐点",
+        "operation": "keep",
+        "status": "needs_material_validation",
+        "hypothesisRefs": [
+          "hyp_order_to_revenue_template",
+          "hyp_rd_ratio_decline_template"
+        ],
+        "reviewNote": "template: 当订单兑现、收入增长、毛利率稳定和研发费用率收敛同时被材料验证时，可形成盈利拐点候选判断。; competing_explanations: 费用率下降是否来自收入低基数而非规模效应, 毛利率是否因竞争加剧抵消费用率收敛, 订单是否已被市场提前定价",
+        "source_name": "收入兑现与费用率收敛驱动盈利拐点",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      }
+    ],
+    "asset_impacts": [],
+    "investment_theses": [],
+    "blocking_conditions": [
+      {
+        "condition": "订单未能转化为验收收入",
+        "targetHypothesisId": "订单兑现驱动收入增长",
+        "status": "candidate",
+        "neededEvidence": [
+          "合同交付条款",
+          "收入确认政策",
+          "财报存货和发出商品变化"
+        ],
+        "source_name": "订单未能转化为验收收入",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "condition": "研发投入继续高增长",
+        "targetHypothesisId": "收入放量带动研发费用率收敛",
+        "status": "candidate",
+        "neededEvidence": [
+          "研发费用明细",
+          "研发人员数量",
+          "新产品研发阶段"
+        ],
+        "source_name": "研发投入继续高增长",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "condition": "毛利率改善不可持续",
+        "targetHypothesisId": "产品结构改善驱动盈利质量提升",
+        "status": "candidate",
+        "neededEvidence": [
+          "产品结构拆分",
+          "成本和价格数据",
+          "管理层说明"
+        ],
+        "source_name": "毛利率改善不可持续",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      }
+    ],
+    "scenario_paths": [
+      {
+        "scenario": "base",
+        "path": [
+          "大客户订单能见度",
+          "收入增速",
+          "研发费用率"
+        ],
+        "missingEvidence": [
+          "订单披露后1-4个季度出现收入确认",
+          "研发费用率同比或环比下降",
+          "毛利率未明显恶化",
+          "订单延迟交付",
+          "收入增长弱于订单口径",
+          "费用率未收敛"
+        ],
+        "source_name": "base",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "scenario": "upside",
+        "path": [
+          "大客户订单能见度",
+          "毛利率",
+          "市场预期差"
+        ],
+        "missingEvidence": [
+          "新增大客户订单",
+          "高毛利产品占比提升",
+          "一致预期上修滞后于基本面改善",
+          "订单规模低于预期",
+          "毛利率因价格竞争下降",
+          "市场已充分定价"
+        ],
+        "source_name": "upside",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      },
+      {
+        "scenario": "downside",
+        "path": [
+          "供应链约束强度",
+          "收入增速",
+          "研发费用率"
+        ],
+        "missingEvidence": [
+          "供应链瓶颈缓解证据不足",
+          "客户验收或预算延迟",
+          "研发费用继续扩张",
+          "供应链约束解除",
+          "订单快速验收并确认收入",
+          "费用率开始收敛"
+        ],
+        "source_name": "downside",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      }
+    ],
+    "asset_impact_clues": [
+      {
+        "asset": "asset_ai_chip_equity",
+        "clue": "positive",
+        "pricedInAssessment": "unknown",
+        "consensusGap": "一致预期或市场预期锚, 估值比较, 后续财报验证, 市场价格表现",
+        "valuationAnchor": "",
+        "marketExpectationNote": "needs_market_expectation_validation",
+        "source_name": "asset_ai_chip_equity",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "template_inherited"
+      }
+    ],
+    "richness_retention": {
+      "source": "cold_start",
+      "imported_count_by_type": {
+        "Industry": 1,
+        "Segment": 1,
+        "Company": 1,
+        "Product": 1,
+        "Asset": 1
+      },
+      "retained_as_candidate": [
+        "industry_semiconductor",
+        "segment_ai_chip_design",
+        "company_cambricon_placeholder",
+        "product_ai_accelerator",
+        "asset_ai_chip_equity",
+        "rel_segment_to_industry",
+        "rel_company_to_segment",
+        "rel_product_to_segment",
+        "sv_customer_order_visibility",
+        "sv_revenue_growth",
+        "sv_gross_margin",
+        "sv_rd_expense_ratio",
+        "sv_supply_chain_constraint",
+        "sv_market_expectation_gap",
+        "prop_sv_customer_order_visibility_to_sv_revenue_growth",
+        "prop_sv_revenue_growth_to_sv_rd_expense_ratio",
+        "prop_sv_gross_margin_to_sv_market_expectation_gap",
+        "hyp_order_to_revenue_template",
+        "hyp_rd_ratio_decline_template",
+        "sig_订单转收入验证信号",
+        "sig_研发费用率季度跟踪",
+        "sig_超预期大客户采购公告",
+        "sig_交付延期或验收失败",
+        "evt_重大订单或中标公告",
+        "evt_财报或业绩预告披露",
+        "evt_出口管制或国产算力政策变化",
+        "judgment_profit_inflection_template"
+      ],
+      "downgraded_to_clue": [],
+      "rejected_or_unresolved": [],
+      "normalization_actions": [
+        "base_ontology.objects -> objects: 补充 operation/governanceLayer/recordStatus/fields/evidenceRefs/evidenceLevel/extractionConfidence/reviewNote",
+        "base_ontology.relations -> relations: 补充 operation/recordStatus/evidenceRefs/evidenceLevel/extractionConfidence",
+        "base_ontology.state_variables -> state_variables: 映射 id->objectId, candidate_status->currentStatus",
+        "template_hypotheses -> hypotheses: 映射 id->objectId, 合并 hypothesis_direction+candidate_status->status",
+        "template_signals -> signals: 生成 objectId, 映射 signal_name->title, target_template_id->target",
+        "typical_events -> events: 生成 objectId, 映射 event_type->title, affected_variables->anchorOrScope",
+        "judgment_templates -> judgment_outputs: 映射 based_on_hypothesis_template_ids->hypothesisRefs",
+        "blocking_templates -> blocking_conditions: 映射 blocking_signal->condition, blocked_hypothesis_type->targetHypothesisId",
+        "material_gap_list -> missing_evidence: 按缺口桶提取摘要"
+      ],
+      "drop_policy": "cold_start_keep_all: 冷启动条目全部保留为 candidate"
+    },
+    "suggested_actions": [],
+    "evidence_matrix": [],
+    "unresolved_objects": [],
+    "unresolved_relations": [],
+    "quality_checks": [
+      {
+        "check": "冷启动模板继承",
+        "result": "pass",
+        "note": "样例声明了产品赛道模板、继承模块、定制模块和弃用模块，避免空白随机生成。"
+      },
+      {
+        "check": "MVO最小可用本体",
+        "result": "pass",
+        "note": "样例达到对象、变量、传导、信号、情景和下游任务单的最低合格要求，没有追求穷举。"
+      },
+      {
+        "check": "冷启动边界",
+        "result": "pass",
+        "note": "样例只生成候选对象、变量、模板和材料计划，未生成已确认观测或正式结论。"
+      },
+      {
+        "check": "来源证据状态",
+        "result": "warning",
+        "note": "当前没有材料原文，所有行业经验和公司样例都需要 后续材料驱动优化 用来源材料验证。"
+      },
+      {
+        "check": "投研链条完整性",
+        "result": "pass",
+        "note": "覆盖订单、收入、毛利率、费用率、供应链约束和市场预期差，但需要后续材料补证。"
+      }
+    ],
+    "missing_evidence": [
+      {
+        "gap": "公司是否应作为本次产品赛道的核心样本，业务收入、产品线和客户结构是否与AI芯片设计直接相关。",
+        "why_it_matters": "priority: high; action: 补充 SourceDocument，并将公司、产品和业务线关系从候选验证为可入库对象或降级为样例。",
+        "suggested_material": "公司年报和季报, 招股书或业务介绍, 重大合同公告",
+        "source_name": "公司是否应作为本次产品赛道的核心样本，业务收入、产品线和客户结构是否与AI芯片设计直接相关。",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "to_verify"
+      },
+      {
+        "gap": "产品形态、应用场景和收入确认口径是否能代表AI芯片设计赛道的核心产品线。",
+        "why_it_matters": "priority: medium; action: 补充产品定义、上下游关系和可观察销售/交付指标。",
+        "suggested_material": "产品手册或公司公告, 产业链研报, 客户采购材料",
+        "source_name": "产品形态、应用场景和收入确认口径是否能代表AI芯片设计赛道的核心产品线。",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "to_verify"
+      },
+      {
+        "gap": "缺少订单金额、客户类型、交付窗口、可取消条款和验收口径。",
+        "why_it_matters": "priority: high; action: 形成带来源、时间、口径和置信度的订单能见度观测。",
+        "suggested_material": "重大合同公告, 招投标结果, 调研纪要",
+        "source_name": "缺少订单金额、客户类型、交付窗口、可取消条款和验收口径。",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "to_verify"
+      },
+      {
+        "gap": "缺少季度收入、产品线收入和订单转收入节奏。",
+        "why_it_matters": "priority: high; action: 形成收入增速和产品线收入的 StateVariableObservation。",
+        "suggested_material": "季度财报, 年度报告, 业绩预告",
+        "source_name": "缺少季度收入、产品线收入和订单转收入节奏。",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "to_verify"
+      },
+      {
+        "gap": "缺少一致预期、估值分位、股价反应和卖方预测修正。",
+        "why_it_matters": "priority: medium; action: 形成市场是否已定价的候选信号和资产线索验证材料。",
+        "suggested_material": "一致预期数据, 估值比较, 卖方研报",
+        "source_name": "缺少一致预期、估值分位、股价反应和卖方预测修正。",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "to_verify"
+      },
+      {
+        "gap": "收集历史订单披露到收入确认的样本，验证1-4个季度滞后窗口是否适用。",
+        "why_it_matters": "priority: high; action: ",
+        "suggested_material": "历史重大合同公告, 后续财报收入确认, 发出商品和合同负债数据",
+        "source_name": "收集历史订单披露到收入确认的样本，验证1-4个季度滞后窗口是否适用。",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "to_verify"
+      },
+      {
+        "gap": "比较历史毛利率改善披露后的一致预期修正、估值变化和股价反应。",
+        "why_it_matters": "priority: medium; action: ",
+        "suggested_material": "历史财报, 一致预期变化, 估值和价格表现",
+        "source_name": "比较历史毛利率改善披露后的一致预期修正、估值变化和股价反应。",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "to_verify"
+      },
+      {
+        "gap": "{'judgment_template_id': 'judgment_profit_inflection_template', 'competing_explanations_to_test': ['费用率下降是否来自一次性收入或低基数，而非规模效应', '毛利率是否因价格竞争、产品结构或代工成本变化抵消收入放量', '订单和盈利改善是否已经被一致预期和估值提前吸收'], 'needed_mate",
+        "why_it_matters": "priority: high; action: ",
+        "suggested_material": "财报费用明细, 产品价格和成本拆分, 一致预期和估值材料",
+        "source_name": "{'judgment_template_id': 'judgment_profit_inflection_template', 'competing_explanations_to_test': ['费用率下降是否来自一次性收入或低基数，而非规模效应', '毛利率是否因价格竞争、产品结构或代工成本变化抵消收入放量', '订单和盈利改善是否已经被一致预期和估值提前吸收'], 'needed_mate",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "to_verify"
+      },
+      {
+        "gap": "盈利拐点线索是否尚未被一致预期、估值水平和股价表现充分吸收。",
+        "why_it_matters": "priority: medium; action: ",
+        "suggested_material": "一致预期收入、利润和毛利率预测, 历史估值分位和可比公司估值, 财报或订单公告前后的价格表现",
+        "source_name": "盈利拐点线索是否尚未被一致预期、估值水平和股价表现充分吸收。",
+        "source_url": null,
+        "candidate_status": "draft",
+        "evidence_state": "to_verify"
+      }
+    ],
+    "human_review_required": [
+      {
+        "item": "是否只覆盖国产AI芯片设计，还是同时覆盖晶圆代工、HBM、先进封装等上游环节",
+        "reason": "冷启动阶段研究范围不确定，需用户确认",
+        "suggested_reviewer_role": "researcher"
+      },
+      {
+        "item": "是否需要指定具体公司作为后续材料抽取对象",
+        "reason": "冷启动阶段研究范围不确定，需用户确认",
+        "suggested_reviewer_role": "researcher"
+      }
+    ]
+  },
+  "template_hypotheses": [
+    {
+      "id": "hyp_order_to_revenue_template",
+      "title": "订单兑现驱动收入增长",
+      "bound_variable_id": "sv_revenue_growth",
+      "hypothesis_direction": "up",
+      "basis_template": "大客户订单能见度提升，并经过交付、验收和收入确认后，收入增速可能上行。",
+      "falsification_criteria": "订单披露后超过交付窗口仍未体现为发出商品、验收或收入确认。",
+      "evidence_needed": [
+        "订单金额和交付条款",
+        "发出商品和合同负债",
+        "收入确认政策"
+      ],
+      "candidate_status": "template_candidate"
+    },
+    {
+      "id": "hyp_rd_ratio_decline_template",
+      "title": "收入放量带动研发费用率收敛",
+      "bound_variable_id": "sv_rd_expense_ratio",
+      "hypothesis_direction": "down",
+      "basis_template": "收入规模扩大且研发费用绝对额增速放缓时，研发费用率可能下降。",
+      "falsification_criteria": "收入增长同时研发费用绝对额继续快速扩张，费用率未连续下降。",
+      "evidence_needed": [
+        "研发费用绝对额",
+        "收入增速",
+        "研发项目阶段和人员规模"
+      ],
+      "candidate_status": "template_candidate"
+    }
+  ],
+  "judgment_templates": [
+    {
+      "id": "judgment_profit_inflection_template",
+      "title": "收入兑现与费用率收敛驱动盈利拐点",
+      "anchored_object_id": "segment_ai_chip_design",
+      "based_on_hypothesis_template_ids": [
+        "hyp_order_to_revenue_template",
+        "hyp_rd_ratio_decline_template"
+      ],
+      "judgment_content_template": "当订单兑现、收入增长、毛利率稳定和研发费用率收敛同时被材料验证时，可形成盈利拐点候选判断。",
+      "scenario_tags": [
+        "base",
+        "upside",
+        "downside"
+      ],
+      "competing_explanations_needed": [
+        "费用率下降是否来自收入低基数而非规模效应",
+        "毛利率是否因竞争加剧抵消费用率收敛",
+        "订单是否已被市场提前定价"
+      ],
+      "candidate_status": "needs_material_validation"
+    }
+  ],
+  "template_signals": [
+    {
+      "signalRole": "validation",
+      "signal_name": "订单转收入验证信号",
+      "target_type": "StateHypothesis",
+      "target_template_id": "hyp_order_to_revenue_template",
+      "compatible_relation_type": "supportsHypothesis",
+      "typical_source": "财报中的合同负债、存货、发出商品、收入确认说明",
+      "validity_window": "1-4个季度",
+      "notes": "用于验证订单能见度是否真正转化为收入，而不是单纯停留在订单口径。"
+    },
+    {
+      "signalRole": "tracking",
+      "signal_name": "研发费用率季度跟踪",
+      "target_type": "StateHypothesis",
+      "target_template_id": "hyp_rd_ratio_decline_template",
+      "compatible_relation_type": "tracksHypothesis",
+      "typical_source": "季度财报",
+      "validity_window": "连续3-4个季度",
+      "notes": "需要同时观察收入增速和研发费用绝对额。"
+    },
+    {
+      "signalRole": "catalyst",
+      "signal_name": "超预期大客户采购公告",
+      "target_type": "JudgmentOutput",
+      "target_template_id": "judgment_profit_inflection_template",
+      "compatible_relation_type": "catalyzesJudgment",
+      "typical_source": "客户招标或公司公告",
+      "validity_window": "公告后至下一次财报验证",
+      "notes": "catalyst 只能催化判断输出，不能单独证明状态假设成立。"
+    },
+    {
+      "signalRole": "blocking",
+      "signal_name": "交付延期或验收失败",
+      "target_type": "StateHypothesis",
+      "target_template_id": "hyp_order_to_revenue_template",
+      "compatible_relation_type": "blocksHypothesis",
+      "typical_source": "财报、公告、客户反馈或调研纪要",
+      "validity_window": "订单交付周期内",
+      "notes": "应通过 blocksHypothesis 指向具体假设。"
+    }
+  ],
+  "blocking_templates": [
+    {
+      "blocking_signal": "订单未能转化为验收收入",
+      "blocked_hypothesis_type": "订单兑现驱动收入增长",
+      "observable_rewrite": "已披露订单或合同在约定窗口内未体现为收入、发出商品转收入或客户验收。",
+      "threshold_or_window": "超过合同交付窗口或连续两个财报期未兑现。",
+      "evidence_needed": [
+        "合同交付条款",
+        "收入确认政策",
+        "财报存货和发出商品变化"
+      ]
+    },
+    {
+      "blocking_signal": "研发投入继续高增长",
+      "blocked_hypothesis_type": "收入放量带动研发费用率收敛",
+      "observable_rewrite": "收入增长同时研发费用绝对额和人员扩张继续高增长，费用率未下降。",
+      "threshold_or_window": "连续两个财报期未出现费用率收敛。",
+      "evidence_needed": [
+        "研发费用明细",
+        "研发人员数量",
+        "新产品研发阶段"
+      ]
+    },
+    {
+      "blocking_signal": "毛利率改善不可持续",
+      "blocked_hypothesis_type": "产品结构改善驱动盈利质量提升",
+      "observable_rewrite": "毛利率改善来自一次性项目、低基数或会计口径，而不是核心产品结构和成本改善。",
+      "threshold_or_window": "下一财报期无法延续或公司解释为一次性因素。",
+      "evidence_needed": [
+        "产品结构拆分",
+        "成本和价格数据",
+        "管理层说明"
+      ]
+    }
+  ],
+  "scenario_paths": [
+    {
+      "scenarioTag": "base",
+      "path_summary": "订单逐步兑现为收入，毛利率稳定，研发费用率随规模扩张缓慢下降。",
+      "key_variables": [
+        "大客户订单能见度",
+        "收入增速",
+        "研发费用率"
+      ],
+      "validation_points": [
+        "订单披露后1-4个季度出现收入确认",
+        "研发费用率同比或环比下降",
+        "毛利率未明显恶化"
+      ],
+      "falsification_points": [
+        "订单延迟交付",
+        "收入增长弱于订单口径",
+        "费用率未收敛"
+      ]
+    },
+    {
+      "scenarioTag": "upside",
+      "path_summary": "国产算力采购或大客户需求超预期，收入放量与产品结构优化共同推动盈利改善。",
+      "key_variables": [
+        "大客户订单能见度",
+        "毛利率",
+        "市场预期差"
+      ],
+      "validation_points": [
+        "新增大客户订单",
+        "高毛利产品占比提升",
+        "一致预期上修滞后于基本面改善"
+      ],
+      "falsification_points": [
+        "订单规模低于预期",
+        "毛利率因价格竞争下降",
+        "市场已充分定价"
+      ]
+    },
+    {
+      "scenarioTag": "downside",
+      "path_summary": "供应链、客户预算或研发投入压力导致订单兑现慢、利润释放延后。",
+      "key_variables": [
+        "供应链约束强度",
+        "收入增速",
+        "研发费用率"
+      ],
+      "validation_points": [
+        "供应链瓶颈缓解证据不足",
+        "客户验收或预算延迟",
+        "研发费用继续扩张"
+      ],
+      "falsification_points": [
+        "供应链约束解除",
+        "订单快速验收并确认收入",
+        "费用率开始收敛"
+      ]
+    }
+  ],
+  "asset_impact_clues": [
+    {
+      "id": "asset_clue_profit_inflection",
+      "related_hypothesis_template_id": "hyp_rd_ratio_decline_template",
+      "asset_anchor_id": "asset_ai_chip_equity",
+      "impact_direction_clue": "positive",
+      "pricedInAssessment": "unknown",
+      "missing_requirements": [
+        "一致预期或市场预期锚",
+        "估值比较",
+        "后续财报验证",
+        "市场价格表现"
+      ],
+      "candidate_status": "clue_only",
+      "evidence_state": "template_inherited"
+    }
+  ],
+  "material_gap_list": [
+    {
+      "gap_id": "gap_001",
+      "target_id": "company_cambricon_placeholder",
+      "gap_type": "object_verification",
+      "question_to_confirm": "公司是否应作为本次产品赛道的核心样本，业务收入、产品线和客户结构是否与AI芯片设计直接相关。",
+      "suggested_material_types": [
+        "公司年报和季报",
+        "招股书或业务介绍",
+        "重大合同公告"
+      ],
+      "priority": "high"
+    },
+    {
+      "gap_id": "gap_002",
+      "target_id": "product_ai_accelerator",
+      "gap_type": "object_verification",
+      "question_to_confirm": "产品形态、应用场景和收入确认口径是否能代表AI芯片设计赛道的核心产品线。",
+      "suggested_material_types": [
+        "产品手册或公司公告",
+        "产业链研报",
+        "客户采购材料"
+      ],
+      "priority": "medium"
+    },
+    {
+      "gap_id": "gap_003",
+      "target_id": "sv_customer_order_visibility",
+      "gap_type": "state_variable_observation",
+      "question_to_confirm": "缺少订单金额、客户类型、交付窗口、可取消条款和验收口径。",
+      "suggested_material_types": [
+        "重大合同公告",
+        "招投标结果",
+        "调研纪要"
+      ],
+      "priority": "high"
+    },
+    {
+      "gap_id": "gap_004",
+      "target_id": "sv_revenue_growth",
+      "gap_type": "state_variable_observation",
+      "question_to_confirm": "缺少季度收入、产品线收入和订单转收入节奏。",
+      "suggested_material_types": [
+        "季度财报",
+        "年度报告",
+        "业绩预告"
+      ],
+      "priority": "high"
+    },
+    {
+      "gap_id": "gap_005",
+      "target_id": "sv_market_expectation_gap",
+      "gap_type": "state_variable_observation",
+      "question_to_confirm": "缺少一致预期、估值分位、股价反应和卖方预测修正。",
+      "suggested_material_types": [
+        "一致预期数据",
+        "估值比较",
+        "卖方研报"
+      ],
+      "priority": "medium"
+    },
+    {
+      "gap_id": "gap_006",
+      "target_id": "sv_customer_order_visibility_to_sv_revenue_growth",
+      "gap_type": "propagation_validation",
+      "question_to_confirm": "收集历史订单披露到收入确认的样本，验证1-4个季度滞后窗口是否适用。",
+      "suggested_material_types": [
+        "历史重大合同公告",
+        "后续财报收入确认",
+        "发出商品和合同负债数据"
+      ],
+      "priority": "high"
+    },
+    {
+      "gap_id": "gap_007",
+      "target_id": "sv_gross_margin_to_sv_market_expectation_gap",
+      "gap_type": "propagation_validation",
+      "question_to_confirm": "比较历史毛利率改善披露后的一致预期修正、估值变化和股价反应。",
+      "suggested_material_types": [
+        "历史财报",
+        "一致预期变化",
+        "估值和价格表现"
+      ],
+      "priority": "medium"
+    },
+    {
+      "gap_id": "gap_008",
+      "target_id": "judgment_profit_inflection_template",
+      "gap_type": "competing_explanation",
+      "question_to_confirm": "费用率下降是否来自一次性收入或低基数，而非规模效应; 毛利率是否因价格竞争、产品结构或代工成本变化抵消收入放量; 订单和盈利改善是否已经被一致预期和估值提前吸收",
+      "suggested_material_types": [
+        "财报费用明细",
+        "产品价格和成本拆分",
+        "一致预期和估值材料"
+      ],
+      "priority": "high"
+    },
+    {
+      "gap_id": "gap_009",
+      "target_id": "asset_clue_profit_inflection",
+      "gap_type": "asset_expectation_valuation",
+      "question_to_confirm": "盈利拐点线索是否尚未被一致预期、估值水平和股价表现充分吸收。",
+      "suggested_material_types": [
+        "一致预期收入、利润和毛利率预测",
+        "历史估值分位和可比公司估值",
+        "财报或订单公告前后的价格表现"
+      ],
+      "priority": "medium"
+    }
+  ],
+  "material_collection_plan": [
+    {
+      "material_type": "上市公司财报与公告",
+      "why_needed": "验证收入、毛利率、研发费用率、订单和收入确认政策。",
+      "feeds_gap_ids": [
+        "gap_001",
+        "gap_002"
+      ],
+      "priority": "high",
+      "suggested_query": "AI芯片 公司 年报 季报 重大合同 业绩说明会",
+      "target_variables": [
+        "收入增速",
+        "毛利率",
+        "研发费用率",
+        "大客户订单能见度"
+      ]
+    },
+    {
+      "material_type": "招投标和客户采购数据",
+      "why_needed": "验证订单能见度和国产算力采购强度。",
+      "feeds_gap_ids": [
+        "gap_001",
+        "gap_002"
+      ],
+      "priority": "high",
+      "suggested_query": "AI芯片 加速卡 中标 算力采购 招投标",
+      "target_variables": [
+        "大客户订单能见度",
+        "市场预期差"
+      ]
+    },
+    {
+      "material_type": "产业链研报",
+      "why_needed": "补充晶圆代工、先进封装、HBM、EDA/IP等上游约束。",
+      "feeds_gap_ids": [
+        "gap_001",
+        "gap_002"
+      ],
+      "priority": "medium",
+      "suggested_query": "AI芯片 供应链 晶圆代工 HBM 先进封装 EDA 国产替代",
+      "target_variables": [
+        "供应链约束强度",
+        "毛利率"
+      ]
+    },
+    {
+      "material_type": "一致预期和估值比较",
+      "why_needed": "判断基本面变化是否已经被资产价格或一致预期吸收。",
+      "feeds_gap_ids": [
+        "gap_001",
+        "gap_002"
+      ],
+      "priority": "medium",
+      "suggested_query": "AI芯片 一致预期 估值 毛利率 收入 研发费用率",
+      "target_variables": [
+        "市场预期差"
+      ]
+    }
+  ],
+  "mvo_quality_gate": {
+    "qualified": true,
+    "minimum_standard": "MVO合格：范围落入七类冷启动之一，研究问题可验证，具备核心对象、状态变量、传导、信号、情景、材料缺口任务单，并且不生成已确认观测或正式结论。",
+    "must_have_checks": [
+      {
+        "criterion": "七类冷启动范围明确",
+        "result": "pass",
+        "note": "本样例定位为 product_track，默认路径和备选 supply_chain 路径均已标注。"
+      },
+      {
+        "criterion": "模板驱动",
+        "result": "pass",
+        "note": "本样例继承 product_track_adoption_replacement_monetization_v1，并明确记录供应链约束和资产预期差两个定制模块。"
+      },
+      {
+        "criterion": "核心变量和传导可验证",
+        "result": "pass",
+        "note": "覆盖订单、收入、毛利率、费用率、供应链约束和市场预期差，并给出3条传导模板。"
+      },
+      {
+        "criterion": "下游材料缺口可执行",
+        "result": "pass",
+        "note": "对象验证、变量观测、历史样本、竞争解释和资产定价材料均已转成 后续材料驱动优化 任务。"
+      },
+      {
+        "criterion": "冷启动边界",
+        "result": "pass",
+        "note": "未生成 StateVariableObservation、正式 JudgmentOutput、正式 AssetImpact、目标价或仓位建议。"
+      }
+    ],
+    "coverage_summary": {
+      "state_variables_count": 6,
+      "propagation_templates_count": 3,
+      "signal_templates_count": 4,
+      "scenario_paths_count": 3,
+      "downstream_task_count": 5,
+      "base_objects_count": 5
+    },
+    "missing_for_mvo": []
+  },
+  "cold_start_quality_notes": [
+    "MVO合格：范围落入 product_track 七类冷启动之一，研究问题可验证。",
+    "候选对象5个，核心状态变量6个，传导链3条，信号4个，情景路径3条，材料缺口任务单5项。",
+    "未生成已确认观测（StateVariableObservation）、正式JudgmentOutput、AssetImpact或InvestmentThesis。"
+  ],
+  "validation_errors": [],
+  "missing_reference_files": [],
+  "cold_start_task_template": {
+    "template_role": "general_cold_start_template",
+    "boundary_rules": [
+      "冷启动 只输出通用冷启动模板、候选骨架和任务单，不生成已确认观测。",
+      "冷启动 不补专业事实，后续材料驱动优化 负责基于材料补充专业对象、变量口径、历史样本和估值材料。",
+      "资产影响只能作为线索和待验证定价问题，不得写成投资结论。"
+    ],
+    "cold_start_general_tasks": [
+      {
+        "task_name": "identify_research_focus",
+        "purpose": "把用户问题归一为产品赛道冷启动，并保留行业锚点、公司样例和资产线索。",
+        "output_fields": [
+          "research_context",
+          "industry_context",
+          "ontology_scope",
+          "candidate_industry_paths"
+        ]
+      },
+      {
+        "task_name": "select_reference_template",
+        "purpose": "选择产品赛道采用-替代-商业化模板，并声明继承的权威参考模型。",
+        "output_fields": [
+          "template_application"
+        ]
+      },
+      {
+        "task_name": "build_mvo_skeleton",
+        "purpose": "生成能支撑下游材料验证的最小对象、变量、传导、信号、情景和资产线索骨架。",
+        "output_fields": [
+          "base_ontology.objects",
+          "base_ontology.relations",
+          "base_ontology.state_variables",
+          "propagation_templates",
+          "template_hypotheses",
+          "judgment_templates",
+          "template_signals",
+          "blocking_templates",
+          "scenario_paths",
+          "asset_impact_clues",
+          "mvo_quality_gate"
+        ]
+      },
+      {
+        "task_name": "create_downstream_task_order",
+        "purpose": "把冷启动阶段不能专业化补充的内容转成 后续材料驱动优化 可执行任务。",
+        "output_fields": [
+          "material_gap_list",
+          "material_collection_plan",
+          "handoff_to_downstream_optimization"
+        ]
+      }
+    ],
+    "downstream_optimization_tasks": [
+      {
+        "task_name": "verify_candidate_objects",
+        "purpose": "用研报、公告、财报和公司材料验证候选公司、产品和赛道边界。",
+        "expected_output": "带来源的对象确认、对象合并/拆分建议和新增专业对象。"
+      },
+      {
+        "task_name": "supplement_state_variable_observations",
+        "purpose": "补充订单能见度、收入增速、毛利率、研发费用率、供应链约束和市场预期差的观测。",
+        "expected_output": "带期间、口径、来源和置信度的 StateVariableObservation。"
+      },
+      {
+        "task_name": "professionalize_variable_definitions",
+        "purpose": "根据材料细化 AI 芯片产品、客户、供应链和收入确认的专业变量口径。",
+        "expected_output": "专业化变量定义、可观测指标、口径差异和数据来源建议。"
+      },
+      {
+        "task_name": "validate_propagation_with_history",
+        "purpose": "用历史订单、收入、毛利率、费用率和估值材料验证传导链是否成立。",
+        "expected_output": "历史样本、支持/削弱信号和传导链修正建议。"
+      },
+      {
+        "task_name": "test_competing_explanations",
+        "purpose": "收集订单不兑现、毛利率不可持续、费用率继续高企、供应链受限等竞争解释。",
+        "expected_output": "竞争解释证据矩阵和对判断模板的削弱/阻断信号。"
+      },
+      {
+        "task_name": "collect_expectation_or_valuation_materials",
+        "purpose": "补充一致预期、估值比较、资产价格表现和市场预期材料。",
+        "expected_output": "资产线索是否已被预期吸收的证据材料和待验证定价问题。"
+      }
+    ],
+    "public_output_contract": [
+      {
+        "output_field": "base_ontology.objects",
+        "why_needed": "后续材料驱动优化 需要知道哪些对象只是候选或样例占位。",
+        "follow_up_action": "验证对象边界、补充专业对象、标记证据状态。"
+      },
+      {
+        "output_field": "base_ontology.state_variables",
+        "why_needed": "后续材料驱动优化 需要知道哪些变量还没有观测值和专业口径。",
+        "follow_up_action": "抽取观测、补充口径、记录来源和期间。"
+      },
+      {
+        "output_field": "propagation_templates",
+        "why_needed": "后续材料驱动优化 需要知道哪些传导链只是模板假设。",
+        "follow_up_action": "用历史样本、材料证据和反例验证传导链。"
+      },
+      {
+        "output_field": "material_gap_list",
+        "why_needed": "后续材料驱动优化 需要把材料缺口转为实际抽取任务。",
+        "follow_up_action": "按 downstream_optimization_tasks 执行材料抽取和本体优化。"
+      }
+    ]
+  },
+  "industry_context": {
+    "primary_industry": "半导体",
+    "segments": [
+      "AI芯片设计",
+      "智能算力加速卡"
+    ],
+    "companies": [
+      "寒武纪"
+    ],
+    "products": [
+      "训练芯片",
+      "推理芯片",
+      "智能加速卡"
+    ],
+    "materials": [],
+    "assets": [
+      "AI芯片上市公司股票"
+    ],
+    "themes": [
+      "国产算力",
+      "订单兑现",
+      "研发费用率收敛",
+      "出口管制"
+    ],
+    "research_question": "AI芯片设计环节的收入兑现和费用率收敛是否能形成盈利拐点。",
+    "confidence": 0.82,
+    "need_user_confirmation": [
+      "是否只覆盖国产AI芯片设计，还是同时覆盖晶圆代工、HBM、先进封装等上游环节",
+      "是否需要指定具体公司作为后续材料抽取对象"
+    ],
+    "regions": [],
+    "business_time_range": "",
+    "industry_calibration_loaded": [
+      "generic_only"
+    ],
+    "notes": "冷启动候选本体，待 后续材料驱动优化 基于材料进行专业化补充"
+  },
+  "typical_events": [
+    {
+      "event_type": "重大订单或中标公告",
+      "description": "客户采购、框架协议或招投标结果披露。",
+      "affected_variables": [
+        "大客户订单能见度",
+        "收入增速",
+        "市场预期差"
+      ],
+      "typical_sources": [
+        "上市公司公告",
+        "政府或客户招投标平台",
+        "新闻"
+      ]
+    },
+    {
+      "event_type": "财报或业绩预告披露",
+      "description": "收入、毛利率、费用率、现金流和订单进展更新。",
+      "affected_variables": [
+        "收入增速",
+        "毛利率",
+        "研发费用率"
+      ],
+      "typical_sources": [
+        "季度报告",
+        "年度报告",
+        "业绩预告"
+      ]
+    },
+    {
+      "event_type": "出口管制或国产算力政策变化",
+      "description": "政策改变供给约束、国产替代节奏或客户采购倾向。",
+      "affected_variables": [
+        "供应链约束强度",
+        "大客户订单能见度",
+        "市场预期差"
+      ],
+      "typical_sources": [
+        "政策文件",
+        "监管公告",
+        "产业新闻"
+      ]
+    }
+  ],
+  "quality_checks": [
+    {
+      "check": "冷启动模板继承",
+      "result": "pass",
+      "note": "样例声明了产品赛道模板、继承模块、定制模块和弃用模块，避免空白随机生成。"
+    },
+    {
+      "check": "MVO最小可用本体",
+      "result": "pass",
+      "note": "样例达到对象、变量、传导、信号、情景和下游任务单的最低合格要求，没有追求穷举。"
+    },
+    {
+      "check": "冷启动边界",
+      "result": "pass",
+      "note": "样例只生成候选对象、变量、模板和材料计划，未生成已确认观测或正式结论。"
+    },
+    {
+      "check": "来源证据状态",
+      "result": "warning",
+      "note": "当前没有材料原文，所有行业经验和公司样例都需要 后续材料驱动优化 用来源材料验证。"
+    },
+    {
+      "check": "投研链条完整性",
+      "result": "pass",
+      "note": "覆盖订单、收入、毛利率、费用率、供应链约束和市场预期差，但需要后续材料补证。"
+    }
+  ],
+  "downstream_optimization_tasks": [
+    {
+      "task_id": "task_verify_objects",
+      "task_type": "verify_candidate_object",
+      "priority": "high",
+      "target_ids": [
+        "company_cambricon_placeholder",
+        "product_ai_accelerator"
+      ],
+      "task_instruction": "验证公司、产品和赛道关系是否有来源材料支撑，无法验证的对象保持样例或降级。",
+      "material_refs_from_plan": [
+        "mat_financial_reports_announcements",
+        "mat_supply_chain_research"
+      ],
+      "expected_output": "SourceDocument、对象证据状态更新、公司-产品-环节关系建议动作。"
+    },
+    {
+      "task_id": "task_observe_financial_variables",
+      "task_type": "supplement_state_variable_observation",
+      "priority": "high",
+      "target_ids": [
+        "sv_customer_order_visibility",
+        "sv_revenue_growth",
+        "sv_gross_margin",
+        "sv_rd_expense_ratio"
+      ],
+      "task_instruction": "从公告和财报抽取订单、收入、毛利率、研发费用率的带时间和来源观测。",
+      "material_refs_from_plan": [
+        "mat_financial_reports_announcements",
+        "mat_tender_procurement"
+      ],
+      "expected_output": "StateVariableObservation、Signal 和支持或削弱假设的建议动作。"
+    },
+    {
+      "task_id": "task_collect_order_revenue_history",
+      "task_type": "collect_historical_propagation_samples",
+      "priority": "high",
+      "target_ids": [
+        "sv_customer_order_visibility",
+        "sv_revenue_growth"
+      ],
+      "task_instruction": "收集订单披露到收入确认的历史样本，校准传导滞后和边界条件。",
+      "material_refs_from_plan": [
+        "mat_financial_reports_announcements",
+        "mat_tender_procurement"
+      ],
+      "expected_output": "传导模板校准、滞后窗口证据和阻断条件补充。"
+    },
+    {
+      "task_id": "task_test_competing_explanations",
+      "task_type": "test_competing_explanations",
+      "priority": "high",
+      "target_ids": [
+        "judgment_profit_inflection_template"
+      ],
+      "task_instruction": "检验盈利拐点模板的竞争解释，区分规模效应、低基数、产品结构、价格竞争和会计口径影响。",
+      "material_refs_from_plan": [
+        "mat_financial_reports_announcements",
+        "mat_supply_chain_research"
+      ],
+      "expected_output": "竞争假设、反证信号和 judgment template 的边界条件更新。"
+    },
+    {
+      "task_id": "task_validate_pricing",
+      "task_type": "collect_expectation_or_valuation_materials",
+      "priority": "medium",
+      "target_ids": [
+        "asset_clue_profit_inflection",
+        "sv_market_expectation_gap"
+      ],
+      "task_instruction": "收集一致预期、估值分位和价格反应，判断盈利拐点线索是否已被资产价格吸收。",
+      "material_refs_from_plan": [
+        "mat_expectation_valuation"
+      ],
+      "expected_output": "资产影响线索的 pricedInAssessment 验证材料和后续跟踪信号。"
+    }
+  ],
+  "readable_report": "# AI芯片产品赛道冷启动报告\n\n> **报告**：投研本体冷启动候选报告\n\n本样例基于产品赛道模板生成 AI 芯片研究本体候选骨架，覆盖对象、候选关系、状态变量、传导模板、信号、情景路径和材料缺口。所有内容均为冷启动候选结构，不代表已确认事实。\n\n| 项目 | 结果 |\n| --- | --- |\n| 主模板 | product_track_adoption_replacement_monetization_v1 |\n| 候选对象 | 公司、产品、产业链环节、状态变量与资产线索 |\n| 质量结论 | MVO 通过，但需要后续材料驱动优化补证 |\n\n## 关键缺口\n\n- 需要公告、财报和招投标材料验证公司、产品和赛道关系。\n- 需要连续财务观测验证订单、收入、毛利率和研发费用率链路。\n- 需要一致预期、估值锚和市场价格表现验证资产线索。\n\n## 下一步\n\n| 优先级 | 行动 | 目的 |\n| --- | --- | --- |\n| P0 | 验证候选对象和关系 | 防止模板骨架被误读为事实 |\n| P0 | 补充状态变量观测 | 支撑后续假设和传导验证 |\n| P1 | 收集预期和估值材料 | 约束资产影响线索边界 |"
+}

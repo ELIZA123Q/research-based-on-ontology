@@ -1,0 +1,603 @@
+{
+  "historical_validation_context": {
+    "validation_id": "VAL-20260601-001",
+    "audit_timestamp": "2026-06-01T02:00:00+08:00",
+    "ontology_context": {
+      "ontology_inputs": [
+        {
+          "ontology_id": "ONT-IND-001",
+          "ontology_name": "示例产业链本体",
+          "ontology_version": "v2.1",
+          "ontology_origin": "material_optimization",
+          "conforms_to": "投研本体核心规范"
+        },
+        {
+          "ontology_id": "ONT-COM-001",
+          "ontology_name": "示例公司本体",
+          "ontology_version": "v1.4",
+          "ontology_origin": "manual_curation",
+          "conforms_to": "投研本体核心规范"
+        }
+      ],
+      "object_count": 48,
+      "relation_count": 73,
+      "hypothesis_count": 9,
+      "signal_count": 24,
+      "scope": "产业链扩产到关键设备订单与公司经营兑现链路",
+      "notes": "本轮校验使用行业本体和公司本体共同回放历史案例；两个本体对设备品类口径存在轻微差异。",
+      "primary_scope_type": "supply_chain",
+      "composition_type": "multi_ontology",
+      "legacy_type_mapping": {
+        "legacy_field": "primary_ontology_type",
+        "legacy_value": "multi_ontology",
+        "mapped_scope_type": "supply_chain",
+        "mapping_basis": "本轮主问题是产业链扩产到设备订单与公司经营兑现的上下游传导，multi_ontology 仅保留为组合形态。"
+      }
+    },
+    "validation_scope": {
+      "focus_areas": [
+        "扩产到设备订单传导",
+        "订单到收入确认",
+        "阻断条件有效性"
+      ],
+      "included_components": [
+        "SV-CAPEX-001",
+        "SV-ORDER-001",
+        "PROP-CAPEX-ORDER-001",
+        "SH-CAPEX-ORDER-001",
+        "SIG-BLOCK-001"
+      ],
+      "excluded_components": [
+        "资产短期价格波动解释",
+        "非核心产品线"
+      ]
+    },
+    "methodology_notes": [
+      "本轮样本覆盖正向触发、失败、边界和留出案例，避免只选择支持链路的案例。",
+      "时间回放以 t0 可获得信息形成预期链路，后续材料只用于验证。",
+      "资产影响仅校验本体是否记录预期差、估值锚和缺失证据，不输出交易结论。"
+    ],
+    "summary": "历史回放显示，扩产到关键设备订单的方向性链路在新增产线场景下有支持，但在存量改造和技术路线切换场景下容易失效。当前本体需要收窄关系适用范围，新增阻断条件，并拆分扩产变量口径。"
+  },
+  "assertion_decomposition": [
+    {
+      "assertion_id": "AST-001",
+      "ontology_component_ids": [
+        "PROP-CAPEX-ORDER-001",
+        "SV-CAPEX-001",
+        "SV-ORDER-001"
+      ],
+      "assertion_type": "propagation_validity",
+      "testable_claim": "核心产品扩产强度上升后，关键设备订单能见度应在 1-3 个季度内改善。",
+      "expected_evidence": [
+        "扩产公告",
+        "设备招标或订单",
+        "供应商交付记录",
+        "财报订单相关科目"
+      ]
+    },
+    {
+      "assertion_id": "AST-002",
+      "ontology_component_ids": [
+        "SIG-BLOCK-001",
+        "SH-CAPEX-ORDER-001"
+      ],
+      "assertion_type": "blocker_validity",
+      "testable_claim": "若扩产主要由存量产线消化或客户切换技术路线，扩产到设备订单的链路应被削弱或阻断。",
+      "expected_evidence": [
+        "客户产线利用率",
+        "技术路线变更公告",
+        "设备采购结构",
+        "供应商订单变化"
+      ]
+    },
+    {
+      "assertion_id": "AST-003",
+      "ontology_component_ids": [
+        "JO-ORDER-REVENUE-001",
+        "AI-ASSET-001"
+      ],
+      "assertion_type": "asset_impact_boundary",
+      "testable_claim": "资产影响线索只能在订单、收入确认和市场预期差均有证据后保留为候选，不得从扩产事件直接跳到资产结论。",
+      "expected_evidence": [
+        "订单兑现",
+        "收入确认",
+        "市场预期材料",
+        "估值锚说明"
+      ]
+    }
+  ],
+  "historical_case_set": {
+    "selection_strategy": "围绕扩产到设备订单传导链，预先选择正向触发、反向失败、边界和留出案例；优先官方公告、财报、招标和行业数据，研报只作辅助线索。",
+    "sample_matrix": {
+      "event_types": [
+        "扩产",
+        "技术路线变化",
+        "订单披露"
+      ],
+      "variable_directions": [
+        "up",
+        "stable",
+        "divergent"
+      ],
+      "chain_positions": [
+        "上游设备",
+        "中游产线",
+        "公司经营"
+      ],
+      "subject_types": [
+        "行业客户",
+        "关键设备供应商",
+        "二线参与者"
+      ],
+      "time_stages": [
+        "周期上行",
+        "库存去化",
+        "主题预期提前反映"
+      ],
+      "outcome_types": [
+        "兑现",
+        "延迟",
+        "阻断",
+        "部分成立"
+      ]
+    },
+    "sources": [
+      {
+        "source_id": "SRC-001",
+        "title": "示例客户扩产公告",
+        "publisher": "示例客户",
+        "publish_time": "2023-03-15",
+        "business_time": "2023Q1",
+        "source_type": "company_disclosure",
+        "source_location": "manual_input:case_001_announcement",
+        "reliability": "high"
+      },
+      {
+        "source_id": "SRC-004",
+        "title": "示例客户存量改造说明",
+        "publisher": "示例客户",
+        "publish_time": "2024-08-30",
+        "business_time": "2024Q3",
+        "source_type": "company_disclosure",
+        "source_location": "manual_input:case_002_update",
+        "reliability": "high"
+      },
+      {
+        "source_id": "SRC-008",
+        "title": "留出历史案例复盘材料",
+        "publisher": "ontology_validation_dataset",
+        "publish_time": "2026-06-01",
+        "business_time": "2022-2023",
+        "source_type": "historical_review",
+        "source_location": "manual_input:holdout_case",
+        "reliability": "medium"
+      }
+    ],
+    "selection_bias_controls": [
+      "包含失败和边界样本，不只选支持本体的案例。",
+      "留出样本未参与本体构建材料。",
+      "明确区分 t0 可见信息和事后验证材料。"
+    ],
+    "case_count_by_type": {
+      "positive_trigger": 1,
+      "negative_failure": 1,
+      "boundary_case": 1,
+      "holdout_case": 1
+    }
+  },
+  "case_replays": [
+    {
+      "case_id": "CASE-001",
+      "case_type": "positive_trigger",
+      "linked_assertion_ids": [
+        "AST-001"
+      ],
+      "t0": "2023-03-15",
+      "t0_available_information": [
+        "客户公告新增产线投资",
+        "本体中已有扩产强度到设备订单能见度传导链"
+      ],
+      "expected_chain_at_t0": [
+        "扩产强度上升",
+        "关键设备采购需求提升",
+        "目标供应商订单能见度改善"
+      ],
+      "validation_window": "2023Q2-2023Q4",
+      "actual_outcome": [
+        "2023Q3 出现设备招标",
+        "2023Q4 目标供应商披露在手订单改善"
+      ],
+      "confounding_factors": [
+        "同期存在行业库存去化，对收入确认节奏形成滞后"
+      ],
+      "replay_result": "supported",
+      "leakage_guardrail": "只使用 2023-03-15 前已披露信息形成预期链路，后续公告仅用于验证结果。",
+      "evidence_refs": [
+        "SRC-001",
+        "SRC-002",
+        "SRC-003"
+      ]
+    },
+    {
+      "case_id": "CASE-002",
+      "case_type": "negative_failure",
+      "linked_assertion_ids": [
+        "AST-001",
+        "AST-002"
+      ],
+      "t0": "2024-05-20",
+      "t0_available_information": [
+        "客户宣布扩产计划",
+        "本体未区分新增产线与存量替换"
+      ],
+      "expected_chain_at_t0": [
+        "扩产强度上升",
+        "设备订单能见度改善"
+      ],
+      "validation_window": "2024Q3-2025Q1",
+      "actual_outcome": [
+        "客户主要使用存量产线改造",
+        "目标供应商订单未明显改善"
+      ],
+      "confounding_factors": [
+        "客户更换部分工艺路线，设备品类需求结构变化"
+      ],
+      "replay_result": "blocked",
+      "leakage_guardrail": "扩产失败原因只在验证阶段使用，不回填到 t0 预期。",
+      "evidence_refs": [
+        "SRC-004",
+        "SRC-005"
+      ]
+    },
+    {
+      "case_id": "CASE-003",
+      "case_type": "boundary_case",
+      "linked_assertion_ids": [
+        "AST-003"
+      ],
+      "t0": "2025-02-10",
+      "t0_available_information": [
+        "小规模扩产公告",
+        "目标公司收入占比较低",
+        "市场已有主题关注"
+      ],
+      "expected_chain_at_t0": [
+        "扩产形成弱设备需求",
+        "公司经营兑现需要订单证据",
+        "资产影响只能作为候选线索"
+      ],
+      "validation_window": "2025Q1-2025Q3",
+      "actual_outcome": [
+        "未披露明确订单",
+        "收入未出现可归因改善",
+        "市场预期材料显示主题已提前反映"
+      ],
+      "confounding_factors": [
+        "同期有宏观流动性变化和行业整体估值重估"
+      ],
+      "replay_result": "partially_supported",
+      "leakage_guardrail": "资产相关变化只用于检验本体是否记录预期差和估值锚，不作为交易结论。",
+      "evidence_refs": [
+        "SRC-006",
+        "SRC-007"
+      ]
+    },
+    {
+      "case_id": "CASE-004",
+      "case_type": "holdout_case",
+      "linked_assertion_ids": [
+        "AST-001",
+        "AST-002"
+      ],
+      "t0": "2022-11-08",
+      "t0_available_information": [
+        "历史扩产项目公开资料",
+        "该案例未参与本体构建"
+      ],
+      "expected_chain_at_t0": [
+        "扩产强度上升",
+        "设备订单改善需要新增采购而非存量替代"
+      ],
+      "validation_window": "2023Q1-2023Q4",
+      "actual_outcome": [
+        "新增采购占比低",
+        "订单改善弱于本体原始传导假设"
+      ],
+      "confounding_factors": [
+        "客户产能利用率较低"
+      ],
+      "replay_result": "partially_supported",
+      "leakage_guardrail": "该案例作为留出样本，不参与本体原始构建材料。",
+      "evidence_refs": [
+        "SRC-008"
+      ]
+    }
+  ],
+  "ontology_diagnostics": {
+    "diagnostic_findings": [
+      {
+        "finding_id": "FIND-001",
+        "finding_type": "over_generalized_relation",
+        "affected_components": [
+          "PROP-CAPEX-ORDER-001"
+        ],
+        "severity": "high",
+        "evidence_case_ids": [
+          "CASE-001",
+          "CASE-002",
+          "CASE-004"
+        ],
+        "diagnosis": "扩产到设备订单的关系在新增产线场景成立，但在存量改造场景不成立，当前关系适用范围过宽。"
+      },
+      {
+        "finding_id": "FIND-002",
+        "finding_type": "missing_blocker",
+        "affected_components": [
+          "SH-CAPEX-ORDER-001",
+          "SIG-BLOCK-001"
+        ],
+        "severity": "high",
+        "evidence_case_ids": [
+          "CASE-002"
+        ],
+        "diagnosis": "本体未把存量产线消化和技术路线切换作为明确阻断条件，导致失败案例无法被结构化解释。"
+      },
+      {
+        "finding_id": "FIND-003",
+        "finding_type": "variable_too_coarse",
+        "affected_components": [
+          "SV-CAPEX-001"
+        ],
+        "severity": "medium",
+        "evidence_case_ids": [
+          "CASE-002",
+          "CASE-004"
+        ],
+        "diagnosis": "扩产强度变量未区分新增产线、存量改造、设备更新和工艺路线切换，影响传导判断。"
+      },
+      {
+        "finding_id": "FIND-004",
+        "finding_type": "asset_jump",
+        "affected_components": [
+          "AI-ASSET-001"
+        ],
+        "severity": "medium",
+        "evidence_case_ids": [
+          "CASE-003"
+        ],
+        "diagnosis": "资产影响线索缺少市场预期差和估值锚，存在从主题热度直接跳到资产解释的风险。"
+      }
+    ],
+    "metric_scores": {
+      "chain_hit_rate": 0.75,
+      "direction_accuracy": 0.5,
+      "propagation_completion_rate": 0.62,
+      "false_positive_rate": 0.25,
+      "false_negative_rate": 0.1,
+      "confidence_calibration": "medium",
+      "evidence_coverage_rate": 0.68,
+      "lag_error_assessment": "本体假设 1-3 个季度兑现基本合理，但订单到收入确认时滞需要单独建模。"
+    }
+  },
+  "validation_recommendations": {
+    "recommendations": [
+      {
+        "recommendation_id": "REC-001",
+        "action": "narrow_scope",
+        "target_components": [
+          "PROP-CAPEX-ORDER-001"
+        ],
+        "rationale": "历史失败和留出样本显示，扩产到设备订单传导仅在新增产线或新增设备采购场景下较稳定。",
+        "supporting_case_ids": [
+          "CASE-001",
+          "CASE-002",
+          "CASE-004"
+        ],
+        "skill2_operation_hint": "update",
+        "priority": "P0"
+      },
+      {
+        "recommendation_id": "REC-002",
+        "action": "add_blocker",
+        "target_components": [
+          "SH-CAPEX-ORDER-001"
+        ],
+        "rationale": "存量产线消化和技术路线切换是历史失败案例中的关键阻断条件。",
+        "supporting_case_ids": [
+          "CASE-002"
+        ],
+        "skill2_operation_hint": "add",
+        "priority": "P0"
+      },
+      {
+        "recommendation_id": "REC-003",
+        "action": "split",
+        "target_components": [
+          "SV-CAPEX-001"
+        ],
+        "rationale": "扩产变量过粗，应拆分新增产线投资、存量改造投资、设备更新投资和技术路线变更。",
+        "supporting_case_ids": [
+          "CASE-002",
+          "CASE-004"
+        ],
+        "skill2_operation_hint": "update",
+        "priority": "P1"
+      },
+      {
+        "recommendation_id": "REC-004",
+        "action": "needs_more_cases",
+        "target_components": [
+          "AI-ASSET-001"
+        ],
+        "rationale": "资产影响线索缺少充分历史样本验证，只能要求补充市场预期、估值锚和公告前后定价材料。",
+        "supporting_case_ids": [
+          "CASE-003"
+        ],
+        "skill2_operation_hint": "strengthen",
+        "priority": "P1"
+      }
+    ]
+  },
+  "ontology_health": {
+    "overall_score": 0.62,
+    "dimension_scores": {
+      "explanatory_power": 0.68,
+      "completeness": 0.58,
+      "falsifiability": 0.72,
+      "granularity": 0.52,
+      "transferability": 0.6,
+      "evidence_coverage": 0.68,
+      "temporal_consistency": 0.7,
+      "compliance": 0.84
+    },
+    "qualified_for_reasoning": false,
+    "critical_issues": [
+      "扩产到设备订单传导关系适用范围过宽。",
+      "缺少存量产线消化和技术路线切换两个阻断条件。",
+      "扩产变量口径过粗，影响历史回放和未来推理。"
+    ],
+    "recommendation_summary": "本体具备基础解释力，但尚未达到高质量投研推理门槛。建议先执行 P0 的关系收窄和阻断条件补充，再进入下一轮材料优化。"
+  },
+  "optimization_plan": [
+    {
+      "plan_id": "HIST-OPT-001",
+      "next_round": "round_history_feedback_1",
+      "source_diagnostic_ids": [
+        "FIND-001",
+        "FIND-002"
+      ],
+      "optimization_goal": "收窄扩产到设备订单传导的适用范围，并补充存量产线消化与技术路线切换阻断条件。",
+      "target_gaps": [
+        "PROP-CAPEX-ORDER-001 适用范围过宽",
+        "SH-CAPEX-ORDER-001 缺少关键阻断条件",
+        "SIG-BLOCK-001 阻断信号不足"
+      ],
+      "suggested_operations": [
+        "revise_relation",
+        "add_blocking_signal"
+      ],
+      "suggested_materials": [
+        "新增产线和存量改造拆分材料",
+        "技术路线切换公告或客户验证材料",
+        "设备采购结构和供应商订单披露"
+      ],
+      "required_materials": [
+        "新增产线和存量改造拆分材料",
+        "技术路线切换公告或客户验证材料",
+        "设备采购结构和供应商订单披露"
+      ],
+      "minimum_evidence_level": "historical_case",
+      "priority": "high",
+      "owner_role": "ontology_optimization_skill",
+      "stop_condition": "若无法区分新增产线与存量改造，保持原传导为低置信候选并不得升级为稳定关系。",
+      "continue_or_stop_condition": "获得独立历史案例和当前材料后执行关系收窄与阻断信号补充；材料不足时只写入 remaining_gaps。",
+      "quality_expected_delta": {
+        "coverage_score": 0.03,
+        "evidence_score": 0.04,
+        "consistency_score": 0.05,
+        "reasoning_score": 0.08
+      }
+    },
+    {
+      "plan_id": "HIST-OPT-002",
+      "next_round": "round_history_feedback_1",
+      "source_diagnostic_ids": [
+        "FIND-003"
+      ],
+      "optimization_goal": "拆分扩产强度变量口径，避免把新增产线、存量改造、设备更新和工艺路线切换混成一个状态变量。",
+      "target_gaps": [
+        "SV-CAPEX-001 变量颗粒度过粗",
+        "扩产强度缺少可观察子口径"
+      ],
+      "suggested_operations": [
+        "split",
+        "supplement_evidence"
+      ],
+      "suggested_materials": [
+        "扩产投资明细",
+        "设备更新与存量改造说明",
+        "工艺路线切换材料"
+      ],
+      "required_materials": [
+        "扩产投资明细",
+        "设备更新与存量改造说明",
+        "工艺路线切换材料"
+      ],
+      "minimum_evidence_level": "historical_case",
+      "priority": "medium",
+      "owner_role": "ontology_optimization_skill",
+      "stop_condition": "若无法获得变量拆分材料，不新增事实观测，只保留变量拆分建议。",
+      "continue_or_stop_condition": "材料足以区分口径时拆分变量；否则保留为下一轮材料缺口。",
+      "quality_expected_delta": {
+        "coverage_score": 0.04,
+        "evidence_score": 0.03,
+        "consistency_score": 0.04,
+        "reasoning_score": 0.06
+      }
+    },
+    {
+      "plan_id": "HIST-OPT-003",
+      "next_round": "round_history_feedback_1",
+      "source_diagnostic_ids": [
+        "FIND-004"
+      ],
+      "optimization_goal": "补充资产影响边界材料，避免从扩产主题直接跳到资产解释。",
+      "target_gaps": [
+        "AI-ASSET-001 缺少市场预期差",
+        "AI-ASSET-001 缺少估值锚和已定价状态"
+      ],
+      "suggested_operations": [
+        "supplement_evidence"
+      ],
+      "suggested_materials": [
+        "市场预期材料",
+        "估值比较材料",
+        "公告前后价格和成交数据"
+      ],
+      "required_materials": [
+        "市场预期材料",
+        "估值比较材料",
+        "公告前后价格和成交数据"
+      ],
+      "minimum_evidence_level": "historical_case",
+      "priority": "medium",
+      "owner_role": "ontology_optimization_skill",
+      "stop_condition": "缺少预期差和估值锚时，不得升级为 AssetImpact，只能保留 asset_impact_clues。",
+      "continue_or_stop_condition": "材料齐备后补充资产影响线索边界；材料不足时降级为待验证缺口。",
+      "quality_expected_delta": {
+        "coverage_score": 0.02,
+        "evidence_score": 0.05,
+        "consistency_score": 0.03,
+        "reasoning_score": 0.04
+      }
+    }
+  ],
+  "optimization_handoff": {
+    "target_skill": "touyan-benti-youhua",
+    "handoff_payload": [
+      "historical_validation_context",
+      "ontology_diagnostics",
+      "validation_recommendations",
+      "optimization_plan"
+    ],
+    "execution_notes": [
+      "将 optimization_plan 作为 next_optimization_plan 或等价优化任务输入。",
+      "历史回放只证明本体链路的适用边界，不等于已执行本体修改。"
+    ],
+    "must_not_do": [
+      "不得由历史回放校验 Skill 直接输出 optimized_ontology。",
+      "不得把事后结果回填为 t0 可见信息。",
+      "不得生成交易执行类表述、价格预测类表述或仓位表达。"
+    ]
+  },
+  "compliance_check": {
+    "no_optimized_ontology_output": true,
+    "no_direct_ontology_modification": true,
+    "t0_leakage_controlled": true,
+    "historical_cases_not_cherry_picked": true,
+    "forecast_rating_target_price_not_mapped_to_fact": true,
+    "no_trading_advice": true
+  },
+  "readable_report": "# 本体历史回放校验报告\n\n> **报告**：本体历史回放校验报告\n\n本轮用扩产、订单和资产影响相关历史案例回放当前本体链路。结果显示本体具备基础解释力，但扩产到订单传导关系适用范围过宽，缺少存量改造和技术路线切换等阻断条件。\n\n| 项目 | 结果 |\n| --- | --- |\n| 历史样本 | 4 个 |\n| 主要问题 | 关系过度泛化、缺阻断条件、变量过粗 |\n| 发布建议 | 继续优化后复评 |\n\n## 关键发现\n\n- 扩产到设备订单的关系在新增产线场景较有效，但在存量改造场景容易误触发。\n- 缺少阻断信号会导致失败案例无法被结构化解释。\n- 资产影响线索需要市场预期差和估值锚材料约束。\n\n## 下一步\n\n| 优先级 | 行动 | 目标 |\n| --- | --- | --- |\n| P0 | 收窄关系适用范围 | 降低误触发 |\n| P0 | 新增阻断信号 | 表达失败路径 |\n| P1 | 拆分扩产变量 | 提高变量可观测性 |"
+}
