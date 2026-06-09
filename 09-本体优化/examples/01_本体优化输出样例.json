@@ -1,0 +1,1339 @@
+{
+  "optimization_run_mode": "auto_batches",
+  "optimization_mode": "full",
+  "optimized_ontology": {
+    "ontology_metadata": {
+      "ontology_id": "ai_chip_product_track",
+      "ontology_version": "1.1.0",
+      "parent_version": "1.0.0",
+      "created_by": "touyan-hangye-chanye-bentilengqidong",
+      "updated_by": "touyan-benti-youhua",
+      "change_reason": "material_optimization",
+      "ontology_quality": {
+        "coverage_score": 0.68,
+        "evidence_score": 0.74,
+        "consistency_score": 0.9,
+        "reasoning_score": 0.66
+      }
+    },
+    "industry_context": {
+      "primary_industry": "半导体",
+      "segments": [
+        "AI芯片设计"
+      ],
+      "companies": [
+        "寒武纪科技股份有限公司"
+      ],
+      "products": [],
+      "materials": [],
+      "assets": [
+        "688256.SH"
+      ],
+      "regions": [
+        "中国"
+      ],
+      "business_time_range": "2023年年度报告期，材料发布时间2024-03-28",
+      "themes": [
+        "研发费用率",
+        "盈利拐点",
+        "国产算力"
+      ],
+      "research_question": "寒武纪研发费用率是否进入下行通道，并可能改善经营利润率。",
+      "industry_calibration_loaded": [
+        "semiconductor_pack_v1"
+      ],
+      "confidence": 0.86,
+      "notes": "本轮只验证冷启动本体中费用率收敛假设的一部分，不确认盈利拐点。"
+    },
+    "base_ontology_reference": {
+      "provided": true,
+      "version_or_name": "AI芯片行业本体冷启动初版",
+      "scope": "AI芯片设计公司费用率收敛与盈利拐点",
+      "source": "touyan-hangye-chanye-bentilengqidong.base_ontology",
+      "notes": "基础本体已有研发费用率变量和盈利拐点候选假设，但缺少事实观测和连续季度验证。"
+    },
+    "concept_layer": {
+      "concept_scheme": {
+        "id": "CS-AI-CHIP-001",
+        "name": "AI芯片产品赛道概念体系",
+        "scopeName": "AI芯片设计公司费用率收敛与盈利拐点",
+        "schemeVersion": "0.2.0",
+        "description": "约束AI芯片设计公司研究中的术语、范围、边界和对象映射。",
+        "authorityPolicy": "概念定义和边界优先使用上市公司公告、招股书、年报、监管文件、政策文件和权威行业报告；未获材料支撑时不得升级为reviewed。"
+      },
+      "concepts": [
+        {
+          "id": "CON-AI-CHIP-001",
+          "name": "AI芯片设计公司",
+          "definition": "以AI训练、推理或智能计算加速芯片设计为核心业务，并通过芯片、板卡、模组或相关软件栈实现商业化的公司。",
+          "conceptType": "company_role",
+          "scopeStatus": "in_scope",
+          "aliases": [
+            "AI芯片公司",
+            "智能计算芯片设计公司"
+          ],
+          "definitionStatus": "source_supported",
+          "inclusionRationale": "本轮材料来自寒武纪年度报告，可支撑公司对象和费用率观测。",
+          "exclusionRationale": "云服务运营商、整机厂商和下游AI应用公司不因使用AI芯片自动纳入本体主范围。",
+          "source_refs": [
+            "SRC-20240328-001#公司基本信息"
+          ]
+        },
+        {
+          "id": "CON-AI-CHIP-002",
+          "name": "研发费用率收敛",
+          "definition": "研发费用占收入比例随收入规模扩大、研发投入节奏稳定或费用结构改善而下降的状态变化。",
+          "conceptType": "term",
+          "scopeStatus": "in_scope",
+          "definitionStatus": "source_supported",
+          "inclusionRationale": "年报披露研发费用率读数，可映射为状态变量和事实观测。",
+          "exclusionRationale": "单期研发费用率下降不等同于盈利拐点已经确认。",
+          "source_refs": [
+            "SRC-20240328-001#研发费用率"
+          ]
+        },
+        {
+          "id": "CON-AI-CHIP-003",
+          "name": "盈利拐点",
+          "definition": "公司经营利润或净利润从亏损收敛转向可持续改善的状态判断，需要收入、毛利、费用和现金流等多维度连续验证。",
+          "conceptType": "term",
+          "scopeStatus": "disputed",
+          "definitionStatus": "draft",
+          "inclusionRationale": "基础本体将其作为待验证研究问题保留。",
+          "exclusionRationale": "本轮只有单期费用率事实，不能把盈利拐点升级为确认判断。",
+          "source_refs": [
+            "SRC-20240328-001#研发费用率"
+          ]
+        }
+      ],
+      "concept_relations": [
+        {
+          "id": "REL-CON-AI-CHIP-001",
+          "type": "conceptInScheme",
+          "sourceId": "CON-AI-CHIP-001",
+          "targetId": "CS-AI-CHIP-001",
+          "properties": {
+            "schemeRole": "primary"
+          },
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "SRC-20240328-001#公司基本信息"
+          ]
+        },
+        {
+          "id": "REL-CON-AI-CHIP-002",
+          "type": "conceptMapsToObject",
+          "sourceId": "CON-AI-CHIP-001",
+          "targetId": "COM-20240328-001",
+          "properties": {
+            "mappingRole": "maps_to_company"
+          },
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "SRC-20240328-001#公司基本信息"
+          ]
+        },
+        {
+          "id": "REL-CON-AI-CHIP-003",
+          "type": "conceptMapsToObject",
+          "sourceId": "CON-AI-CHIP-002",
+          "targetId": "SV-RD-EXPENSE-RATIO",
+          "properties": {
+            "mappingRole": "maps_to_variable"
+          },
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "SRC-20240328-001#研发费用率"
+          ]
+        }
+      ],
+      "boundary_decisions": [
+        {
+          "id": "CB-AI-CHIP-001",
+          "title": "AI芯片设计公司边界",
+          "decisionType": "include",
+          "decisionText": "本轮纳入寒武纪公司画像、研发费用率变量和相关财报观测；暂不扩展到整机厂商、云服务运营商或下游AI应用公司。",
+          "appliesToConceptIds": [
+            "CON-AI-CHIP-001"
+          ],
+          "source_refs": [
+            "SRC-20240328-001#公司基本信息"
+          ]
+        },
+        {
+          "id": "CB-AI-CHIP-002",
+          "title": "盈利拐点判断边界",
+          "decisionType": "defer",
+          "decisionText": "研发费用率单期下降只能弱强化费用率收敛假设，不能作为确认盈利拐点的充分条件。",
+          "appliesToConceptIds": [
+            "CON-AI-CHIP-002",
+            "CON-AI-CHIP-003"
+          ],
+          "source_refs": [
+            "SRC-20240328-001#研发费用率"
+          ]
+        }
+      ]
+    },
+    "source_documents": [
+      {
+        "id": "SRC-20240328-001",
+        "title": "寒武纪 2023 年度报告",
+        "documentType": "财报",
+        "publisher": "寒武纪科技股份有限公司",
+        "publishTime": "2024-03-28",
+        "businessTime": "2023年度",
+        "sourceForm": "original_pdf",
+        "sourceReliability": "high",
+        "sourceLocation": "上市公司公告/年度报告原文",
+        "evidenceLocations": [
+          "年报经营数据章节",
+          "年报研发费用章节"
+        ],
+        "materialRole": "补充费用率事实观测，验证基础本体中的费用率收敛缺口。",
+        "adoptionStatus": "adopted",
+        "adoptionReason": "上市公司年报可作为收入和研发费用率事实观测来源。"
+      }
+    ],
+    "evidence_claims": [
+      {
+        "id": "CLM-20240328-001",
+        "sourceDocumentId": "SRC-20240328-001",
+        "evidenceLocation": "年报研发费用章节",
+        "source_statement": "研发费用率由269%降至211%",
+        "statement_type": "fact",
+        "normalized_claim": "寒武纪2023年研发费用率较上一期下降至211%。",
+        "evidence_level": "official_source_supported",
+        "allowed_target_object_types": [
+          "StateVariableObservation",
+          "Signal"
+        ],
+        "must_not_map_to": [
+          "JudgmentOutput",
+          "AssetImpact"
+        ]
+      },
+      {
+        "id": "CLM-20240328-002",
+        "sourceDocumentId": "SRC-20240328-001",
+        "evidenceLocation": "年报经营数据章节",
+        "source_statement": "年报披露营业收入和研发费用相关数据",
+        "statement_type": "fact",
+        "normalized_claim": "收入规模和研发费用率应共同用于验证费用率收敛逻辑，不能只看单点费用率读数。",
+        "evidence_level": "official_source_supported",
+        "allowed_target_object_types": [
+          "StateVariable",
+          "StateVariablePropagation",
+          "Signal"
+        ],
+        "must_not_map_to": [
+          "JudgmentOutput",
+          "AssetImpact"
+        ]
+      }
+    ],
+    "objects": [
+      {
+        "operation": "keep",
+        "id": "COM-20240328-001",
+        "type": "Company",
+        "governanceLayer": "application_workspace",
+        "recordStatus": "candidate",
+        "fields": {
+          "name": "寒武纪科技股份有限公司",
+          "shortName": "寒武纪",
+          "ticker": "688256.SH"
+        },
+        "evidenceRefs": [
+          "SRC-20240328-001#公司基本信息"
+        ],
+        "evidenceLevel": "official_source_supported",
+        "extractionConfidence": 0.92,
+        "reviewNote": "基础本体已有公司对象；本轮保留并补充财报来源。"
+      },
+      {
+        "operation": "keep",
+        "id": "AST-20240328-001",
+        "type": "Asset",
+        "governanceLayer": "application_workspace",
+        "recordStatus": "candidate",
+        "fields": {
+          "name": "寒武纪A股",
+          "assetType": "equity",
+          "ticker": "688256.SH",
+          "market": "SSE STAR Market"
+        },
+        "evidenceRefs": [
+          "SRC-20240328-001#公司基本信息"
+        ],
+        "evidenceLevel": "official_source_supported",
+        "extractionConfidence": 0.86,
+        "reviewNote": "资产对象来自基础本体，本轮只补充公司公告来源。"
+      },
+      {
+        "operation": "update",
+        "id": "SV-RD-EXPENSE-RATIO",
+        "type": "StateVariable",
+        "governanceLayer": "industry_extension",
+        "recordStatus": "candidate",
+        "fields": {
+          "name": "研发费用率",
+          "variableType": "quantitative",
+          "category": "expense_structure",
+          "description": "研发支出 / 营业收入，用于观察收入放量后费用率是否收敛。",
+          "observationFrequency": "季度或年度",
+          "sourceType": "industry_template",
+          "unit": "%"
+        },
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用和营业收入"
+        ],
+        "evidenceLevel": "official_source_supported",
+        "extractionConfidence": 0.88,
+        "reviewNote": "将冷启动中的费用率变量优化为可由财报直接观测的口径。"
+      },
+      {
+        "operation": "add",
+        "id": "SV-REVENUE-SCALE",
+        "type": "StateVariable",
+        "governanceLayer": "industry_extension",
+        "recordStatus": "candidate",
+        "fields": {
+          "name": "收入规模",
+          "variableType": "quantitative",
+          "category": "revenue_quality",
+          "description": "营业收入规模及其持续性，用于判断费用率下降是否来自收入分母扩张。",
+          "observationFrequency": "季度或年度",
+          "sourceType": "industry_template",
+          "unit": "金额或增速"
+        },
+        "evidenceRefs": [
+          "SRC-20240328-001#公司经营数据"
+        ],
+        "evidenceLevel": "official_source_supported",
+        "extractionConfidence": 0.82,
+        "reviewNote": "作为费用率收敛链路的源变量加入，仍需连续期间观测。"
+      },
+      {
+        "operation": "add",
+        "id": "SVP-REVENUE-EXPENSE-RATIO",
+        "type": "StateVariablePropagation",
+        "governanceLayer": "industry_extension",
+        "recordStatus": "candidate",
+        "fields": {
+          "propagationLogic": "收入规模持续扩大时，固定或半固定研发投入被更大收入分母摊薄，研发费用率可能下降；若收入增长不可持续或研发投入重新加速，该传导会失效。",
+          "directionMapping": "收入规模上行 -> 研发费用率下行，但需同时检查毛利率、收入质量和研发投入节奏。"
+        },
+        "evidenceRefs": [
+          "SRC-20240328-001#经营数据和费用率"
+        ],
+        "evidenceLevel": "single_source_candidate",
+        "extractionConfidence": 0.74,
+        "reviewNote": "本轮只把传导链显式化，不能确认长期有效。"
+      },
+      {
+        "operation": "add",
+        "id": "OBS-20240328-001",
+        "type": "StateVariableObservation",
+        "governanceLayer": "application_workspace",
+        "recordStatus": "candidate",
+        "fields": {
+          "observedValue": "211%",
+          "valueType": "actual",
+          "observationTime": "2023",
+          "observationSourceName": "寒武纪 2023 年度报告",
+          "sourceStatementType": "fact"
+        },
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ],
+        "evidenceLevel": "official_source_supported",
+        "extractionConfidence": 0.9,
+        "reviewNote": "可作为单一官方来源事实观测候选。"
+      },
+      {
+        "operation": "strengthen",
+        "id": "SH-RD-EXPENSE-RATIO-DOWN",
+        "type": "StateHypothesis",
+        "governanceLayer": "industry_extension",
+        "recordStatus": "candidate",
+        "fields": {
+          "title": "研发费用率收敛假设",
+          "hypothesisContent": "若收入规模持续增长，AI芯片设计公司的研发费用率可能逐步下降。",
+          "direction": "down",
+          "timeHorizon": "未来4-6个季度",
+          "basis": "2023年年报显示研发费用率较上一期下降，但仍需连续季度验证。",
+          "falsificationCriteria": "后续季度研发费用率重新上行，或收入增长无法延续。",
+          "hypothesisStatus": "proposed",
+          "proposedBy": "system"
+        },
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ],
+        "evidenceLevel": "official_source_supported",
+        "extractionConfidence": 0.78,
+        "reviewNote": "本轮只能强化假设，不能确认费用率进入持续下行通道。"
+      },
+      {
+        "operation": "add",
+        "id": "SIG-20240328-001",
+        "type": "Signal",
+        "governanceLayer": "application_workspace",
+        "recordStatus": "candidate",
+        "fields": {
+          "title": "研发费用率同比下降",
+          "signalType": "财报数据",
+          "signalRole": "validation",
+          "signalContent": "研发费用率由269%降至211%",
+          "statementType": "fact",
+          "observationTime": "2023",
+          "reliability": "high",
+          "validityWindow": "2024-2025",
+          "signalStatus": "active"
+        },
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ],
+        "evidenceLevel": "official_source_supported",
+        "extractionConfidence": 0.84,
+        "reviewNote": "单篇财报只能形成支持信号，不能确认盈利拐点。"
+      }
+    ],
+    "relations": [
+      {
+        "operation": "keep",
+        "id": "REL-20240328-001",
+        "type": "companyLinkedToAsset",
+        "sourceId": "COM-20240328-001",
+        "targetId": "AST-20240328-001",
+        "properties": {
+          "listingRole": "上市主体"
+        },
+        "recordStatus": "candidate",
+        "evidenceRefs": [
+          "SRC-20240328-001#公司基本信息"
+        ],
+        "evidenceLevel": "official_source_supported",
+        "extractionConfidence": 0.86
+      },
+      {
+        "operation": "update",
+        "id": "REL-20240328-002",
+        "type": "observedOn",
+        "sourceId": "SV-RD-EXPENSE-RATIO",
+        "targetId": "COM-20240328-001",
+        "properties": {
+          "observationScope": "公司整体"
+        },
+        "recordStatus": "candidate",
+        "evidenceRefs": [
+          "SRC-20240328-001#公司经营数据"
+        ],
+        "evidenceLevel": "official_source_supported",
+        "extractionConfidence": 0.86
+      },
+      {
+        "operation": "add",
+        "id": "REL-20240328-003",
+        "type": "observationBindsVariable",
+        "sourceId": "OBS-20240328-001",
+        "targetId": "SV-RD-EXPENSE-RATIO",
+        "properties": {},
+        "recordStatus": "candidate",
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ],
+        "evidenceLevel": "official_source_supported",
+        "extractionConfidence": 0.9
+      },
+      {
+        "operation": "add",
+        "id": "REL-20240328-003A",
+        "type": "observedOn",
+        "sourceId": "SV-REVENUE-SCALE",
+        "targetId": "COM-20240328-001",
+        "properties": {
+          "observationScope": "公司整体"
+        },
+        "recordStatus": "candidate",
+        "evidenceRefs": [
+          "SRC-20240328-001#公司经营数据"
+        ],
+        "evidenceLevel": "official_source_supported",
+        "extractionConfidence": 0.82
+      },
+      {
+        "operation": "add",
+        "id": "REL-20240328-003B",
+        "type": "propagatesFrom",
+        "sourceId": "SVP-REVENUE-EXPENSE-RATIO",
+        "targetId": "SV-REVENUE-SCALE",
+        "properties": {},
+        "recordStatus": "candidate",
+        "evidenceRefs": [
+          "SRC-20240328-001#经营数据和费用率"
+        ],
+        "evidenceLevel": "single_source_candidate",
+        "extractionConfidence": 0.74
+      },
+      {
+        "operation": "add",
+        "id": "REL-20240328-003C",
+        "type": "propagatesTo",
+        "sourceId": "SVP-REVENUE-EXPENSE-RATIO",
+        "targetId": "SV-RD-EXPENSE-RATIO",
+        "properties": {},
+        "recordStatus": "candidate",
+        "evidenceRefs": [
+          "SRC-20240328-001#经营数据和费用率"
+        ],
+        "evidenceLevel": "single_source_candidate",
+        "extractionConfidence": 0.74
+      },
+      {
+        "operation": "keep",
+        "id": "REL-20240328-004",
+        "type": "hypothesisBindsVariable",
+        "sourceId": "SH-RD-EXPENSE-RATIO-DOWN",
+        "targetId": "SV-RD-EXPENSE-RATIO",
+        "properties": {},
+        "recordStatus": "candidate",
+        "evidenceRefs": [],
+        "evidenceLevel": "no_evidence",
+        "extractionConfidence": 0.72
+      },
+      {
+        "operation": "add",
+        "id": "REL-20240328-005",
+        "type": "signalBasedOnObservation",
+        "sourceId": "SIG-20240328-001",
+        "targetId": "OBS-20240328-001",
+        "properties": {},
+        "recordStatus": "candidate",
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ],
+        "evidenceLevel": "official_source_supported",
+        "extractionConfidence": 0.88
+      },
+      {
+        "operation": "strengthen",
+        "id": "REL-20240328-006",
+        "type": "supportsHypothesis",
+        "sourceId": "SIG-20240328-001",
+        "targetId": "SH-RD-EXPENSE-RATIO-DOWN",
+        "properties": {
+          "supportStrength": "weak",
+          "relevanceNote": "单年费用率下降支持费用率收敛方向，但不足以验证连续趋势。"
+        },
+        "recordStatus": "candidate",
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ],
+        "evidenceLevel": "official_source_supported",
+        "extractionConfidence": 0.78
+      }
+    ],
+    "state_variables": [
+      {
+        "objectId": "SV-RD-EXPENSE-RATIO",
+        "name": "研发费用率",
+        "operation": "update",
+        "evidenceLevel": "official_source_supported",
+        "currentStatus": "candidate",
+        "note": "已补充可观测口径和财报来源。"
+      },
+      {
+        "objectId": "SV-REVENUE-SCALE",
+        "name": "收入规模",
+        "operation": "add",
+        "evidenceLevel": "official_source_supported",
+        "currentStatus": "candidate",
+        "note": "作为研发费用率收敛链路的源变量加入，仍需连续季度验证收入质量。"
+      }
+    ],
+    "state_observations": [
+      {
+        "objectId": "OBS-20240328-001",
+        "variableId": "SV-RD-EXPENSE-RATIO",
+        "observedValue": "211%",
+        "operation": "add",
+        "evidenceLevel": "official_source_supported",
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ]
+      }
+    ],
+    "propagation_templates": [
+      {
+        "objectId": "SVP-REVENUE-EXPENSE-RATIO",
+        "templateName": "收入规模扩张到研发费用率收敛",
+        "operation": "add",
+        "evidenceLevel": "single_source_candidate",
+        "verified_steps": [
+          "财报披露研发费用率读数，可形成费用率事实观测。",
+          "收入规模和研发费用率可以在同一官方财报中追溯。"
+        ],
+        "missing_steps": [
+          "缺少连续季度收入规模和费用率共同变化样本。",
+          "缺少毛利率、现金流和收入质量对盈利拐点的共同验证。",
+          "缺少市场预期和估值锚，不能形成资产影响结论。"
+        ]
+      }
+    ],
+    "hypotheses": [
+      {
+        "objectId": "SH-RD-EXPENSE-RATIO-DOWN",
+        "title": "研发费用率收敛假设",
+        "operation": "strengthen",
+        "evidenceLevel": "official_source_supported",
+        "status": "proposed",
+        "supportingSignals": [
+          "SIG-20240328-001"
+        ],
+        "reviewNote": "只能强化候选假设，不能升级为确认趋势。"
+      }
+    ],
+    "signals": [
+      {
+        "objectId": "SIG-20240328-001",
+        "title": "研发费用率同比下降",
+        "signalRole": "validation",
+        "operation": "add",
+        "evidenceLevel": "official_source_supported",
+        "target": "SH-RD-EXPENSE-RATIO-DOWN"
+      }
+    ],
+    "events": [],
+    "judgment_outputs": [],
+    "asset_impacts": [],
+    "investment_theses": [],
+    "blocking_conditions": [
+      {
+        "condition": "后续季度研发费用率重新上行，或收入增长无法延续。",
+        "targetHypothesisId": "SH-RD-EXPENSE-RATIO-DOWN",
+        "evidenceLevel": "no_evidence",
+        "status": "待下一轮搜索验证",
+        "neededEvidence": [
+          "2024Q1-Q3季度报告",
+          "收入增长和毛利率趋势"
+        ]
+      }
+    ],
+    "scenario_paths": [
+      {
+        "scenario": "base",
+        "path": [
+          "收入规模扩大",
+          "研发费用率下降",
+          "经营亏损收窄"
+        ],
+        "evidenceLevel": "single_source_candidate",
+        "missingEvidence": [
+          "连续季度收入放量",
+          "毛利率稳定或改善",
+          "费用率下降是否来自收入分母效应"
+        ]
+      }
+    ],
+    "asset_impact_clues": [
+      {
+        "asset": "688256.SH",
+        "clue": "费用率下降可能成为市场关注的盈利拐点线索，但本轮缺少一致预期和估值锚。",
+        "evidenceLevel": "single_source_candidate",
+        "pricedInAssessment": "unknown",
+        "consensusGap": "未提供",
+        "valuationAnchor": "未提供",
+        "marketExpectationNote": "不得据此生成投资结论或目标价。"
+      }
+    ],
+    "richness_retention": {
+      "source": "base_ontology_only",
+      "imported_count_by_type": {},
+      "retained_as_candidate": [],
+      "downgraded_to_clue": [
+        "688256.SH 盈利拐点资产线索"
+      ],
+      "rejected_or_unresolved": [],
+      "normalization_actions": [
+        "本示例未提供高召回候选层，仅保留基础本体中的费用率链条"
+      ],
+      "drop_policy": "未被反证的基础候选不得因本轮只验证费用率缺口而静默删除。"
+    },
+    "suggested_actions": [
+      {
+        "suggestedActionId": "ACT-SUG-20240328-001",
+        "actionType": "CreateStateObservation",
+        "targetObjectId": null,
+        "actorRole": "system",
+        "fieldInputs": {
+          "observedValue": "211%",
+          "valueType": "actual",
+          "observationTime": "2023",
+          "observationSourceName": "寒武纪 2023 年度报告",
+          "sourceStatementType": "fact"
+        },
+        "relationInputs": {
+          "stateVariableId": "SV-RD-EXPENSE-RATIO",
+          "sourceDocumentId": "SRC-20240328-001"
+        },
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ],
+        "preconditionCheck": {
+          "status": "pass",
+          "notes": "状态变量候选已识别，观测来自财报事实。"
+        },
+        "extractionConfidence": 0.9
+      },
+      {
+        "suggestedActionId": "ACT-SUG-20240328-002",
+        "actionType": "AddSignal",
+        "targetObjectId": null,
+        "actorRole": "system",
+        "fieldInputs": {
+          "title": "研发费用率同比下降",
+          "signalType": "财报数据",
+          "signalRole": "validation",
+          "signalContent": "研发费用率由269%降至211%",
+          "statementType": "fact",
+          "observationTime": "2023",
+          "reliability": "high",
+          "validityWindow": "2024-2025"
+        },
+        "relationInputs": {
+          "supportsHypothesis": "SH-RD-EXPENSE-RATIO-DOWN",
+          "observationId": "OBS-20240328-001"
+        },
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ],
+        "preconditionCheck": {
+          "status": "unknown",
+          "notes": "需行业负责人确认该信号是否足以强化费用率收敛假设。"
+        },
+        "extractionConfidence": 0.84
+      }
+    ],
+    "evidence_matrix": [
+      {
+        "claim": "研发费用率出现下降",
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ],
+        "sourceCount": 1,
+        "evidenceLevel": "official_source_supported",
+        "optimizationAction": "add",
+        "verified_steps": [
+          "经营指标变化：研发费用率由财报披露并可形成事实观测"
+        ],
+        "missing_steps": [
+          "触发/事件：订单或客户采购变化未提供",
+          "商业转化：订单到交付、验收、收入确认链条未提供",
+          "财务影响：收入增长、毛利率和现金流协同验证未提供",
+          "资产影响线索：市场预期、估值锚和定价状态未提供"
+        ],
+        "degradation_reason": "仅有单篇年报事实，不能从费用率单点读数直接推出盈利拐点或资产影响。",
+        "missingLinks": [
+          "需要后续季度财报确认是否连续下行",
+          "需要收入增速和毛利率共同验证盈利拐点"
+        ]
+      }
+    ],
+    "unresolved_objects": [],
+    "unresolved_relations": [],
+    "quality_checks": [
+      {
+        "check": "是否先诊断基础本体缺口",
+        "result": "pass",
+        "note": "本轮目标来自基础本体中费用率观测和盈利拐点假设缺口。"
+      },
+      {
+        "check": "是否区分事实和判断",
+        "result": "pass",
+        "note": "研发费用率读数作为 observation，盈利拐点只作为待验证假设。"
+      },
+      {
+        "check": "是否生成投资建议",
+        "result": "pass",
+        "note": "未输出买卖建议、目标价或仓位。"
+      }
+    ],
+    "missing_evidence": [
+      {
+        "gap": "缺少连续两个季度费用率下行证据",
+        "why_it_matters": "单篇年报只能形成单来源候选，不能确认趋势。",
+        "suggested_material": "后续季度财报"
+      },
+      {
+        "gap": "缺少市场预期和估值锚",
+        "why_it_matters": "没有预期锚就不能判断资产影响是否有预期差。",
+        "suggested_material": "一致预期、估值比较、市场价格表现"
+      }
+    ],
+    "human_review_required": [
+      {
+        "item": "SH-RD-EXPENSE-RATIO-DOWN",
+        "reason": "是否足以从 proposed 升级仍需行业负责人确认。",
+        "suggested_reviewer_role": "industry_owner"
+      }
+    ]
+  },
+  "optimization_report": {
+    "selected_playbook": {
+      "scope_type": "industry",
+      "playbook_id": "industry_structure_cycle_competition_policy_v1",
+      "selection_basis": "base_ontology 来自 AI芯片行业本体冷启动初版，primary_industry=半导体，segments 包含 AI芯片设计，命中 semiconductor_pack_v1。",
+      "confidence": 0.88,
+      "industry_pack_ids": [
+        "semiconductor_pack_v1"
+      ],
+      "fallback_reason": ""
+    },
+    "base_ontology_assessment": {
+      "provided": true,
+      "version_or_name": "AI芯片行业本体冷启动初版",
+      "scope": "AI芯片设计公司费用率收敛与盈利拐点",
+      "diagnosed_gaps": [
+        {
+          "gap": "研发费用率变量缺少事实观测",
+          "affected_items": [
+            "SV-RD-EXPENSE-RATIO"
+          ],
+          "severity": "high",
+          "why_it_matters": "没有观测值就无法验证费用率收敛假设。"
+        },
+        {
+          "gap": "盈利拐点假设缺少连续季度和收入兑现证据",
+          "affected_items": [
+            "SH-RD-EXPENSE-RATIO-DOWN"
+          ],
+          "severity": "high",
+          "why_it_matters": "单点费用率下降不能直接推出盈利拐点。"
+        },
+        {
+          "gap": "资产影响线索缺少市场预期和估值锚",
+          "affected_items": [
+            "688256.SH"
+          ],
+          "severity": "medium",
+          "why_it_matters": "没有预期锚，不能判断资产定价线索。"
+        }
+      ],
+      "overall_assessment": "基础本体已有候选骨架，但证据主要停留在 no_evidence，需要先补财报事实观测。",
+      "cannot_optimize_reason": ""
+    },
+    "current_optimization_goal": {
+      "goal": "用可追溯财报材料补充研发费用率事实观测，并判断能否强化费用率收敛假设。",
+      "round_focus": "第一轮：验证状态变量观测与候选假设。",
+      "target_gaps": [
+        "研发费用率变量缺少事实观测",
+        "盈利拐点假设缺少支持信号"
+      ],
+      "success_criteria": [
+        "至少找到一份官方财报或公告作为事实来源",
+        "形成 StateVariableObservation",
+        "明确哪些结论仍不能升级"
+      ]
+    },
+    "material_requirements": [
+      {
+        "ontology_gap": "研发费用率变量缺少事实观测",
+        "needed_material_type": "上市公司年报或季报",
+        "reason": "财报能提供收入、研发费用和费用率口径。",
+        "priority": "P0",
+        "acceptable_evidence_level": "official_source_supported"
+      },
+      {
+        "ontology_gap": "盈利拐点假设缺少连续季度验证",
+        "needed_material_type": "后续季度财报、业绩说明会纪要",
+        "reason": "需要验证费用率是否连续下行，以及收入放量是否持续。",
+        "priority": "P0",
+        "acceptable_evidence_level": "official_source_supported"
+      },
+      {
+        "ontology_gap": "资产影响线索缺少市场预期和估值锚",
+        "needed_material_type": "一致预期、估值比较、市场价格表现",
+        "reason": "资产影响只能作为线索，需要市场预期和估值锚辅助判断。",
+        "priority": "P1",
+        "acceptable_evidence_level": "single_source_candidate"
+      }
+    ],
+    "evidence_requirements": [
+      {
+        "ontology_gap": "研发费用率变量缺少事实观测",
+        "required_materials": [
+          "上市公司年报",
+          "上市公司季报"
+        ],
+        "minimum_evidence_level": "official_source_supported",
+        "required_metadata": [
+          "发布主体",
+          "发布时间",
+          "财报期间",
+          "证据位置",
+          "原文来源"
+        ],
+        "forbidden_source_types": [
+          "无原文的二次转述",
+          "研报预测",
+          "AI 摘要"
+        ],
+        "playbook_rule": "industry playbook 与 semiconductor_pack_v1 均要求半导体经营变量先由公告、财报或可追溯产业数据形成事实观测。"
+      },
+      {
+        "ontology_gap": "盈利拐点假设缺少连续季度验证",
+        "required_materials": [
+          "后续季度财报",
+          "业绩说明会纪要",
+          "收入和毛利率连续观测"
+        ],
+        "minimum_evidence_level": "official_source_supported",
+        "required_metadata": [
+          "发布主体",
+          "发布时间",
+          "业务期间",
+          "证据位置"
+        ],
+        "forbidden_source_types": [
+          "目标价",
+          "评级",
+          "推荐语"
+        ],
+        "playbook_rule": "semiconductor_pack_v1 明确要求研发费用率、收入、毛利率和订单兑现分层验证，不能从单期费用率下降直接升级为盈利拐点。"
+      }
+    ],
+    "material_search_and_assessment": {
+      "search_enabled": true,
+      "search_objective": "围绕基础本体中的费用率观测缺口，优先补充可追溯财报材料。",
+      "query_plan": [
+        {
+          "ontology_gap": "研发费用率变量缺少事实观测",
+          "query": "寒武纪 2023 年度报告 研发费用率 营业收入",
+          "target_material_type": "上市公司年报",
+          "purpose": "获取研发费用率、收入和公司基本信息事实来源。",
+          "priority": "P0"
+        },
+        {
+          "ontology_gap": "盈利拐点假设缺少连续季度验证",
+          "query": "寒武纪 2024 季度报告 研发费用率 收入",
+          "target_material_type": "上市公司季报",
+          "purpose": "验证费用率是否连续收敛。",
+          "priority": "P0"
+        }
+      ],
+      "search_log": [
+        {
+          "query": "寒武纪 2023 年度报告 研发费用率 营业收入",
+          "result_count": 1,
+          "selected_source_ids": [
+            "SRC-20240328-001"
+          ],
+          "notes": "采用上市公司年度报告作为事实观测来源。"
+        }
+      ],
+      "adopted_source_ids": [
+        "SRC-20240328-001"
+      ],
+      "rejected_sources": [
+        {
+          "title_or_url": "未追溯到原文的二次转述",
+          "reason": "缺少原始发布主体和证据位置，只能作为线索，不纳入正式材料。"
+        }
+      ],
+      "watchlist_sources": [
+        "2024Q1-Q3季度报告"
+      ],
+      "quality_assessment": {
+        "source_reliability": "上市公司财报可靠性较高，可作为事实观测来源。",
+        "timeliness": "材料发布时间为2024-03-28，可用于2023年年报期观测。",
+        "evidence_granularity": "能覆盖公司整体费用和收入，但缺少产品线拆分。",
+        "source_independence": "只有单一原始来源，不能形成多来源确认。",
+        "bias_or_limitation": "财报不等于订单兑现趋势，需要后续季度材料验证持续性。",
+        "overall_quality": "medium"
+      },
+      "limitations": [
+        "样例仅采纳一份年报，未形成多来源验证",
+        "后续季度材料仍需补充"
+      ]
+    },
+    "evidence_claims_summary": [
+      {
+        "claimId": "CLM-20240328-001",
+        "summary": "2023年研发费用率下降至211%。",
+        "statement_type": "fact",
+        "evidence_level": "official_source_supported",
+        "ontology_mapping": "可映射为 StateVariableObservation 和 validation Signal。",
+        "restriction": "不得映射为 JudgmentOutput 或 AssetImpact。"
+      }
+    ],
+    "optimization_changes": [
+      {
+        "operation": "update",
+        "target": "SV-RD-EXPENSE-RATIO",
+        "before": "冷启动阶段仅为研发费用率候选变量。",
+        "after": "补充财报可观测口径、单位、观察频率和来源证据。",
+        "reason": "财报披露了研发费用率相关事实。",
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ],
+        "evidenceLevel": "official_source_supported"
+      },
+      {
+        "operation": "add",
+        "target": "OBS-20240328-001",
+        "before": "无已抽取观测。",
+        "after": "新增研发费用率事实观测候选。",
+        "reason": "来源为上市公司年报事实披露。",
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ],
+        "evidenceLevel": "official_source_supported"
+      },
+      {
+        "operation": "strengthen",
+        "target": "SH-RD-EXPENSE-RATIO-DOWN",
+        "before": "只有基础本体候选假设，证据等级为 no_evidence。",
+        "after": "由财报事实形成弱支持，但仍为 candidate。",
+        "reason": "单年费用率下降支持方向，但不足以确认持续趋势。",
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ],
+        "evidenceLevel": "official_source_supported"
+      }
+    ],
+    "optimization_decision_basis": [
+      {
+        "operation": "update",
+        "target": "SV-RD-EXPENSE-RATIO",
+        "playbook_rule": "semiconductor_pack_v1 将研发费用率列为公司研究和产品赛道常用财务变量，要求具备明确口径、观察频率和财报来源。",
+        "evidenceLevel": "official_source_supported",
+        "decision_reason": "2023年年报为官方财报来源，足以修正研发费用率变量的观察口径和来源说明。",
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ]
+      },
+      {
+        "operation": "add",
+        "target": "OBS-20240328-001",
+        "playbook_rule": "semiconductor_pack_v1 允许官方财报生成研发费用率事实观测候选，但禁止据此确认盈利拐点。",
+        "evidenceLevel": "official_source_supported",
+        "decision_reason": "财报事实可创建 StateVariableObservation；由于只有单期数据，观测仍为 candidate。",
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ]
+      },
+      {
+        "operation": "strengthen",
+        "target": "SH-RD-EXPENSE-RATIO-DOWN",
+        "playbook_rule": "semiconductor_pack_v1 将单期研发费用率下降列为常见误判之一，只能弱强化费用率收敛假设。",
+        "evidenceLevel": "official_source_supported",
+        "decision_reason": "单年费用率下降支持假设方向，但缺少连续季度、收入放量和毛利率验证。",
+        "evidenceRefs": [
+          "SRC-20240328-001#研发费用率"
+        ]
+      }
+    ],
+    "quality_checks": [
+      {
+        "check": "材料搜索是否由本体缺口驱动",
+        "result": "pass",
+        "note": "搜索目标来自研发费用率观测缺口和盈利拐点验证缺口。"
+      },
+      {
+        "check": "是否区分事实、判断和推荐语",
+        "result": "pass",
+        "note": "财报事实作为观测；盈利拐点和资产影响均未升级为结论。"
+      },
+      {
+        "check": "是否输出下一轮计划",
+        "result": "pass",
+        "note": "下一轮计划指向季度财报、订单收入传导和市场预期锚。"
+      }
+    ],
+    "stability_audit": {
+      "before_after_diff": {
+        "base_counts": {
+          "objects": 7,
+          "relations": 7,
+          "state_variables": 1,
+          "state_observations": 0,
+          "propagation_templates": 1,
+          "signals": 0,
+          "hypotheses": 1
+        },
+        "optimized_counts": {
+          "objects": 8,
+          "relations": 9,
+          "state_variables": 2,
+          "state_observations": 1,
+          "propagation_templates": 1,
+          "signals": 1,
+          "hypotheses": 1
+        },
+        "diffs": {
+          "objects": 1,
+          "relations": 2,
+          "state_variables": 1,
+          "state_observations": 1,
+          "propagation_templates": 0,
+          "signals": 1,
+          "hypotheses": 0
+        },
+        "unexplained_drops": [],
+        "verdict": "pass"
+      },
+      "change_budget": {
+        "base_core_total": 15,
+        "max_change_ratio": 0.2,
+        "max_change_count": 3,
+        "raw_non_keep_count": 3,
+        "final_non_keep_count": 3,
+        "downgraded_count": 0,
+        "highest_evidence_level": "official_source_supported",
+        "downgraded_items": [],
+        "verdict": "within_budget"
+      },
+      "plan_adherence": {
+        "previous_plan_provided": false,
+        "current_goal": "用可追溯财报材料补充研发费用率事实观测，并判断能否强化费用率收敛假设。",
+        "actual_target_gaps": [
+          "研发费用率变量缺少事实观测",
+          "盈利拐点假设缺少支持信号"
+        ],
+        "adherence_level": "first_round",
+        "details": "首轮材料驱动优化，无上一轮计划可比对。"
+      },
+      "scope_type_validation": {
+        "input_scope_type": "industry",
+        "authoritative_enum_version": "objects.yaml scope_type v0.1.0",
+        "is_standard": true,
+        "cross_skill_inconsistency_detected": false,
+        "resolution": "输入 scope_type 属于核心规范枚举，直接使用 industry playbook。",
+        "resolved_scope_type": "industry",
+        "confidence": 0.88
+      }
+    },
+    "remaining_gaps": [
+      {
+        "gap": "缺少连续季度费用率下行证据",
+        "why_it_matters": "盈利拐点需要趋势而非单期数据。",
+        "required_materials": [
+          "2024Q1-Q3季度报告",
+          "2024年度报告"
+        ]
+      },
+      {
+        "gap": "缺少订单到收入传导证据",
+        "why_it_matters": "费用率下降是否有价值取决于收入放量是否可持续。",
+        "required_materials": [
+          "重大合同公告",
+          "招投标数据",
+          "业绩说明会纪要"
+        ]
+      },
+      {
+        "gap": "缺少市场预期和估值锚",
+        "why_it_matters": "资产影响线索不能直接变成投资结论。",
+        "required_materials": [
+          "一致预期",
+          "估值比较",
+          "市场价格表现"
+        ]
+      }
+    ],
+    "next_optimization_plan": [
+      {
+        "next_round": "第二轮",
+        "optimization_goal": "补状态变量连续观测，验证研发费用率是否连续收敛。",
+        "target_gaps": [
+          "缺少连续季度费用率下行证据"
+        ],
+        "suggested_materials": [
+          "2024Q1季度报告",
+          "2024Q2季度报告",
+          "2024Q3季度报告"
+        ],
+        "owner_role": "researcher",
+        "continue_or_stop_condition": "若后续季度费用率不能连续下降，则降级费用率收敛假设；若连续下降，再进入传导链验证。",
+        "plan_id": "NEXT-OPT-001",
+        "suggested_operations": [
+          "supplement_evidence"
+        ],
+        "required_materials": [
+          "2024Q1季度报告",
+          "2024Q2季度报告",
+          "2024Q3季度报告"
+        ],
+        "minimum_evidence_level": "multi_source",
+        "priority": "medium",
+        "stop_condition": "若后续季度费用率不能连续下降，则降级费用率收敛假设；若连续下降，再进入传导链验证。"
+      },
+      {
+        "next_round": "第三轮",
+        "optimization_goal": "补订单到收入的商业转化链条。",
+        "target_gaps": [
+          "缺少订单到收入传导证据"
+        ],
+        "suggested_materials": [
+          "重大合同公告",
+          "客户采购或招投标数据",
+          "业绩说明会纪要"
+        ],
+        "owner_role": "researcher",
+        "continue_or_stop_condition": "若收入放量和毛利率不能配合验证，则不得升级盈利拐点假设。",
+        "plan_id": "NEXT-OPT-002",
+        "suggested_operations": [
+          "supplement_evidence"
+        ],
+        "required_materials": [
+          "重大合同公告",
+          "客户采购或招投标数据",
+          "业绩说明会纪要"
+        ],
+        "minimum_evidence_level": "multi_source",
+        "priority": "medium",
+        "stop_condition": "若收入放量和毛利率不能配合验证，则不得升级盈利拐点假设。"
+      }
+    ],
+    "gap_buckets": {
+      "buckets": {
+        "P0_independent": [],
+        "P0_blocked": [],
+        "P1_independent": [],
+        "P1_blocked": [
+          {
+            "gap_id": "GAP-OPT-002",
+            "gap_type": "weak_hypothesis_evidence",
+            "gap_description": "盈利拐点假设缺少支持信号",
+            "blocking_level": "P1",
+            "dependency": "depends_on[GAP-OPT-001]",
+            "depends_on_gap_ids": [
+              "GAP-OPT-001"
+            ],
+            "expected_change_scope": "small",
+            "source": "base_ontology_assessment",
+            "target_structures": [
+              "hypotheses.SH-RD-EXPENSE-RATIO-DOWN",
+              "signals"
+            ],
+            "affected_chain_ids": [
+              "SVP-REVENUE-EXPENSE-RATIO"
+            ],
+            "suggested_playbook": "product_track",
+            "topic_cluster_id": "TC-RD-EXPENSE-RATIO",
+            "status": "pending"
+          }
+        ],
+        "P2_deferred": [],
+        "core_change_blocked": [],
+        "resolved": [
+          {
+            "gap_id": "GAP-OPT-001",
+            "gap_type": "missing_observation",
+            "gap_description": "研发费用率变量缺少事实观测",
+            "blocking_level": "P0",
+            "dependency": "independent",
+            "expected_change_scope": "small",
+            "source": "base_ontology_assessment",
+            "target_structures": [
+              "state_variables.SV-RD-EXPENSE-RATIO",
+              "state_observations"
+            ],
+            "affected_chain_ids": [
+              "SVP-REVENUE-EXPENSE-RATIO"
+            ],
+            "suggested_playbook": "product_track",
+            "topic_cluster_id": "TC-RD-EXPENSE-RATIO",
+            "status": "resolved"
+          }
+        ]
+      },
+      "bucket_metadata": {
+        "total_gaps": 2,
+        "classified_at": "2026-06-05T12:00:00Z",
+        "classification_basis": "基于 base_ontology_assessment 中的两个高优先级缺口分级。",
+        "next_reclassification_round": 2
+      }
+    },
+    "batch_selection": {
+      "batch_id": "BATCH-P0-001",
+      "selected_gap_ids": [
+        "GAP-OPT-001"
+      ],
+      "selection_bucket": "P0_independent",
+      "topic_cluster_id": "TC-RD-EXPENSE-RATIO",
+      "selection_reason": "选择阻断费用率观测链路的 P0 small 缺口，能在单批内通过官方财报材料闭环。",
+      "deferred_gap_ids": [
+        "GAP-OPT-002"
+      ],
+      "blocked_gap_ids": [],
+      "core_change_blocked_gap_ids": [],
+      "expected_change_scope": "small",
+      "change_budget_hint": "本批只新增/强化少量状态观测和信号，低于 official_source_supported 预算。"
+    },
+    "core_change_proposals_summary": {
+      "proposal_count": 0,
+      "highest_risk_level": "none",
+      "blocked_gap_ids": [],
+      "summary": "本轮未发现需要修改核心对象、关系、动作、枚举或公共契约的建议。"
+    },
+    "core_change_proposals_file": {
+      "path": "examples/05_核心规范变更建议空样例.json",
+      "sha256": "sha256:586f8c47ab2c821f4ba33fc6f848617791c2efa529a099c3c9bb0b449a4caa63",
+      "proposal_count": 0
+    },
+    "core_fit_assessment": {
+      "summary": "本轮重大结构改动均可由现有核心 schema 准确表达；未使用实例层 workaround，也未发现 core_required 阻断项。",
+      "assessments": [
+        {
+          "assessment_id": "CFA-001",
+          "target_gap_id": "GAP-OPT-001",
+          "target_change": "为研发费用率状态变量补充事实观测和验证信号。",
+          "fit_category": "instance_fit",
+          "existing_schema_mapping": [
+            "StateVariable",
+            "StateVariableObservation",
+            "Signal",
+            "observationBindsVariable",
+            "signalBasedOnObservation"
+          ],
+          "semantic_loss_risk": "none",
+          "decision": "现有核心 schema 可准确表达该观测与信号，不需要核心规范变更。",
+          "allowed_instance_change": true,
+          "linked_change_targets": [
+            "SV-RD-EXPENSE-RATIO",
+            "SVO-RD-EXPENSE-RATIO-2023",
+            "SIG-RD-EXPENSE-RATIO-DOWN"
+          ]
+        }
+      ],
+      "workarounds": [],
+      "core_required_blocked_gap_ids": []
+    }
+  },
+  "optimization_run_log": {
+    "run_id": "RUN-OPT-001",
+    "run_mode": "auto_batches",
+    "started_from_version": "1.0.0",
+    "final_version": "1.1.0",
+    "batches": [
+      {
+        "batch_id": "BATCH-P0-001",
+        "selected_gap_ids": [
+          "GAP-OPT-001"
+        ],
+        "optimization_mode": "full",
+        "delta_change_count": 0,
+        "merge_status": "not_needed",
+        "validation_status": "pass",
+        "core_change_proposal_count": 0,
+        "notes": "样例首轮使用 full 模式直接生成完整 optimized_ontology。"
+      }
+    ],
+    "final_delivery_status": "complete",
+    "stop_reason": "single_example_round_completed",
+    "core_change_proposals_file": "examples/05_核心规范变更建议空样例.json"
+  },
+  "readable_report": "# 本体优化报告\n\n> **报告**：投研本体材料驱动优化报告\n\n本样例围绕研发费用率观测缺口进行优化，新增财报来源、证据主张和状态变量观测候选，并弱强化费用率收敛假设。优化后的内容仍保持 candidate 边界，不输出投资结论、买卖建议、目标价或仓位建议。\n\n| 项目 | 结果 |\n| --- | --- |\n| 本轮目标 | 补研发费用率事实观测 |\n| 主要动作 | update、add、strengthen |\n| 证据等级 | official_source_supported |\n| 剩余缺口 | 连续季度验证、订单到收入传导、市场预期和估值锚 |\n\n## 改动分析\n\n- 研发费用率变量补充财报口径和来源。\n- 新增研发费用率事实观测候选。\n- 盈利拐点相关假设只做弱强化，未升级为正式判断。\n\n## 下一步\n\n| 优先级 | 行动 | 目的 |\n| --- | --- | --- |\n| P0 | 补充后续季度财报 | 验证费用率是否连续收敛 |\n| P1 | 补订单和收入材料 | 验证商业兑现链条 |\n| P1 | 补预期和估值材料 | 约束资产线索边界 |"
+}

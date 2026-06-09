@@ -1,0 +1,1366 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "投研本体评测输出结构",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "evaluation_metadata",
+    "question_set_assessment",
+    "evaluation_summary",
+    "threshold_check",
+    "dimension_scores",
+    "question_level_results",
+    "critical_failures",
+    "ontology_issue_mapping",
+    "evaluation_fix_report",
+    "optimization_plan",
+    "optimization_handoff",
+    "compliance_check",
+    "readable_report",
+    "data_requirements_checklist",
+    "data_sourcing_summary",
+    "data_driven_score_adjustments"
+  ],
+  "properties": {
+    "evaluation_metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evaluation_id",
+        "ontology_name",
+        "ontology_version",
+        "scope_type",
+        "target_scope",
+        "eval_question_count",
+        "reference_materials_count",
+        "evaluation_confidence",
+        "news_hotspot_config"
+      ],
+      "properties": {
+        "evaluation_id": {
+          "type": "string"
+        },
+        "ontology_name": {
+          "type": "string"
+        },
+        "ontology_version": {
+          "type": "string"
+        },
+        "scope_type": {
+          "$ref": "#/$defs/scope_type"
+        },
+        "target_scope": {
+          "type": "string"
+        },
+        "eval_question_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reference_materials_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "evaluation_confidence": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "news_hotspot_config": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "recency_days"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "recency_days": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "source_policy": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "question_set_assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question_set_quality",
+        "question_counts_by_tier",
+        "question_counts_by_type",
+        "scope_type_weighting_applied",
+        "coverage_gaps",
+        "hotspot_source_status",
+        "baseline_comparability"
+      ],
+      "properties": {
+        "question_set_quality": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "question_counts_by_tier": {
+          "$ref": "#/$defs/question_tier_counts"
+        },
+        "question_counts_by_type": {
+          "$ref": "#/$defs/question_type_counts"
+        },
+        "scope_type_weighting_applied": {
+          "type": "boolean"
+        },
+        "coverage_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hotspot_source_status": {
+          "enum": [
+            "not_used",
+            "fully_traceable",
+            "partially_traceable",
+            "insufficient_reference_support"
+          ]
+        },
+        "baseline_comparability": {
+          "enum": [
+            "comparable",
+            "partially_comparable",
+            "not_comparable"
+          ]
+        }
+      }
+    },
+    "evaluation_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total_score",
+        "practical_readiness_score",
+        "core_question_pass_rate",
+        "grade",
+        "release_decision",
+        "summary_comment"
+      ],
+      "properties": {
+        "total_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "practical_readiness_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "core_question_pass_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "grade": {
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E"
+          ]
+        },
+        "release_decision": {
+          "enum": [
+            "allow_publish",
+            "conditional_publish",
+            "reject_publish",
+            "insufficient_evidence"
+          ]
+        },
+        "summary_comment": {
+          "type": "string"
+        }
+      }
+    },
+    "threshold_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total_score_met",
+        "core_question_pass_rate_met",
+        "critical_failure_count_met",
+        "core_chain_break_count_met",
+        "high_priority_gap_count_met",
+        "verification_signal_coverage_met",
+        "boundary_condition_coverage_met",
+        "ontology_consistency_score_met",
+        "insufficient_evidence_triggered",
+        "hard_gate_notes"
+      ],
+      "properties": {
+        "total_score_met": {
+          "type": "boolean"
+        },
+        "core_question_pass_rate_met": {
+          "type": "boolean"
+        },
+        "critical_failure_count_met": {
+          "type": "boolean"
+        },
+        "core_chain_break_count_met": {
+          "type": "boolean"
+        },
+        "high_priority_gap_count_met": {
+          "type": "boolean"
+        },
+        "verification_signal_coverage_met": {
+          "type": "boolean"
+        },
+        "boundary_condition_coverage_met": {
+          "type": "boolean"
+        },
+        "ontology_consistency_score_met": {
+          "type": "boolean"
+        },
+        "insufficient_evidence_triggered": {
+          "type": "boolean"
+        },
+        "hard_gate_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "dimension_scores": {
+      "$ref": "#/$defs/dimension_scores_100"
+    },
+    "question_level_results": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/question_result"
+      }
+    },
+    "critical_failures": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/critical_failure"
+      }
+    },
+    "ontology_issue_mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "missing_objects",
+        "missing_state_variables",
+        "missing_relations",
+        "missing_signals",
+        "missing_event_templates",
+        "missing_boundary_conditions",
+        "broken_reasoning_chains",
+        "over_generalized_conclusions",
+        "ontology_inconsistencies",
+        "insufficient_reference_support"
+      ],
+      "properties": {
+        "missing_objects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue_item"
+          }
+        },
+        "missing_state_variables": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue_item"
+          }
+        },
+        "missing_relations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue_item"
+          }
+        },
+        "missing_signals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue_item"
+          }
+        },
+        "missing_event_templates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue_item"
+          }
+        },
+        "missing_boundary_conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue_item"
+          }
+        },
+        "broken_reasoning_chains": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue_item"
+          }
+        },
+        "over_generalized_conclusions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue_item"
+          }
+        },
+        "ontology_inconsistencies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue_item"
+          }
+        },
+        "insufficient_reference_support": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue_item"
+          }
+        }
+      }
+    },
+    "evaluation_fix_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_fixes",
+        "recommended_fixes",
+        "backlog_items",
+        "do_not_add_to_ontology"
+      ],
+      "properties": {
+        "required_fixes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fix_item"
+          }
+        },
+        "recommended_fixes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fix_item"
+          }
+        },
+        "backlog_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fix_item"
+          }
+        },
+        "do_not_add_to_ontology": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fix_item"
+          }
+        }
+      }
+    },
+    "optimization_plan": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/optimization_plan_item"
+      }
+    },
+    "optimization_handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target_skill",
+        "handoff_payload",
+        "execution_notes",
+        "must_not_do"
+      ],
+      "properties": {
+        "target_skill": {
+          "const": "touyan-benti-youhua"
+        },
+        "handoff_payload": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "evaluation_fix_report",
+              "optimization_plan"
+            ]
+          }
+        },
+        "execution_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "must_not_do": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "compliance_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "does_not_output_investment_advice",
+        "does_not_output_target_price",
+        "does_not_output_return_forecast",
+        "does_not_output_position_advice",
+        "hotspot_sources_traceable",
+        "ontology_external_content_labeled",
+        "notes"
+      ],
+      "properties": {
+        "does_not_output_investment_advice": {
+          "type": "boolean"
+        },
+        "does_not_output_target_price": {
+          "type": "boolean"
+        },
+        "does_not_output_return_forecast": {
+          "type": "boolean"
+        },
+        "does_not_output_position_advice": {
+          "type": "boolean"
+        },
+        "hotspot_sources_traceable": {
+          "type": "boolean"
+        },
+        "ontology_external_content_labeled": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "readable_report": {
+      "type": "string",
+      "description": "人类可读的评测报告（Markdown 格式），采用四段式结构：身份背景（引用块）→ 发布判定（判定结果 + 归因说明 + 紧凑表格）→ 维度分析（关键维度解读 + 失败项归因，详情折叠）→ 下一步行动（三列表格，最多 5 条）。面向投研人员和本体维护者，正文 800-1500 字，详情使用 <details> 标签折叠。"
+    },
+    "data_requirements_checklist": {
+      "type": "array",
+      "description": "从本体推导的数据需求清单。每条对应一个需要从外部数据源获取的信号、指标、事件或事实，用于支撑 verifiability 和 boundary_conditions 评分。",
+      "items": {
+        "$ref": "#/$defs/data_requirement_item"
+      }
+    },
+    "data_sourcing_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "数据回灌结果的统计摘要，记录数据需求清单中有多少项被外部数据 Skill 成功获取。",
+      "required": [
+        "total_requested",
+        "total_fulfilled",
+        "fulfillment_rate",
+        "by_priority",
+        "unfulfilled_items"
+      ],
+      "properties": {
+        "total_requested": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "数据需求清单中的总项数"
+        },
+        "total_fulfilled": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "已被 fetched_data 满足的项数"
+        },
+        "fulfillment_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "数据满足率 = total_fulfilled / total_requested"
+        },
+        "by_priority": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "properties": {
+            "high": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["fulfilled", "total"],
+              "properties": {
+                "fulfilled": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "total": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "medium": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["fulfilled", "total"],
+              "properties": {
+                "fulfilled": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "total": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "low": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["fulfilled", "total"],
+              "properties": {
+                "fulfilled": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "total": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "unfulfilled_items": {
+          "type": "array",
+          "description": "未能获取数据的 data_item_id 列表，含建议的下一次检索方向",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["data_item_id", "reason", "suggested_retrieval"],
+            "properties": {
+              "data_item_id": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "suggested_retrieval": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "data_driven_score_adjustments": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "记录哪些维度、哪些题目的得分因为有真实数据支撑而被确认或提升，以及数据缺口导致的降级。",
+      "required": [
+        "verifiability_boosted_by_data",
+        "boundary_conditions_boosted_by_data",
+        "hotspot_score_impact",
+        "degraded_by_data_gap"
+      ],
+      "properties": {
+        "verifiability_boosted_by_data": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["applicable", "question_ids", "baseline_score", "adjusted_score", "notes"],
+          "properties": {
+            "applicable": {
+              "type": "boolean"
+            },
+            "question_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "baseline_score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "adjusted_score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        "boundary_conditions_boosted_by_data": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["applicable", "question_ids", "baseline_score", "adjusted_score", "notes"],
+          "properties": {
+            "applicable": {
+              "type": "boolean"
+            },
+            "question_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "baseline_score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "adjusted_score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        "hotspot_score_impact": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["data_fulfilled_count", "total_hotspot_questions", "practical_readiness_delta", "notes"],
+          "properties": {
+            "data_fulfilled_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "total_hotspot_questions": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "practical_readiness_delta": {
+              "type": "number"
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        "degraded_by_data_gap": {
+          "type": "array",
+          "description": "因数据缺口导致发布判定降级或评测可信度降低的记录",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["gap_reason", "affected_dimensions", "downgrade_description"],
+            "properties": {
+              "gap_reason": {
+                "type": "string"
+              },
+              "affected_dimensions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "downgrade_description": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "scope_type": {
+      "enum": [
+        "industry",
+        "supply_chain",
+        "product_track",
+        "company_research",
+        "policy_theme",
+        "macro_theme",
+        "event_theme",
+        "uncertain"
+      ]
+    },
+    "question_tier": {
+      "enum": [
+        "baseline",
+        "type_specific",
+        "hotspot",
+        "challenge"
+      ]
+    },
+    "question_type": {
+      "enum": [
+        "event_impact",
+        "industry_chain_transmission",
+        "company_benefit",
+        "risk_falsification",
+        "state_monitoring",
+        "asset_revaluation"
+      ]
+    },
+    "severity": {
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ]
+    },
+    "priority": {
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "operation": {
+      "enum": [
+        "add",
+        "update",
+        "split",
+        "merge",
+        "downgrade",
+        "deprecate",
+        "reject",
+        "supplement_evidence",
+        "revise_relation",
+        "add_blocking_signal",
+        "defer",
+        "backlog"
+      ]
+    },
+    "minimum_evidence_level": {
+      "enum": [
+        "no_evidence",
+        "single_source_candidate",
+        "multi_source_supported",
+        "official_source_supported",
+        "review_confirmed"
+      ]
+    },
+    "question_tier_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseline",
+        "type_specific",
+        "hotspot",
+        "challenge"
+      ],
+      "properties": {
+        "baseline": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "type_specific": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "hotspot": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "challenge": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "question_type_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_impact",
+        "industry_chain_transmission",
+        "company_benefit",
+        "risk_falsification",
+        "state_monitoring",
+        "asset_revaluation"
+      ],
+      "properties": {
+        "event_impact": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "industry_chain_transmission": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "company_benefit": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "risk_falsification": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "state_monitoring": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "asset_revaluation": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "dimension_scores_5": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "coverage",
+        "reasoning_chain_completeness",
+        "explanation_clarity",
+        "verifiability",
+        "boundary_conditions",
+        "falsification_ability",
+        "conclusion_usability",
+        "ontology_consistency"
+      ],
+      "properties": {
+        "coverage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "reasoning_chain_completeness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "explanation_clarity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "verifiability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "boundary_conditions": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "falsification_ability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "conclusion_usability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "ontology_consistency": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        }
+      }
+    },
+    "dimension_scores_100": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "coverage",
+        "reasoning_chain_completeness",
+        "explanation_clarity",
+        "verifiability",
+        "boundary_conditions",
+        "falsification_ability",
+        "conclusion_usability",
+        "ontology_consistency"
+      ],
+      "properties": {
+        "coverage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "reasoning_chain_completeness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "explanation_clarity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "verifiability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "boundary_conditions": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "falsification_ability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "conclusion_usability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ontology_consistency": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "question_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question_id",
+        "question_tier",
+        "question_type",
+        "question_text",
+        "target_capability",
+        "answer_summary",
+        "scores",
+        "weighted_score",
+        "pass_or_fail",
+        "severity",
+        "identified_issues",
+        "ontology_fix_suggestions",
+        "reference_notes",
+        "hotspot_source_refs"
+      ],
+      "properties": {
+        "question_id": {
+          "type": "string"
+        },
+        "question_tier": {
+          "$ref": "#/$defs/question_tier"
+        },
+        "question_type": {
+          "$ref": "#/$defs/question_type"
+        },
+        "question_text": {
+          "type": "string"
+        },
+        "target_capability": {
+          "type": "string"
+        },
+        "answer_summary": {
+          "type": "string"
+        },
+        "scores": {
+          "$ref": "#/$defs/dimension_scores_5"
+        },
+        "weighted_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "pass_or_fail": {
+          "enum": [
+            "pass",
+            "fail",
+            "insufficient_reference_support"
+          ]
+        },
+        "severity": {
+          "$ref": "#/$defs/severity"
+        },
+        "identified_issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue_item"
+          }
+        },
+        "ontology_fix_suggestions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reference_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hotspot_source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "critical_failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "failure_id",
+        "question_ids",
+        "failure_type",
+        "severity",
+        "description",
+        "release_impact"
+      ],
+      "properties": {
+        "failure_id": {
+          "type": "string"
+        },
+        "question_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "failure_type": {
+          "enum": [
+            "core_object_missing",
+            "core_state_variable_missing",
+            "core_relation_missing",
+            "core_chain_break",
+            "no_verification_signal",
+            "no_boundary_condition",
+            "no_falsification_ability",
+            "ontology_inconsistency",
+            "reference_conflict"
+          ]
+        },
+        "severity": {
+          "$ref": "#/$defs/severity"
+        },
+        "description": {
+          "type": "string"
+        },
+        "release_impact": {
+          "type": "string"
+        }
+      }
+    },
+    "issue_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "issue_id",
+        "issue_type",
+        "description",
+        "affected_question_ids",
+        "severity"
+      ],
+      "properties": {
+        "issue_id": {
+          "type": "string"
+        },
+        "issue_type": {
+          "enum": [
+            "missing_object",
+            "missing_state_variable",
+            "missing_relation",
+            "missing_signal",
+            "missing_event_template",
+            "missing_boundary_condition",
+            "broken_reasoning_chain",
+            "over_generalized_conclusion",
+            "ontology_inconsistency",
+            "insufficient_reference_support"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "affected_question_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "severity": {
+          "$ref": "#/$defs/severity"
+        },
+        "source_question_tier": {
+          "$ref": "#/$defs/question_tier"
+        }
+      }
+    },
+    "fix_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fix_id",
+        "source_issue_ids",
+        "source_question_ids",
+        "source_question_tier",
+        "fix_type",
+        "description",
+        "suggested_operation",
+        "minimum_evidence_level",
+        "priority",
+        "stability_assessment"
+      ],
+      "properties": {
+        "fix_id": {
+          "type": "string"
+        },
+        "source_issue_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_question_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_question_tier": {
+          "$ref": "#/$defs/question_tier"
+        },
+        "fix_type": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "suggested_operation": {
+          "$ref": "#/$defs/operation"
+        },
+        "minimum_evidence_level": {
+          "$ref": "#/$defs/minimum_evidence_level"
+        },
+        "priority": {
+          "$ref": "#/$defs/priority"
+        },
+        "stability_assessment": {
+          "enum": [
+            "stable_logic",
+            "candidate_logic",
+            "short_term_fact",
+            "out_of_scope"
+          ]
+        }
+      }
+    },
+    "optimization_plan_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plan_id",
+        "source_question_ids",
+        "source_question_tier",
+        "source_issue_ids",
+        "optimization_goal",
+        "target_gaps",
+        "suggested_operations",
+        "required_materials",
+        "minimum_evidence_level",
+        "priority",
+        "stop_condition",
+        "quality_expected_delta"
+      ],
+      "properties": {
+        "plan_id": {
+          "type": "string"
+        },
+        "source_question_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_question_tier": {
+          "$ref": "#/$defs/question_tier"
+        },
+        "source_issue_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "optimization_goal": {
+          "type": "string"
+        },
+        "target_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "target_file": {
+          "type": "string",
+          "description": "建议写入或检查的 bundle 文件，如 ontology_bundle_vN/05_reasoning.yaml。"
+        },
+        "target_path": {
+          "type": "string",
+          "description": "bundle 文件内部路径。"
+        },
+        "target_id": {
+          "type": "string",
+          "description": "目标对象、关系、变量、信号、证据或治理项 ID。"
+        },
+        "legacy_path": {
+          "type": "string",
+          "description": "旧 JSON 路径，可选。"
+        },
+        "suggested_operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/operation"
+          }
+        },
+        "required_materials": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "minimum_evidence_level": {
+          "$ref": "#/$defs/minimum_evidence_level"
+        },
+        "priority": {
+          "$ref": "#/$defs/priority"
+        },
+        "stop_condition": {
+          "type": "string"
+        },
+        "quality_expected_delta": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "coverage_score",
+            "evidence_score",
+            "consistency_score",
+            "reasoning_score"
+          ],
+          "properties": {
+            "coverage_score": {
+              "type": "number"
+            },
+            "evidence_score": {
+              "type": "number"
+            },
+            "consistency_score": {
+              "type": "number"
+            },
+            "reasoning_score": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "data_requirement_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "data_item_id",
+        "data_type",
+        "search_keywords",
+        "priority",
+        "mapped_ontology_element",
+        "mapped_eval_dimensions",
+        "rationale"
+      ],
+      "properties": {
+        "data_item_id": {
+          "type": "string",
+          "description": "数据项唯一标识，与 fetched_data 中的 data_item_id 对应"
+        },
+        "data_type": {
+          "enum": [
+            "signal",
+            "indicator",
+            "event",
+            "timeline",
+            "fact"
+          ],
+          "description": "signal=可观测信号, indicator=量化指标, event=事件事实, timeline=时间序列, fact=一般事实"
+        },
+        "search_keywords": {
+          "type": "array",
+          "description": "用于数据检索的关键词列表",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "date_range": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["start", "end"],
+          "properties": {
+            "start": {
+              "type": "string",
+              "format": "date"
+            },
+            "end": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        },
+        "priority": {
+          "$ref": "#/$defs/priority"
+        },
+        "mapped_ontology_element": {
+          "type": "string",
+          "description": "映射的本体元素ID，如 state_variable.xxx 或 verification_signal.xxx"
+        },
+        "mapped_eval_dimensions": {
+          "type": "array",
+          "description": "该数据项支撑的评测维度",
+          "items": {
+            "enum": [
+              "coverage",
+              "reasoning_chain_completeness",
+              "verifiability",
+              "boundary_conditions",
+              "falsification_ability"
+            ]
+          },
+          "minItems": 1
+        },
+        "rationale": {
+          "type": "string",
+          "description": "为什么本体的这个元素需要这条外部数据"
+        },
+        "source": {
+          "enum": [
+            "explicit_signal",
+            "inferred",
+            "user_specified"
+          ],
+          "description": "数据需求来源：explicit_signal=本体显式信号字段, inferred=从状态变量/传导链推断, user_specified=用户指定",
+          "default": "inferred"
+        },
+        "fulfilled": {
+          "type": "boolean",
+          "description": "是否已被 fetched_data 满足（在 data_sourcing_summary 中使用）"
+        }
+      }
+    }
+  }
+}

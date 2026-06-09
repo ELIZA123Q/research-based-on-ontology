@@ -1,0 +1,1626 @@
+schema_name: objects
+schema_version: 0.1.0
+namespace: investment_ontology
+status: draft
+canonical_rule: YAML 是正式机器约束；Markdown 只负责解释和示例。
+description: 投研本体对象类型、字段、状态字段和必要关系规范。
+
+time_types:
+  business_time: 现实世界中事实、信号、判断或影响发生和生效的时间。
+  system_time: 系统记录、创建、修改或审核对象的时间。
+
+identity_and_governance:
+  instance_id_rule: 所有实例必须有稳定 id；id 不承载业务结论，只用于引用。
+  instance_id_pattern: "{prefix}-{YYYYMMDD}-{serial}"
+  relation_id_pattern: "REL-{YYYYMMDD}-{serial}"
+  action_audit_id_pattern: "AA-{YYYYMMDD}-{serial}"
+  review_record_id_pattern: "RR-{YYYYMMDD}-{serial}"
+  object_id_prefixes:
+    ConceptScheme: CS
+    Concept: CON
+    ConceptBoundary: CB
+    Industry: IND
+    Segment: SEG
+    Company: COM
+    Product: PRD
+    Material: MAT
+    Asset: AST
+    StateVariable: SV
+    StateVariableObservation: OBS
+    StateVariablePropagation: SVP
+    Event: EVT
+    StateHypothesis: SH
+    Signal: SIG
+    JudgmentOutput: JO
+    AssetImpact: AI
+    InvestmentThesis: TH
+    SourceDocument: SRC
+    EvidenceEpisode: EPI
+    EvidenceClaim: ECL
+    EvidenceFact: EF
+    PatchRequest: PRQ
+    PatchLedgerItem: PLI
+    InferenceRun: IR
+    ActionAudit: AA
+    ReviewRecord: RR
+  governance_layers:
+    ontology_core: 本体层，全公司共享，改动需本体维护方评审。
+    industry_extension: 行业扩展层，由行业负责人维护，可沉淀行业模板和行业特有变量。
+    application_workspace: 应用层，个人或团队工作空间，默认不改变本体结构。
+  common_fields_applied_to_all_object_types:
+    inheritance_rule: 实例文件可在容器级声明默认值；若对象实例未显式填写 governanceLayer 或 recordStatus，可继承容器默认值。正式入库时系统应补齐为实例字段。
+    id:
+      zh_name: 实例 ID
+      type: string
+      required: true
+      generated_by: system
+    governanceLayer:
+      zh_name: 治理层级
+      type: enum
+      enum: [ontology_core, industry_extension, application_workspace]
+      required: true
+      default: application_workspace
+    recordStatus:
+      zh_name: 记录状态
+      type: enum
+      enum: [candidate, confirmed, archived]
+      required: true
+      default: candidate
+    extractionConfidence:
+      zh_name: AI 抽取置信度
+      type: number
+      required: false
+      value_range: [0, 1]
+    confirmedBy:
+      zh_name: 确认人
+      type: string
+      required: false
+    confirmedAt:
+      zh_name: 确认时间
+      type: datetime
+      time_type: system_time
+      required: false
+    validFrom:
+      zh_name: 有效开始时间
+      type: datetime
+      time_type: business_time
+      required: false
+      description: 事实、关系、信号、判断或证据在现实世界中开始适用的时间；不适用时留空。
+    validTo:
+      zh_name: 有效结束时间
+      type: datetime
+      time_type: business_time
+      required: false
+      description: 事实、关系、信号、判断或证据在现实世界中停止适用的时间；未知时留空。
+    observedAt:
+      zh_name: 观测时间
+      type: datetime
+      time_type: business_time
+      required: false
+      description: 来源材料声称、披露或观察到该事实的业务时间。
+    learnedAt:
+      zh_name: 系统获知时间
+      type: datetime
+      time_type: system_time
+      required: false
+      generated_by: system
+      description: 系统把该对象、关系或证据纳入候选图谱的时间。
+    invalidatedAt:
+      zh_name: 失效记录时间
+      type: datetime
+      time_type: system_time
+      required: false
+      description: 该记录被新证据标记为不再适用的系统时间；历史记录不得物理删除。
+    invalidatedBy:
+      zh_name: 失效依据
+      type: object_ref
+      required: false
+      description: 指向触发失效的 EvidenceClaim、EvidenceFact、Signal、PatchLedgerItem 或 ReviewRecord。
+    supersedes:
+      zh_name: 替代旧记录
+      type: array
+      required: false
+      description: 当前记录替代的旧 claim、fact、signal、relation 或 patch ID。
+    supersededBy:
+      zh_name: 被新记录替代
+      type: array
+      required: false
+      description: 替代当前记录的新 claim、fact、signal、relation 或 patch ID。
+  naming_rules:
+    - 英文字段名使用 lowerCamelCase；对象类型使用 PascalCase；关系和动作使用 lowerCamelCase 或 PascalCase，保持本文件已有命名。
+    - zh_name 用于展示，不得作为机器主键。
+    - 同一实例的 name/title 可修订，id 不可修订。
+
+public_contracts:
+  description: 跨 Skill 共享的数据契约。各 Skill 的输入输出 schema 可以扩展字段，但不得另行定义冲突的枚举或最小字段。
+  scope_type:
+    description: 本体研究范围的唯一权威枚举，适用于 ontology_scope.scope_type、评测 scope_type、历史回放 primary_scope_type 和优化 selected_playbook.scope_type。
+    type: enum
+    enum:
+      - industry
+      - supply_chain
+      - product_track
+      - company_research
+      - policy_theme
+      - macro_theme
+      - event_theme
+      - uncertain
+    legacy_aliases:
+      product_technology:
+        maps_to: product_track
+        reason: 旧评测与历史回放字段用于表达产品、技术路线、商业化和替代关系，应与冷启动/优化的 product_track 对齐。
+      company:
+        maps_to: company_research
+        reason: 旧历史回放字段 company 表达公司研究范围。
+      industry_chain:
+        maps_to: null
+        reason: 旧历史回放字段语义过宽，需根据研究主轴映射为 industry 或 supply_chain，并记录映射依据。
+      asset_portfolio:
+        maps_to: null
+        reason: 资产组合不是本体研究范围类型，应作为 validation_profile 或应用场景记录。
+      material_driven:
+        maps_to: null
+        reason: 材料驱动是优化来源或构建方式，不是本体研究范围类型。
+      multi_ontology:
+        maps_to: null
+        reason: 多本体组合是 composition_type，不是单一本体范围类型。
+    required_usage:
+      - 冷启动输出使用 ontology_scope.scope_type。
+      - 优化输入读取 base_ontology.ontology_scope.scope_type，输出 optimization_report.selected_playbook.scope_type。
+      - 评测输入与输出使用 scope_type；旧 ontology_type 只能作为兼容输入，必须映射后记录。
+      - 历史回放使用 primary_scope_type；旧 primary_ontology_type 只能作为兼容输入，必须映射后记录。
+  optimization_plan_item_minimum_contract:
+    description: 所有上游诊断、评测、历史回放和缺口发现输出的 optimization_plan，以及优化 Skill 输出的 next_optimization_plan，都必须满足的最小任务单契约。
+    required_fields:
+      plan_id:
+        type: string
+        description: 计划项唯一标识。
+      optimization_goal:
+        type: string
+        description: 本轮要修复或验证的具体目标。
+      target_gaps:
+        type: array
+        items: string
+        description: 目标缺口、组件或问题描述。
+      suggested_operations:
+        type: array
+        items: enum
+        enum: [add, split, merge, downgrade, supplement_evidence, revise_relation, add_blocking_signal, defer, reject]
+        description: 建议动作，只表达任务意图，不等于已执行修改。
+      required_materials:
+        type: array
+        items: string
+        description: 最低必需材料类型或证据来源。
+      minimum_evidence_level:
+        type: enum
+        enum: [no_evidence, single_source_candidate, single_report, multi_source, multi_source_supported, official_source_supported, historical_case, ontology_feedback, expert_confirmed, review_confirmed]
+        description: 执行该任务前至少需要达到的证据等级。
+      priority:
+        type: enum
+        enum: [high, medium, low]
+        description: 任务优先级。
+      stop_condition:
+        type: string
+        description: 何时停止扩张、进入执行或拒绝该计划。
+    optional_extension_fields:
+      - next_round
+      - source_question_ids
+      - source_question_tier
+      - source_issue_ids
+      - source_gap_ids
+      - source_diagnostic_ids
+      - suggested_materials
+      - owner_role
+      - continue_or_stop_condition
+      - quality_expected_delta
+
+object_categories:
+  conceptual_definition:
+    zh_name: 概念定义类
+    description: 定义研究范围、术语、边界、同义词和概念到业务对象的映射依据。
+  research_target:
+    zh_name: 研究标的类
+    description: 现实世界锚点，承载产业、公司、产品、材料和资产标的。
+  observable_dimension:
+    zh_name: 可观测维度类
+    description: 定义可观察变量、观测事实和变量之间的传导逻辑。
+  research_reasoning:
+    zh_name: 研究推理类
+    description: 承载事件、假设、信号、判断、资产影响和长期命题。
+  source_and_record:
+    zh_name: 来源与记录类
+    description: 支撑来源追溯、动作留痕、审核和复盘。
+
+state_variable_categories:
+  macro_economic_condition: 经济态势
+  monetary_liquidity: 货币流动性
+  fx_and_trade: 汇率与外贸
+  top_level_policy: 顶层调控
+  geopolitical_disturbance: 地缘扰动
+  supply_demand_price: 供需与量价
+  industry_cycle: 行业周期
+  competitive_landscape: 竞争格局
+  sector_policy: 细分政策
+  technology_iteration: 技术迭代
+  profitability: 盈利能力
+  expense_structure: 费用结构
+  revenue_quality: 收入质量
+  asset_pricing: 资产定价
+  operating_efficiency: 运营效率
+  product_competitiveness: 产品竞争力
+  governance_and_risk: 治理与风险
+
+common_enums:
+  conceptType: [industry_scope, supply_chain_scope, product_or_technology, material_or_input, company_role, policy_theme, macro_theme, event_theme, asset_scope, term]
+  conceptScopeStatus: [in_scope, out_of_scope, adjacent, overlap, disputed, unknown]
+  conceptDefinitionStatus: [draft, source_supported, reviewed, deprecated]
+  boundaryDecisionType: [include, exclude, adjacent, overlap]
+  conceptMappingRole: [defines_scope, maps_to_industry, maps_to_segment, maps_to_product, maps_to_material, maps_to_company, maps_to_asset, maps_to_event, maps_to_variable, alias_only]
+  variableType: [quantitative, qualitative]
+  stateVariableSourceType: [platform_predefined, industry_template, reusable_researcher_defined, temporary_researcher_defined]
+  observationValueType: [actual, estimated]
+  sourceStatementType: [fact, estimate]
+  hypothesisDirection: [up, down, stable, divergent]
+  hypothesisStatus: [proposed, active, blocked, deprecated]
+  signalRole: [validation, catalyst, tracking, weakening, blocking]
+  signalStatus: [active, weakened, withdrawn, invalidated]
+  statementType: [fact, forecast, assumption, judgment, recommendation]
+  reliability: [high, medium, low]
+  judgmentStatus: [candidate, watchlist, active, formalTrigger, resolved, expired, pricedIn, deprecated]
+  impactDirection: [positive, negative, neutral]
+  impactMagnitude: [large, medium, small]
+  scenarioTag: [base, upside, downside]
+  confidenceLevel: [high, medium, low]
+  pricedInAssessment: [underpriced, fairly_priced, priced_in, overreacted, unknown]
+  thesisStatus: [watchlist, active, deprecated]
+  sourceForm: [original_pdf, official_page, broker_page, repost_page, ai_summary, data_feed, manual_input]
+  sourceReliability: [high, medium, low]
+  episodeType: [source_material, historical_case, reasoning_feedback, evaluation_feedback, manual_note, structured_data]
+  episodeStatus: [ingested, parsed, partially_parsed, quarantined, rejected]
+  claimType: [fact_observation, estimate, forecast, assumption, transmission_logic, validation_signal, falsification_condition, scenario_path, asset_mapping, author_judgment, restricted_item]
+  claimStatus: [candidate, active, invalidated, superseded, rejected, quarantined]
+  factStatus: [candidate, active, invalidated, superseded, rejected]
+  patchOperation: [add, modify, retire, merge, split, supplement_evidence, revise_relation, add_blocking_signal, reject, defer]
+  patchReviewStatus: [pending, approved, rejected, supplementRequired, merged, superseded]
+  patchMergeStatus: [not_started, merged, rejected, deferred, failed]
+  semanticRisk: [low, medium, high, core_change_required]
+  inferenceRunStatus: [completed, partial, blocked, failed]
+  reviewType: [admission, state_upgrade, signal_status_update, retrospect]
+  reviewResult: [pending, approved, rejected, supplementRequired]
+  executionStatus: [success, failed]
+  assetType: [equity, bond, futures, fund, index, commodity, fx, other]
+  governanceLayer: [ontology_core, industry_extension, application_workspace]
+  recordStatus: [candidate, confirmed, archived]
+
+field_type_notes:
+  string: 自由文本。
+  enum: 必须取 enum 中的一个值。
+  number: 数值。
+  datetime: ISO-8601 日期或日期时间。
+  time_window: 时间区间或可解释的期限描述。
+  array: 列表。
+  object_ref: 对象引用，正式关联应优先用 relations.yaml 中的关系表达。
+  any: 审计快照，允许保存结构化或非结构化旧值和新值。
+
+object_types:
+  ConceptScheme:
+    zh_name: 概念体系
+    category: conceptual_definition
+    managed_by: industry_owner
+    description: 某一行业、主题或研究范围的概念口径集合，用于约束后续对象生成、边界判断和术语归一。
+    fields:
+      name:
+        zh_name: 名称
+        type: string
+        required: true
+      scopeName:
+        zh_name: 范围名称
+        type: string
+        required: true
+      schemeVersion:
+        zh_name: 概念体系版本
+        type: string
+        required: true
+      description:
+        zh_name: 描述
+        type: string
+        required: true
+      language:
+        zh_name: 语言
+        type: string
+        required: false
+      authorityPolicy:
+        zh_name: 权威来源策略
+        type: string
+        required: true
+    required_relations: []
+    optional_relations: [sourceOf]
+    quality_rules:
+      - ConceptScheme 只定义某个本体的概念范围和术语口径，不把具体行业百科写入核心规范。
+      - 每个行业或主题本体最多应有一个主 ConceptScheme；多体系并存时必须说明适用边界。
+
+  Concept:
+    zh_name: 概念
+    category: conceptual_definition
+    managed_by: industry_owner
+    description: 用自然语言定义研究范围中的术语、主题、技术、环节或相邻概念，并说明其在当前本体中的纳入状态。
+    fields:
+      name:
+        zh_name: 名称
+        type: string
+        required: true
+      definition:
+        zh_name: 定义
+        type: string
+        required: true
+      conceptType:
+        zh_name: 概念类型
+        type: enum
+        enum: [industry_scope, supply_chain_scope, product_or_technology, material_or_input, company_role, policy_theme, macro_theme, event_theme, asset_scope, term]
+        required: true
+      scopeStatus:
+        zh_name: 当前本体范围状态
+        type: enum
+        enum: [in_scope, out_of_scope, adjacent, overlap, disputed, unknown]
+        required: true
+      aliases:
+        zh_name: 同义词与别名
+        type: array
+        required: false
+      englishName:
+        zh_name: 英文名
+        type: string
+        required: false
+      inclusionRationale:
+        zh_name: 纳入理由
+        type: string
+        required: false
+      exclusionRationale:
+        zh_name: 排除理由
+        type: string
+        required: false
+      definitionStatus:
+        zh_name: 定义状态
+        type: enum
+        enum: [draft, source_supported, reviewed, deprecated]
+        required: true
+        default: draft
+      sourceRequirement:
+        zh_name: 来源要求
+        type: string
+        required: false
+    required_relations: [conceptInScheme]
+    optional_relations: [conceptBroaderThan, conceptNarrowerThan, conceptIncludes, conceptOverlapsWith, conceptExcludes, conceptMapsToObject, sourceOf]
+    quality_rules:
+      - Concept 回答”这个词是什么意思、在不在当前本体范围内、为什么”，不得替代 Industry、Segment、Product 等业务对象。
+      - Concept.definition 只写术语口径（涵盖范围、排除边界、与易混淆术语的区别），不得复制对应 Object.description 的内容。校验时若两者文本高度近似，标记为跨模块复写（WARN）。
+      - 关键概念必须绑定 SourceDocument；无权威来源时保持 candidate 或 disputed。
+      - adjacent 与 overlap 概念只能约束边界和映射，不能自动生成业务对象。
+      - 每个 scopeStatus=in_scope 的 Concept 必须至少有一条 conceptMapsToObject 关系指向 02_objects 中存在的对象；无映射的 in_scope Concept 视为”范围已声明但未实例化”，进入 07_governance 的未解析项。
+
+  ConceptBoundary:
+    zh_name: 概念边界裁定
+    category: conceptual_definition
+    managed_by: industry_owner
+    description: 记录某概念在当前本体中纳入、排除、相邻、交叉或延后的边界判断及依据。
+    fields:
+      title:
+        zh_name: 标题
+        type: string
+        required: true
+      decisionType:
+        zh_name: 裁定类型
+        type: enum
+        enum: [include, exclude, adjacent, overlap]
+        required: true
+        description: 只放有结论的裁定。暂无法裁定（原 defer）统一进入 07_governance.yaml 的未解析项，不在 concepts 层留悬空裁定。
+      decisionText:
+        zh_name: 裁定说明
+        type: string
+        required: true
+      appliesToScope:
+        zh_name: 适用范围
+        type: string
+        required: true
+      boundaryCondition:
+        zh_name: 边界条件
+        type: string
+        required: false
+      reviewNote:
+        zh_name: 复核说明
+        type: string
+        required: false
+    required_relations: [boundaryForConcept]
+    optional_relations: [sourceOf]
+    quality_rules:
+      - ConceptBoundary 必须能解释为什么某概念被纳入、排除、标记为相邻或交叉。
+      - 暂无法裁定的概念（原 defer）统一进入 07_governance.yaml 的未解析项，不在 concepts 层留悬空裁定。这样保证概念层只放已决策内容，governance 集中管理所有待定项。
+      - 边界裁定不得直接生成投资结论；只能约束后续对象生成、检索、评测和推理范围。
+
+  Industry:
+    zh_name: 产业
+    category: research_target
+    managed_by: data_admin
+    description: 宏观产业分类，如半导体、新能源。
+    fields:
+      name:
+        zh_name: 名称
+        type: string
+        required: true
+      description:
+        zh_name: 描述
+        type: string
+        required: false
+      classificationStandard:
+        zh_name: 分类标准
+        type: string
+        required: false
+    required_relations: []
+    optional_relations: [subIndustryOf]
+
+  Segment:
+    zh_name: 产业链环节
+    category: research_target
+    managed_by: data_admin
+    description: 产业链中可独立分析的位置，如上游设备、中游制造、下游应用。
+    fields:
+      name:
+        zh_name: 名称
+        type: string
+        required: true
+      positionInChain:
+        zh_name: 链条位置
+        type: enum
+        enum: [upstream, midstream, downstream, cross_chain, other]
+        required: false
+      description:
+        zh_name: 描述
+        type: string
+        required: false
+    required_relations: [segmentBelongsToIndustry]
+    optional_relations: [segmentConnectsToSegment]
+
+  Company:
+    zh_name: 公司
+    category: research_target
+    managed_by: data_admin
+    description: 核心研究主体。
+    fields:
+      name:
+        zh_name: 名称
+        type: string
+        required: true
+      shortName:
+        zh_name: 简称
+        type: string
+        required: false
+        source_note: 由 03 半导体示例反推补充。
+      ticker:
+        zh_name: 证券代码
+        type: string
+        required: false
+      description:
+        zh_name: 描述
+        type: string
+        required: false
+    required_relations: [companyBelongsToIndustry, companyParticipatesInSegment]
+    optional_relations: [companyLinkedToAsset, companyRelatesToCompany]
+
+  Product:
+    zh_name: 产品
+    category: research_target
+    managed_by: data_admin
+    description: 公司的具体产品、产品线或关键产品。
+    fields:
+      name:
+        zh_name: 名称
+        type: string
+        required: true
+      description:
+        zh_name: 描述
+        type: string
+        required: false
+    required_relations: [productProducedBy, productBelongsToSegment]
+    optional_relations: [productRelatesToProduct]
+
+  Material:
+    zh_name: 材料
+    category: research_target
+    managed_by: data_admin
+    description: 关键原材料或投入品。
+    fields:
+      name:
+        zh_name: 名称
+        type: string
+        required: true
+      materialType:
+        zh_name: 材料类型
+        type: string
+        required: false
+      description:
+        zh_name: 描述
+        type: string
+        required: false
+    required_relations: [materialBelongsToIndustry, materialUsedInSegment]
+    optional_relations: [materialUsedInProduct, materialRelatesToMaterial]
+
+  Asset:
+    zh_name: 资产标的
+    category: research_target
+    managed_by: data_admin
+    description: 判断最终作用的投资标的，如股票、债券、期货。
+    fields:
+      name:
+        zh_name: 名称
+        type: string
+        required: true
+      assetType:
+        zh_name: 资产类型
+        type: enum
+        enum: [equity, bond, futures, fund, index, commodity, fx, other]
+        required: true
+      ticker:
+        zh_name: 交易代码
+        type: string
+        required: false
+      market:
+        zh_name: 交易市场
+        type: string
+        required: false
+    required_relations: []
+    optional_relations: [assetLinkedToIndustry, assetExposedToTarget]
+
+  StateVariable:
+    zh_name: 状态变量
+    category: observable_dimension
+    managed_by: researcher_or_system
+    description: 稳定可观察维度，定义持续观察什么口径，不记录具体读数。
+    fields:
+      name:
+        zh_name: 名称
+        type: string
+        required: true
+      variableType:
+        zh_name: 变量类型
+        type: enum
+        enum: [quantitative, qualitative]
+        required: true
+      category:
+        zh_name: 类别
+        type: enum
+        enum_ref: state_variable_categories
+        required: true
+      description:
+        zh_name: 描述
+        type: string
+        required: true
+      observationFrequency:
+        zh_name: 观测频率
+        type: string
+        required: true
+      unit:
+        zh_name: 计量单位
+        type: string
+        required: false
+        rule: 定量变量必填；定性变量可填阶段标签或描述。
+      sourceType:
+        zh_name: 来源类型
+        type: enum
+        enum: [platform_predefined, industry_template, reusable_researcher_defined, temporary_researcher_defined]
+        required: true
+      variableScope:
+        zh_name: 变量适用范围
+        type: string
+        required: false
+      referenceBaseline:
+        zh_name: 参考基准
+        type: string
+        required: false
+        source_note: 由 03 半导体示例反推补充，用于保存历史区间、同业均值或管理层目标等比较基准。
+    required_relations: []
+    optional_relations: [observedOn]
+    quality_rules:
+      - 状态变量必须能持续观察、能时间比较、能形成方向性假设、能参与传导。
+      - 状态主题不是正式对象，不能直接作为 StateVariable 入库。
+
+  StateVariableObservation:
+    zh_name: 状态变量观测
+    category: observable_dimension
+    managed_by: system_or_researcher
+    description: 某状态变量在某一业务时间点的事实性读数或明确来源估算。
+    fields:
+      observedValue:
+        zh_name: 观测值
+        type: string
+        required: true
+      valueType:
+        zh_name: 数值类型
+        type: enum
+        enum: [actual, estimated]
+        required: true
+      observationScope:
+        zh_name: 观测适用范围
+        type: string
+        required: false
+      observationNote:
+        zh_name: 观测说明
+        type: string
+        required: false
+        source_note: 由 03 半导体示例反推补充。
+      observationTime:
+        zh_name: 观测业务时间
+        type: datetime
+        time_type: business_time
+        required: true
+      observationSourceName:
+        zh_name: 来源名称
+        type: string
+        required: true
+      sourceStatementType:
+        zh_name: 来源表述类型
+        type: enum
+        enum: [fact, estimate]
+        required: true
+      recordedAt:
+        zh_name: 录入时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+    required_relations: [observationBindsVariable]
+    optional_relations: [sourceOf]
+    quality_rules:
+      - 观测只记录事实或估算读数，不包含方向性判断。
+      - forecast、guidance、recommendation 不得作为 StateVariableObservation 的 observedValue，须转为 Signal 或 StateHypothesis 的依据。
+
+  StateVariablePropagation:
+    zh_name: 状态传导逻辑
+    category: observable_dimension
+    managed_by: researcher_or_industry_owner
+    description: 两个状态变量之间可复用的传导机制。
+    fields:
+      propagationLogic:
+        zh_name: 传导机制
+        type: string
+        required: true
+      directionMapping:
+        zh_name: 方向映射
+        type: string
+        required: true
+      lagDescription:
+        zh_name: 时间滞后
+        type: string
+        required: false
+      boundaryConditions:
+        zh_name: 边界条件
+        type: string
+        required: false
+      causalConfidence:
+        zh_name: 因果置信度
+        type: enum
+        enum: [high, medium, low, unverified]
+        required: false
+      historicalSupport:
+        zh_name: 历史验证
+        type: string
+        required: false
+    required_relations: [propagatesFrom, propagatesTo]
+    optional_relations: [sourceOf]
+    quality_rules:
+      - 变量层面的可复用因果逻辑用 StateVariablePropagation 表达。
+      - 具体研究中假设之间的前提依赖用 dependsOnHypothesis 表达。
+
+  Event:
+    zh_name: 事件
+    category: research_reasoning
+    managed_by: system_or_researcher
+    description: 客观发生的外部事实，研究推理的起点。
+    fields:
+      title:
+        zh_name: 标题
+        type: string
+        required: true
+      eventType:
+        zh_name: 事件类型
+        type: string
+        required: true
+      eventTime:
+        zh_name: 事件业务时间
+        type: datetime
+        time_type: business_time
+        required: true
+      description:
+        zh_name: 描述
+        type: string
+        required: true
+      eventEvidenceType:
+        zh_name: 事件依据类型
+        type: enum
+        enum: [disclosure, marketData, news, policy, researchInput]
+        required: true
+      recordedAt:
+        zh_name: 录入时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+    required_relations: []
+    optional_relations: [anchoredOn, eventRelatesToEvent, eventAffectsVariable, eventProducesObservation, sourceOf]
+    quality_rules:
+      - Event 必须是具体已发生事实，不是事件模板。
+
+  StateHypothesis:
+    zh_name: 状态假设
+    category: research_reasoning
+    managed_by: researcher
+    description: 研究员对状态变量未来走向的方向性判断。
+    lifecycle_field: hypothesisStatus
+    initial_state: proposed
+    terminal_states: [deprecated]
+    fields:
+      title:
+        zh_name: 假设标题
+        type: string
+        required: true
+        source_note: 由 03 半导体示例反推补充。
+      hypothesisContent:
+        zh_name: 假设内容
+        type: string
+        required: true
+        source_note: 由 03 半导体示例反推补充。
+      direction:
+        zh_name: 方向
+        type: enum
+        enum: [up, down, stable, divergent]
+        required: true
+      magnitude:
+        zh_name: 幅度
+        type: string
+        required: false
+      timeHorizon:
+        zh_name: 有效时间窗口
+        type: time_window
+        time_type: business_time
+        required: true
+      basis:
+        zh_name: 立论依据
+        type: string
+        required: true
+      falsificationCriteria:
+        zh_name: 证伪标准
+        type: string
+        required: true
+      requiredValidationCriteria:
+        zh_name: 升级验证门槛
+        type: string
+        required: false
+      keyRisks:
+        zh_name: 关键风险
+        type: string
+        required: false
+      hypothesisStatus:
+        zh_name: 假设状态
+        type: enum
+        enum: [proposed, active, blocked, deprecated]
+        required: true
+        generated_default: proposed
+      proposedBy:
+        zh_name: 提出人
+        type: string
+        required: true
+      proposedAt:
+        zh_name: 提出时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+    required_relations: [hypothesisBindsVariable]
+    optional_relations: [basedOnEvent, competesWithHypothesis, supersedesHypothesis, dependsOnHypothesis, sourceOf]
+    quality_rules:
+      - 假设必须绑定一个 StateVariable。
+      - 阻断状态只能由 BlockHypothesis 动作产生。
+      - 恢复被阻断假设时，须先更新或撤销 blocking 信号，再执行 ActivateHypothesis。
+
+  Signal:
+    zh_name: 信号
+    category: research_reasoning
+    managed_by: system_or_researcher
+    description: 支持、催化、跟踪、削弱或阻断假设和判断的证据或观察。
+    lifecycle_field: signalStatus
+    initial_state: active
+    fields:
+      title:
+        zh_name: 标题
+        type: string
+        required: true
+      signalType:
+        zh_name: 信号类型
+        type: string
+        required: true
+      signalRole:
+        zh_name: 信号角色
+        type: enum
+        enum: [validation, catalyst, tracking, weakening, blocking]
+        required: true
+      signalContent:
+        zh_name: 信号内容
+        type: string
+        required: true
+      statementType:
+        zh_name: 表述类型
+        type: enum
+        enum: [fact, forecast, assumption, judgment, recommendation]
+        required: true
+      observationTime:
+        zh_name: 信号业务时间
+        type: datetime
+        time_type: business_time
+        required: true
+      reliability:
+        zh_name: 可信度
+        type: enum
+        enum: [high, medium, low]
+        required: true
+      validityWindow:
+        zh_name: 有效时间窗口
+        type: time_window
+        time_type: business_time
+        required: true
+      signalStatus:
+        zh_name: 信号状态
+        type: enum
+        enum: [active, weakened, withdrawn, invalidated]
+        required: true
+        generated_default: active
+      recordedAt:
+        zh_name: 录入时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+    required_relations:
+      - one_role_compatible_effect_relation
+    optional_relations: [signalBasedOnObservation, sourceOf]
+    role_compatible_relations:
+      validation: [supportsHypothesis, supportsJudgment]
+      catalyst: [catalyzesJudgment]
+      tracking: [tracksHypothesis, tracksJudgment]
+      weakening: [weakensHypothesis, weakensJudgment]
+      blocking: [blocksHypothesis]
+    quality_rules:
+      - 一个 Signal 只有一个 signalRole；同一事实同时承担催化和验证作用时，应拆成两条 Signal 或明确主角色。
+      - blocking 信号只能通过 blocksHypothesis 作用于 StateHypothesis，不能直接阻断 JudgmentOutput。
+
+  JudgmentOutput:
+    zh_name: 判断输出
+    category: research_reasoning
+    managed_by: researcher
+    description: 研究员基于假设形成的方向性结论。
+    lifecycle_field: judgmentStatus
+    initial_state: candidate
+    terminal_states: [resolved, expired, pricedIn, deprecated]
+    fields:
+      title:
+        zh_name: 标题
+        type: string
+        required: true
+      judgmentContent:
+        zh_name: 判断内容
+        type: string
+        required: true
+      judgmentStatus:
+        zh_name: 判断状态
+        type: enum
+        enum: [candidate, watchlist, active, formalTrigger, resolved, expired, pricedIn, deprecated]
+        required: true
+        generated_default: candidate
+      competingExplanations:
+        zh_name: 竞争解释
+        type: string
+        required: false
+        required_before_state: active
+      scenarioTag:
+        zh_name: 情景标签
+        type: enum
+        enum: [base, upside, downside]
+        required: false
+        description: 表示该判断属于基准、乐观或悲观情景；用于刻画真实投研中的多路径思考。
+      confidenceLevel:
+        zh_name: 判断置信度
+        type: enum
+        enum: [high, medium, low]
+        required: false
+        description: 研究员对判断成立概率和证据充分性的综合分级，不替代信号数量和审核。
+      nextValidationCheckpoint:
+        zh_name: 下一验证点
+        type: string
+        required: false
+        description: 该判断下一步最应观察的事件、数据或调研问题。
+      expectedEvidenceDate:
+        zh_name: 预期验证时间
+        type: datetime
+        time_type: business_time
+        required: false
+        description: 下一验证点预计出现或更新的业务时间。
+      timeHorizon:
+        zh_name: 预期时间窗口
+        type: time_window
+        time_type: business_time
+        required: false
+        source_note: 由 03 半导体示例反推补充。
+      createdAt:
+        zh_name: 创建时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+      lastUpdatedAt:
+        zh_name: 最近更新时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+    required_relations: [judgmentAnchoredOn, basedOnHypothesis]
+    optional_relations: [supportsJudgment, catalyzesJudgment, tracksJudgment, weakensJudgment, judgmentRelatesToJudgment, sourceOf]
+    quality_rules:
+      - JudgmentOutput 必须挂载到具体研究标的对象。
+      - 进入 active 前必须填写 competingExplanations。
+
+  AssetImpact:
+    zh_name: 资产影响
+    category: research_reasoning
+    managed_by: system_or_researcher
+    description: 判断对资产标的的预期影响。
+    fields:
+      impactDescription:
+        zh_name: 影响描述
+        type: string
+        required: false
+        source_note: 由 03 半导体示例反推补充。
+      impactDirection:
+        zh_name: 影响方向
+        type: enum
+        enum: [positive, negative, neutral]
+        required: true
+      impactMagnitude:
+        zh_name: 影响幅度
+        type: enum
+        enum: [large, medium, small]
+        required: true
+      timeHorizon:
+        zh_name: 影响时间窗口
+        type: time_window
+        time_type: business_time
+        required: true
+      pricedInAssessment:
+        zh_name: 定价反映程度
+        type: enum
+        enum: [underpriced, fairly_priced, priced_in, overreacted, unknown]
+        required: false
+        description: 判断当前是否已被市场充分反映；用于区分基本面正确和投资有效。
+      consensusGap:
+        zh_name: 市场预期差
+        type: string
+        required: false
+        description: 研究员判断与市场共识、卖方一致预期或当前价格隐含预期之间的差异。
+      valuationAnchor:
+        zh_name: 估值锚
+        type: string
+        required: false
+        description: 用于解释资产影响的估值口径、可比对象或关键估值变量；不是目标价。
+      marketExpectationNote:
+        zh_name: 市场预期说明
+        type: string
+        required: false
+        description: 对市场是否已经交易该逻辑、预期差在哪里、何时可能收敛的文字说明。
+      assessedAt:
+        zh_name: 评估录入时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+    required_relations: [impactDerivedFrom, impactsAsset]
+    optional_relations: []
+    quality_rules:
+      - 资产影响表达研究判断对资产的预期影响，不是交易指令、仓位建议或目标价。
+
+  InvestmentThesis:
+    zh_name: 投资命题
+    category: research_reasoning
+    managed_by: researcher
+    description: 围绕同一研究对象的多条判断的长期管理容器。
+    lifecycle_field: thesisStatus
+    fields:
+      title:
+        zh_name: 标题
+        type: string
+        required: true
+      summary:
+        zh_name: 摘要
+        type: string
+        required: true
+      thesisStatus:
+        zh_name: 命题状态
+        type: enum
+        enum: [watchlist, active, deprecated]
+        required: true
+      createdAt:
+        zh_name: 创建时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+    required_relations: [thesisAnchoredOn]
+    optional_relations: [thesisContainsJudgment, sourceOf]
+
+  SourceDocument:
+    zh_name: 来源文档
+    category: source_and_record
+    managed_by: system_or_researcher
+    description: 信号、观测值和判断的原始来源。
+    fields:
+      title:
+        zh_name: 标题
+        type: string
+        required: true
+      documentType:
+        zh_name: 文档类型
+        type: string
+        required: true
+      publishTime:
+        zh_name: 发布时间
+        type: datetime
+        time_type: business_time
+        required: false
+      author:
+        zh_name: 作者/机构
+        type: string
+        required: false
+      publisher:
+        zh_name: 发布机构
+        type: string
+        required: false
+        source_note: 由 03 半导体示例反推补充。
+      content:
+        zh_name: 内容
+        type: string
+        required: false
+      sourceForm:
+        zh_name: 来源形态
+        type: enum
+        enum: [original_pdf, official_page, broker_page, repost_page, ai_summary, data_feed, manual_input]
+        required: true
+      sourceReliability:
+        zh_name: 来源可信度
+        type: enum
+        enum: [high, medium, low]
+        required: true
+      originalUrl:
+        zh_name: 原始链接
+        type: string
+        required: false
+        source_note: 由 03 半导体示例反推补充。
+      recordedAt:
+        zh_name: 录入时间
+        type: datetime
+        time_type: system_time
+        required: false
+        generated_by: system
+    required_relations: []
+    optional_relations: [sourceOf]
+    quality_rules:
+      - AI 摘要只能作为线索，不得单独作为正式对象入库依据。
+
+  EvidenceEpisode:
+    zh_name: 证据摄入事件
+    category: source_and_record
+    managed_by: system_or_researcher
+    description: 一次材料、历史案例、推理反馈、评测反馈或结构化数据的摄入与抽取事件；用于把来源、抽取时间、业务时间和后续 claim 关联起来。
+    fields:
+      title:
+        zh_name: 标题
+        type: string
+        required: true
+      episodeType:
+        zh_name: Episode 类型
+        type: enum
+        enum: [source_material, historical_case, reasoning_feedback, evaluation_feedback, manual_note, structured_data]
+        required: true
+      sourceDocumentId:
+        zh_name: 来源文档 ID
+        type: object_ref
+        required: false
+      sourcePathOrUrl:
+        zh_name: 来源路径或链接
+        type: string
+        required: false
+      publishTime:
+        zh_name: 来源发布时间
+        type: datetime
+        time_type: business_time
+        required: false
+      businessTime:
+        zh_name: 业务时间或区间
+        type: time_window
+        time_type: business_time
+        required: false
+      ingestedAt:
+        zh_name: 摄入时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+      sourceReliability:
+        zh_name: 来源可信度
+        type: enum
+        enum: [high, medium, low]
+        required: true
+      episodeStatus:
+        zh_name: Episode 状态
+        type: enum
+        enum: [ingested, parsed, partially_parsed, quarantined, rejected]
+        required: true
+        default: ingested
+      originalLocation:
+        zh_name: 原始位置
+        type: string
+        required: false
+      textSpan:
+        zh_name: 文本范围
+        type: string
+        required: false
+      limitations:
+        zh_name: 限制条件
+        type: array
+        required: false
+      groupId:
+        zh_name: 命名空间
+        type: string
+        required: false
+        description: 用于隔离行业、本体版本、客户或任务上下文；不替代 ontology_id。
+    required_relations: []
+    optional_relations: [sourceOf, episodeMentionsObject]
+    quality_rules:
+      - EvidenceEpisode 是证据摄入和追溯单元，不是正式业务对象。
+      - 每个从材料、回放或推理反馈生成的 EvidenceClaim 应能追溯到至少一个 EvidenceEpisode。
+
+  EvidenceClaim:
+    zh_name: 证据主张
+    category: source_and_record
+    managed_by: system_or_researcher
+    description: 从 EvidenceEpisode 中抽取或整理出的最小可追溯主张，承载事实、估算、预测、传导、信号、反证、情景或资产映射线索。
+    lifecycle_field: claimStatus
+    initial_state: candidate
+    terminal_states: [invalidated, superseded, rejected, quarantined]
+    fields:
+      claimText:
+        zh_name: 原始主张摘要
+        type: string
+        required: true
+      normalizedClaim:
+        zh_name: 归一化主张
+        type: string
+        required: true
+      claimType:
+        zh_name: 主张类型
+        type: enum
+        enum: [fact_observation, estimate, forecast, assumption, transmission_logic, validation_signal, falsification_condition, scenario_path, asset_mapping, author_judgment, restricted_item]
+        required: true
+      claimStatus:
+        zh_name: 主张状态
+        type: enum
+        enum: [candidate, active, invalidated, superseded, rejected, quarantined]
+        required: true
+        default: candidate
+      sourceStatementType:
+        zh_name: 来源表述类型
+        type: enum
+        enum: [fact, estimate]
+        required: false
+      evidenceLocation:
+        zh_name: 证据位置
+        type: string
+        required: false
+      confidence:
+        zh_name: 主张置信度
+        type: number
+        value_range: [0, 1]
+        required: false
+      allowedTargetObjectTypes:
+        zh_name: 允许映射对象类型
+        type: array
+        required: false
+      mustNotMapTo:
+        zh_name: 禁止映射目标
+        type: array
+        required: false
+      scope:
+        zh_name: 适用范围
+        type: string
+        required: false
+      restrictions:
+        zh_name: 使用限制
+        type: array
+        required: false
+    required_relations: []
+    optional_relations: [claimFromEpisode, claimSupportsObject, claimSupportsRelation, claimInvalidatesClaim, claimTriggersPatch, sourceOf]
+    quality_rules:
+      - EvidenceClaim 是证据图谱的最小主张单元；不得直接等同于正式本体对象、关系或判断。
+      - restricted_item、author_judgment、forecast 类型不得直接升级为事实观测。
+      - claimStatus 失效或被替代时，必须保留历史并记录 invalidatedBy 或 supersededBy。
+
+  EvidenceFact:
+    zh_name: 证据事实
+    category: source_and_record
+    managed_by: system_or_researcher
+    description: 由一个或多个 EvidenceClaim 归并出的结构化事实候选；可用于生成观测、事件、信号或关系候选，但不能绕过优化 Skill 写入正式本体。
+    lifecycle_field: factStatus
+    initial_state: candidate
+    terminal_states: [invalidated, superseded, rejected]
+    fields:
+      factText:
+        zh_name: 事实文本
+        type: string
+        required: true
+      normalizedFact:
+        zh_name: 归一化事实
+        type: string
+        required: true
+      factStatus:
+        zh_name: 事实状态
+        type: enum
+        enum: [candidate, active, invalidated, superseded, rejected]
+        required: true
+        default: candidate
+      factScope:
+        zh_name: 事实范围
+        type: string
+        required: false
+      confidence:
+        zh_name: 事实置信度
+        type: number
+        value_range: [0, 1]
+        required: false
+      sourceClaimIds:
+        zh_name: 来源主张 ID
+        type: array
+        required: true
+    required_relations: []
+    optional_relations: [sourceOf]
+    quality_rules:
+      - EvidenceFact 必须由 EvidenceClaim 支撑，不得凭模型常识生成。
+      - EvidenceFact 只能作为正式对象、观测、信号或关系的候选来源。
+
+  PatchRequest:
+    zh_name: 本体补丁请求
+    category: source_and_record
+    managed_by: system_or_researcher
+    description: 由缺口发现、历史回放、评测、推理反馈或人工修订提出的候选改动请求；正式合并必须经过优化 Skill。
+    fields:
+      patchRequestTitle:
+        zh_name: 补丁请求标题
+        type: string
+        required: true
+      operation:
+        zh_name: 建议操作
+        type: enum
+        enum: [add, modify, retire, merge, split, supplement_evidence, revise_relation, add_blocking_signal, reject, defer]
+        required: true
+      targetLayer:
+        zh_name: 目标层
+        type: string
+        required: true
+      targetFile:
+        zh_name: 目标文件
+        type: string
+        required: false
+      targetPath:
+        zh_name: 目标路径
+        type: string
+        required: false
+      targetId:
+        zh_name: 目标 ID
+        type: string
+        required: false
+      reason:
+        zh_name: 原因
+        type: string
+        required: true
+      semanticRisk:
+        zh_name: 语义风险
+        type: enum
+        enum: [low, medium, high, core_change_required]
+        required: true
+      reviewStatus:
+        zh_name: 审核状态
+        type: enum
+        enum: [pending, approved, rejected, supplementRequired, merged, superseded]
+        required: true
+        default: pending
+      evidenceEpisodeIds:
+        zh_name: 证据 Episode ID
+        type: array
+        required: false
+      evidenceClaimIds:
+        zh_name: 证据 Claim ID
+        type: array
+        required: false
+      mergePrecondition:
+        zh_name: 合并前置条件
+        type: string
+        required: false
+    required_relations: []
+    optional_relations: [sourceOf]
+    quality_rules:
+      - PatchRequest 只能表达候选改动，不代表正式本体已经变化。
+      - 涉及正式对象、关系、动作或推理语义的改动必须由优化 Skill 审核并合并。
+
+  PatchLedgerItem:
+    zh_name: 补丁账本项
+    category: source_and_record
+    managed_by: system
+    description: 优化 Skill 对 PatchRequest 的 append-only 合并、拒绝、延后或失败记录，用于审计本体增量演化。
+    immutable: true
+    fields:
+      patchId:
+        zh_name: 补丁 ID
+        type: string
+        required: true
+      patchRequestId:
+        zh_name: 补丁请求 ID
+        type: object_ref
+        required: false
+      baseOntologyVersion:
+        zh_name: 基座版本
+        type: string
+        required: true
+      baseHash:
+        zh_name: 基座 Hash
+        type: string
+        required: false
+      operation:
+        zh_name: 执行操作
+        type: enum
+        enum: [add, modify, retire, merge, split, supplement_evidence, revise_relation, add_blocking_signal, reject, defer]
+        required: true
+      mergeStatus:
+        zh_name: 合并状态
+        type: enum
+        enum: [not_started, merged, rejected, deferred, failed]
+        required: true
+      mergedAt:
+        zh_name: 合并时间
+        type: datetime
+        time_type: system_time
+        required: false
+      targetFile:
+        zh_name: 目标文件
+        type: string
+        required: false
+      targetPath:
+        zh_name: 目标路径
+        type: string
+        required: false
+      targetId:
+        zh_name: 目标 ID
+        type: string
+        required: false
+      evidenceEpisodeIds:
+        zh_name: 证据 Episode ID
+        type: array
+        required: false
+      evidenceClaimIds:
+        zh_name: 证据 Claim ID
+        type: array
+        required: false
+      mergeReason:
+        zh_name: 合并理由
+        type: string
+        required: true
+    required_relations: []
+    optional_relations: [sourceOf]
+    quality_rules:
+      - PatchLedgerItem 创建后不可修改；修正应追加新的账本项。
+      - 每次正式本体增量合并、拒绝或延后都必须能回溯到 PatchRequest、证据或治理原因。
+
+  InferenceRun:
+    zh_name: 推理运行记录
+    category: source_and_record
+    managed_by: system
+    description: 记录一次投研推理调用的输入问题、业务时间、本体版本、使用证据、排除证据、推理链和反馈。
+    fields:
+      question:
+        zh_name: 用户问题
+        type: string
+        required: true
+      businessTime:
+        zh_name: 推理业务时间
+        type: datetime
+        time_type: business_time
+        required: false
+      ontologyVersion:
+        zh_name: 本体版本
+        type: string
+        required: true
+      centerObjects:
+        zh_name: 中心对象
+        type: array
+        required: false
+      usedRelationIds:
+        zh_name: 使用关系 ID
+        type: array
+        required: false
+      usedEvidenceClaimIds:
+        zh_name: 使用证据 Claim ID
+        type: array
+        required: false
+      excludedInvalidClaimIds:
+        zh_name: 排除的失效 Claim ID
+        type: array
+        required: false
+      reasoningChain:
+        zh_name: 推理链摘要
+        type: array
+        required: false
+      confidence:
+        zh_name: 推理置信度
+        type: enum
+        enum: [high, medium, low]
+        required: false
+      runStatus:
+        zh_name: 运行状态
+        type: enum
+        enum: [completed, partial, blocked, failed]
+        required: true
+      ontologyFeedback:
+        zh_name: 本体反馈
+        type: array
+        required: false
+      candidatePatchRequestIds:
+        zh_name: 候选补丁请求 ID
+        type: array
+        required: false
+      runAt:
+        zh_name: 运行时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+    required_relations: []
+    optional_relations: [sourceOf]
+    quality_rules:
+      - InferenceRun 是运行日志，不是正式投研结论或发布判断。
+      - 推理排除失效证据时，应记录 excludedInvalidClaimIds。
+
+  ActionAudit:
+    zh_name: 动作记录
+    category: source_and_record
+    managed_by: system
+    description: 本体中每次操作的完整记录；系统自动生成，创建后不可修改。
+    immutable: true
+    fields:
+      actionType:
+        zh_name: 动作类型
+        type: string
+        required: true
+      performedBy:
+        zh_name: 执行人
+        type: string
+        required: true
+      performedAt:
+        zh_name: 执行时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+      targetObject:
+        zh_name: 被操作对象
+        type: object_ref
+        required: true
+      targetField:
+        zh_name: 被修改字段
+        type: string
+        required: false
+      previousValue:
+        zh_name: 修改前值
+        type: any
+        required: false
+      newValue:
+        zh_name: 修改后值
+        type: any
+        required: false
+      previousState:
+        zh_name: 操作前状态
+        type: string
+        required: false
+      newState:
+        zh_name: 操作后状态
+        type: string
+        required: false
+      actionReason:
+        zh_name: 操作原因
+        type: string
+        required: true
+      evidenceRefs:
+        zh_name: 操作依据引用
+        type: array
+        required: false
+        source_note: 由 03 半导体示例反推补充。
+      executionStatus:
+        zh_name: 执行结果
+        type: enum
+        enum: [success, failed]
+        required: true
+    required_relations: [auditFor]
+    optional_relations: [sourceOf]
+
+  ReviewRecord:
+    zh_name: 审核记录
+    category: source_and_record
+    managed_by: reviewer_or_system
+    description: 对象、动作或复盘是否被认可的记录。
+    fields:
+      reviewType:
+        zh_name: 审核类型
+        type: enum
+        enum: [admission, state_upgrade, signal_status_update, retrospect]
+        required: true
+      reviewResult:
+        zh_name: 审核结论
+        type: enum
+        enum: [pending, approved, rejected, supplementRequired]
+        required: true
+      reviewNotes:
+        zh_name: 审核意见
+        type: string
+        required: false
+      fundamentalCorrect:
+        zh_name: 基本面判断正确性
+        type: string
+        required: false
+        only_for_reviewType: retrospect
+      timingCorrect:
+        zh_name: 时间节点判断正确性
+        type: string
+        required: false
+        only_for_reviewType: retrospect
+      catalystEffective:
+        zh_name: 催化信号有效性
+        type: string
+        required: false
+        only_for_reviewType: retrospect
+      assetImpactRealized:
+        zh_name: 资产影响兑现情况
+        type: string
+        required: false
+        only_for_reviewType: retrospect
+      expectationGapReviewed:
+        zh_name: 预期差复盘
+        type: string
+        required: false
+        only_for_reviewType: retrospect
+        description: 复盘当时判断相对市场共识的预期差是否真实存在、是否按预期收敛。
+      pricingReviewed:
+        zh_name: 定价状态复盘
+        type: string
+        required: false
+        only_for_reviewType: retrospect
+        description: 复盘判断兑现时市场是否已提前定价、过度反应或仍未反映。
+      scenarioReviewed:
+        zh_name: 情景路径复盘
+        type: string
+        required: false
+        only_for_reviewType: retrospect
+        description: 复盘实际路径更接近 base、upside 还是 downside，以及分叉原因。
+      reviewedBy:
+        zh_name: 审核人
+        type: string
+        required: true
+      reviewedAt:
+        zh_name: 审核时间
+        type: datetime
+        time_type: system_time
+        required: true
+        generated_by: system
+    required_relations: [reviewFor]
+    optional_relations: [sourceOf]

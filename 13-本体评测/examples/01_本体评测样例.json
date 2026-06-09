@@ -1,0 +1,594 @@
+{
+  "evaluation_metadata": {
+    "evaluation_id": "eval_semiconductor_supply_chain_v1",
+    "ontology_name": "AI算力半导体产业链本体",
+    "ontology_version": "v1.3",
+    "scope_type": "supply_chain",
+    "target_scope": "AI算力产业链事件影响与上下游传导分析",
+    "eval_question_count": 4,
+    "reference_materials_count": 3,
+    "evaluation_confidence": "medium",
+    "news_hotspot_config": {
+      "enabled": true,
+      "recency_days": 90,
+      "source_policy": "热点题必须记录公告、政策原文、公司发布或可靠新闻来源；无法核验时只降级实战就绪度。"
+    }
+  },
+  "question_set_assessment": {
+    "question_set_quality": "medium",
+    "question_counts_by_tier": {
+      "baseline": 1,
+      "type_specific": 1,
+      "hotspot": 1,
+      "challenge": 1
+    },
+    "question_counts_by_type": {
+      "event_impact": 1,
+      "industry_chain_transmission": 1,
+      "company_benefit": 0,
+      "risk_falsification": 1,
+      "state_monitoring": 1,
+      "asset_revaluation": 0
+    },
+    "scope_type_weighting_applied": true,
+    "coverage_gaps": [
+      "样例题集未覆盖公司受益和资产重估，只能展示中等可信度评测。"
+    ],
+    "hotspot_source_status": "partially_traceable",
+    "baseline_comparability": "partially_comparable"
+  },
+  "evaluation_summary": {
+    "total_score": 76.5,
+    "practical_readiness_score": 72.0,
+    "core_question_pass_rate": 0.5,
+    "grade": "C",
+    "release_decision": "reject_publish",
+    "summary_comment": "本体已能表达 HBM 需求到先进封装的部分传导，但缺少先进封装到测试设备的明确关系和验证信号，暂不适合正式发布。"
+  },
+  "threshold_check": {
+    "total_score_met": false,
+    "core_question_pass_rate_met": false,
+    "critical_failure_count_met": true,
+    "core_chain_break_count_met": false,
+    "high_priority_gap_count_met": false,
+    "verification_signal_coverage_met": false,
+    "boundary_condition_coverage_met": true,
+    "ontology_consistency_score_met": true,
+    "insufficient_evidence_triggered": false,
+    "hard_gate_notes": [
+      "核心产业链传导题未通过。",
+      "验证信号覆盖率不足。"
+    ]
+  },
+  "dimension_scores": {
+    "coverage": 78,
+    "reasoning_chain_completeness": 68,
+    "explanation_clarity": 82,
+    "verifiability": 62,
+    "boundary_conditions": 74,
+    "falsification_ability": 72,
+    "conclusion_usability": 79,
+    "ontology_consistency": 84
+  },
+  "question_level_results": [
+    {
+      "question_id": "Q_BASE_001",
+      "question_tier": "baseline",
+      "question_type": "event_impact",
+      "question_text": "AI算力需求上升会如何影响半导体产业链的核心状态变量和关键环节？",
+      "target_capability": "测试事件到状态变量、产业链传导和验证信号的基础链路。",
+      "answer_summary": "本体能从算力需求连接到 HBM 需求和先进封装产能利用率，但测试设备验证信号不足。",
+      "scores": {
+        "coverage": 4,
+        "reasoning_chain_completeness": 3.5,
+        "explanation_clarity": 4,
+        "verifiability": 3,
+        "boundary_conditions": 3.5,
+        "falsification_ability": 3.5,
+        "conclusion_usability": 4,
+        "ontology_consistency": 4
+      },
+      "weighted_score": 77.5,
+      "pass_or_fail": "fail",
+      "severity": "high",
+      "identified_issues": [
+        {
+          "issue_id": "ISS_001",
+          "issue_type": "missing_signal",
+          "description": "先进封装景气度向测试设备订单或稼动率传导时缺少验证信号。",
+          "affected_question_ids": [
+            "Q_BASE_001"
+          ],
+          "severity": "high",
+          "source_question_tier": "baseline"
+        }
+      ],
+      "ontology_fix_suggestions": [
+        "补充先进封装产能利用率、测试设备订单能见度和资本开支之间的信号关系。"
+      ],
+      "reference_notes": [
+        "参考材料显示测试设备订单可作为后续验证信号，但当前本体未稳定表达。"
+      ],
+      "hotspot_source_refs": []
+    },
+    {
+      "question_id": "Q_TYPE_001",
+      "question_tier": "type_specific",
+      "question_type": "industry_chain_transmission",
+      "question_text": "HBM 需求上升会如何传导到先进封装、测试设备和材料环节？",
+      "target_capability": "测试产业链本体的上下游传导方向、机制和滞后效应。",
+      "answer_summary": "HBM 到先进封装链路完整，但先进封装到测试设备的关系端点缺失，材料环节边界条件较粗。",
+      "scores": {
+        "coverage": 3.5,
+        "reasoning_chain_completeness": 2.5,
+        "explanation_clarity": 4,
+        "verifiability": 2.5,
+        "boundary_conditions": 3.5,
+        "falsification_ability": 3,
+        "conclusion_usability": 3.5,
+        "ontology_consistency": 4
+      },
+      "weighted_score": 68.8,
+      "pass_or_fail": "fail",
+      "severity": "high",
+      "identified_issues": [
+        {
+          "issue_id": "ISS_002",
+          "issue_type": "broken_reasoning_chain",
+          "description": "HBM → 先进封装 → 测试设备之间缺少明确 StateVariablePropagation。",
+          "affected_question_ids": [
+            "Q_TYPE_001"
+          ],
+          "severity": "high",
+          "source_question_tier": "type_specific"
+        }
+      ],
+      "ontology_fix_suggestions": [
+        "为先进封装产能紧张到测试设备需求增加建立候选传导关系，并补充滞后窗口。"
+      ],
+      "reference_notes": [
+        "需要公告、设备订单或资本开支材料支持。"
+      ],
+      "hotspot_source_refs": []
+    },
+    {
+      "question_id": "Q_HOT_001",
+      "question_tier": "hotspot",
+      "question_type": "state_monitoring",
+      "question_text": "近期先进封装扩产新闻是否改变本体中测试设备需求验证信号的优先级？",
+      "target_capability": "测试本体面对近期新闻时能否给出可追踪信号，而不把短期新闻直接写成稳定结论。",
+      "answer_summary": "本体能识别扩产新闻属于事件触发，但缺少对测试设备订单和交付周期的追踪信号。",
+      "scores": {
+        "coverage": 3.5,
+        "reasoning_chain_completeness": 3,
+        "explanation_clarity": 4,
+        "verifiability": 2.5,
+        "boundary_conditions": 3.5,
+        "falsification_ability": 3.5,
+        "conclusion_usability": 3.5,
+        "ontology_consistency": 4
+      },
+      "weighted_score": 70,
+      "pass_or_fail": "insufficient_reference_support",
+      "severity": "medium",
+      "identified_issues": [
+        {
+          "issue_id": "ISS_003",
+          "issue_type": "insufficient_reference_support",
+          "description": "热点题来源只覆盖新闻摘要，缺少公告或原始来源，不能作为正式失败门槛。",
+          "affected_question_ids": [
+            "Q_HOT_001"
+          ],
+          "severity": "medium",
+          "source_question_tier": "hotspot"
+        }
+      ],
+      "ontology_fix_suggestions": [
+        "将热点暴露的问题列为候选优化项，先补充公告或公司发布来源。"
+      ],
+      "reference_notes": [
+        "热点事实需要进一步核验原始来源。"
+      ],
+      "hotspot_source_refs": [
+        "REF_NEWS_001"
+      ]
+    },
+    {
+      "question_id": "Q_CHAL_001",
+      "question_tier": "challenge",
+      "question_type": "risk_falsification",
+      "question_text": "如果先进封装扩产快于需求兑现，原有景气传导逻辑会在哪里失效？",
+      "target_capability": "测试反向变量、阻断条件和链条断点表达能力。",
+      "answer_summary": "本体能表达供需缺口收敛会削弱封装景气假设，但缺少对设备订单取消或递延的阻断信号。",
+      "scores": {
+        "coverage": 4,
+        "reasoning_chain_completeness": 3.5,
+        "explanation_clarity": 4,
+        "verifiability": 3,
+        "boundary_conditions": 4,
+        "falsification_ability": 4,
+        "conclusion_usability": 4,
+        "ontology_consistency": 4
+      },
+      "weighted_score": 78.1,
+      "pass_or_fail": "fail",
+      "severity": "medium",
+      "identified_issues": [
+        {
+          "issue_id": "ISS_004",
+          "issue_type": "missing_signal",
+          "description": "缺少设备订单递延、取消或交付周期缩短作为阻断信号。",
+          "affected_question_ids": [
+            "Q_CHAL_001"
+          ],
+          "severity": "medium",
+          "source_question_tier": "challenge"
+        }
+      ],
+      "ontology_fix_suggestions": [
+        "补充 blocking signal 候选，明确作用于先进封装扩产带来的设备需求假设。"
+      ],
+      "reference_notes": [
+        "需要历史案例或设备公司公告验证。"
+      ],
+      "hotspot_source_refs": []
+    }
+  ],
+  "critical_failures": [],
+  "ontology_issue_mapping": {
+    "missing_objects": [],
+    "missing_state_variables": [],
+    "missing_relations": [],
+    "missing_signals": [
+      {
+        "issue_id": "ISS_001",
+        "issue_type": "missing_signal",
+        "description": "缺少测试设备订单能见度和交付周期验证信号。",
+        "affected_question_ids": [
+          "Q_BASE_001"
+        ],
+        "severity": "high",
+        "source_question_tier": "baseline"
+      },
+      {
+        "issue_id": "ISS_004",
+        "issue_type": "missing_signal",
+        "description": "缺少设备订单递延、取消或交付周期缩短作为阻断信号。",
+        "affected_question_ids": [
+          "Q_CHAL_001"
+        ],
+        "severity": "medium",
+        "source_question_tier": "challenge"
+      }
+    ],
+    "missing_event_templates": [],
+    "missing_boundary_conditions": [],
+    "broken_reasoning_chains": [
+      {
+        "issue_id": "ISS_002",
+        "issue_type": "broken_reasoning_chain",
+        "description": "HBM → 先进封装 → 测试设备之间缺少明确传导链。",
+        "affected_question_ids": [
+          "Q_TYPE_001"
+        ],
+        "severity": "high",
+        "source_question_tier": "type_specific"
+      }
+    ],
+    "over_generalized_conclusions": [],
+    "ontology_inconsistencies": [],
+    "insufficient_reference_support": [
+      {
+        "issue_id": "ISS_003",
+        "issue_type": "insufficient_reference_support",
+        "description": "热点题缺少可追溯原始来源。",
+        "affected_question_ids": [
+          "Q_HOT_001"
+        ],
+        "severity": "medium",
+        "source_question_tier": "hotspot"
+      }
+    ]
+  },
+  "evaluation_fix_report": {
+    "required_fixes": [
+      {
+        "fix_id": "FIX_REQ_001",
+        "source_issue_ids": [
+          "ISS_002"
+        ],
+        "source_question_ids": [
+          "Q_TYPE_001"
+        ],
+        "source_question_tier": "type_specific",
+        "fix_type": "core_chain_repair",
+        "description": "补齐 HBM 到先进封装再到测试设备的传导关系、状态变量和验证信号。",
+        "suggested_operation": "revise_relation",
+        "minimum_evidence_level": "multi_source_supported",
+        "priority": "high",
+        "stability_assessment": "stable_logic"
+      }
+    ],
+    "recommended_fixes": [
+      {
+        "fix_id": "FIX_REC_001",
+        "source_issue_ids": [
+          "ISS_001",
+          "ISS_004"
+        ],
+        "source_question_ids": [
+          "Q_BASE_001",
+          "Q_CHAL_001"
+        ],
+        "source_question_tier": "baseline",
+        "fix_type": "signal_supplement",
+        "description": "补充测试设备订单能见度、交付周期和订单递延作为验证与阻断信号。",
+        "suggested_operation": "supplement_evidence",
+        "minimum_evidence_level": "multi_source_supported",
+        "priority": "medium",
+        "stability_assessment": "candidate_logic"
+      }
+    ],
+    "backlog_items": [
+      {
+        "fix_id": "FIX_BACKLOG_001",
+        "source_issue_ids": [
+          "ISS_003"
+        ],
+        "source_question_ids": [
+          "Q_HOT_001"
+        ],
+        "source_question_tier": "hotspot",
+        "fix_type": "hotspot_source_followup",
+        "description": "补充近期先进封装扩产新闻的原始公告或公司发布来源后再判断是否进入本体。",
+        "suggested_operation": "defer",
+        "minimum_evidence_level": "official_source_supported",
+        "priority": "medium",
+        "stability_assessment": "short_term_fact"
+      }
+    ],
+    "do_not_add_to_ontology": [
+      {
+        "fix_id": "FIX_DONT_001",
+        "source_issue_ids": [
+          "ISS_003"
+        ],
+        "source_question_ids": [
+          "Q_HOT_001"
+        ],
+        "source_question_tier": "hotspot",
+        "fix_type": "short_term_news_detail",
+        "description": "单篇新闻中的具体扩产时点和市场短期解读不应直接进入稳定本体。",
+        "suggested_operation": "reject",
+        "minimum_evidence_level": "no_evidence",
+        "priority": "low",
+        "stability_assessment": "short_term_fact"
+      }
+    ]
+  },
+  "optimization_plan": [
+    {
+      "plan_id": "PLAN_EVAL_001",
+      "source_question_ids": [
+        "Q_TYPE_001",
+        "Q_BASE_001"
+      ],
+      "source_question_tier": "type_specific",
+      "source_issue_ids": [
+        "ISS_001",
+        "ISS_002"
+      ],
+      "optimization_goal": "修复先进封装到测试设备的核心传导链和验证信号。",
+      "target_gaps": [
+        "缺少 StateVariablePropagation: 先进封装产能紧张 -> 测试设备需求/订单能见度",
+        "缺少验证信号: 测试设备订单、交付周期、资本开支"
+      ],
+      "suggested_operations": [
+        "revise_relation",
+        "supplement_evidence",
+        "add_blocking_signal"
+      ],
+      "required_materials": [
+        "设备公司公告或财报",
+        "先进封装资本开支材料",
+        "可追溯行业资料或历史案例"
+      ],
+      "minimum_evidence_level": "multi_source_supported",
+      "priority": "high",
+      "stop_condition": "补齐传导关系、验证信号、阻断信号并在核心题复评中单题分达到 80 分以上。",
+      "quality_expected_delta": {
+        "coverage_score": 0.08,
+        "evidence_score": 0.1,
+        "consistency_score": 0.04,
+        "reasoning_score": 0.12
+      }
+    },
+    {
+      "plan_id": "PLAN_EVAL_002",
+      "source_question_ids": [
+        "Q_HOT_001"
+      ],
+      "source_question_tier": "hotspot",
+      "source_issue_ids": [
+        "ISS_003"
+      ],
+      "optimization_goal": "核验热点扩产事实是否暴露稳定本体缺口。",
+      "target_gaps": [
+        "热点来源缺少原始公告或公司发布",
+        "热点事实与稳定传导逻辑的边界未区分"
+      ],
+      "suggested_operations": [
+        "defer",
+        "supplement_evidence"
+      ],
+      "required_materials": [
+        "公司公告或官方发布",
+        "业务时间和原文位置"
+      ],
+      "minimum_evidence_level": "official_source_supported",
+      "priority": "medium",
+      "stop_condition": "确认热点事实来源后，仅将可复用的稳定链路或信号交给优化 Skill，短期事实留在证据层。",
+      "quality_expected_delta": {
+        "coverage_score": 0.02,
+        "evidence_score": 0.06,
+        "consistency_score": 0.02,
+        "reasoning_score": 0.03
+      }
+    }
+  ],
+  "optimization_handoff": {
+    "target_skill": "touyan-benti-youhua",
+    "handoff_payload": [
+      "evaluation_fix_report",
+      "optimization_plan"
+    ],
+    "execution_notes": [
+      "评测建议只说明缺口和证据需求，不代表已完成本体修改。",
+      "热点题相关计划必须先核验原始来源。"
+    ],
+    "must_not_do": [
+      "不要把评测建议直接升级为 confirmed。",
+      "不要把热点新闻直接沉淀为稳定产业逻辑。",
+      "不要补充与 target_scope 无关的对象。",
+      "不要输出买卖建议、目标价、收益率预测或仓位建议。"
+    ]
+  },
+  "compliance_check": {
+    "does_not_output_investment_advice": true,
+    "does_not_output_target_price": true,
+    "does_not_output_return_forecast": true,
+    "does_not_output_position_advice": true,
+    "hotspot_sources_traceable": false,
+    "ontology_external_content_labeled": true,
+    "notes": [
+      "热点题来源未完全核验，因此只进入 backlog 和实战就绪度扣分。",
+      "样例未输出任何交易建议。"
+    ]
+  },
+  "readable_report": "# 本体评测报告\n\n> **本体**：AI 芯片产业链本体 v0.3\n> **报告**：本体评测报告\n> **范围**：AI 芯片需求向先进封装、测试设备和材料环节的传导推理\n> **时间**：2026-06-02\n\n## 发布判定\n\n**conditional_publish**\n\n总分 72.5/100，核心题通过率 75%。本体对 HBM 与先进封装主链路已有基本表达，但测试设备传导、验证信号和热点来源核验仍不足，因此判定为有条件发布。\n\n| 维度 | 结果 |\n|------|------|\n| 发布结论 | 有条件 |\n| 总分 | 72.5 / 100 |\n| 核心通过率 | 75% |\n| 失败项数 | 0 个严重失败 |\n| 数据满足率 | 33% （1/3 项数据需求已获取） |\n\n## 维度分析\n\n主要短板是可验证性和传导完整度。测试设备订单能见度、交付周期和订单递延信号缺少稳定表达，使本体在回答 HBM 需求如何外溢到设备环节时只能给出泛化解释。\n\n## 关键失败项\n\nQ_TYPE_001 暴露 HBM 到先进封装再到测试设备的传导关系端点缺失。Q_HOT_001 的热点来源只覆盖新闻摘要，缺少公告或公司原始发布，因此不能作为正式 critical failure。\n\n## 下一步\n\n| 优先级 | 行动项 | 预期收益 |\n|-------|-------|---------|\n| P0 | 补齐先进封装到测试设备的传导链和验证信号 | 提升传导完整度与可验证性 |\n| P1 | 回溯热点扩产新闻的原始来源 | 提升热点题可信度 |\n| P2 | 增加订单递延和交付周期阻断信号 | 提升反证能力 |",
+  "data_requirements_checklist": [
+    {
+      "data_item_id": "DATA-001",
+      "data_type": "signal",
+      "search_keywords": [
+        "先进封装 测试设备 订单 交付周期"
+      ],
+      "date_range": {
+        "start": "2023-01-01",
+        "end": "2025-12-31"
+      },
+      "priority": "high",
+      "mapped_ontology_element": "verification_signal.test_equipment_order_visibility",
+      "mapped_eval_dimensions": [
+        "verifiability"
+      ],
+      "rationale": "用于核验测试设备订单能见度是否可作为先进封装扩产传导的验证信号。",
+      "source": "inferred",
+      "fulfilled": false
+    },
+    {
+      "data_item_id": "DATA-002",
+      "data_type": "timeline",
+      "search_keywords": [
+        "HBM 先进封装 资本开支 产能 扩产"
+      ],
+      "date_range": {
+        "start": "2023-01-01",
+        "end": "2025-12-31"
+      },
+      "priority": "high",
+      "mapped_ontology_element": "transmission_chain.hbm_to_advanced_packaging",
+      "mapped_eval_dimensions": [
+        "reasoning_chain_completeness",
+        "verifiability"
+      ],
+      "rationale": "用于核验 HBM 需求到先进封装扩产的关键节点时间线。",
+      "source": "explicit_signal",
+      "fulfilled": true
+    },
+    {
+      "data_item_id": "DATA-003",
+      "data_type": "event",
+      "search_keywords": [
+        "先进封装 扩产 公告 原始来源"
+      ],
+      "date_range": {
+        "start": "2025-01-01",
+        "end": "2026-06-02"
+      },
+      "priority": "medium",
+      "mapped_ontology_element": "hotspot.advanced_packaging_expansion_news",
+      "mapped_eval_dimensions": [
+        "boundary_conditions"
+      ],
+      "rationale": "用于核验热点扩产新闻是否有公告或公司原始发布来源。",
+      "source": "user_specified",
+      "fulfilled": false
+    }
+  ],
+  "data_sourcing_summary": {
+    "total_requested": 3,
+    "total_fulfilled": 1,
+    "fulfillment_rate": 0.3333,
+    "by_priority": {
+      "high": {
+        "fulfilled": 1,
+        "total": 2
+      },
+      "medium": {
+        "fulfilled": 0,
+        "total": 1
+      },
+      "low": {
+        "fulfilled": 0,
+        "total": 0
+      }
+    },
+    "unfulfilled_items": [
+      {
+        "data_item_id": "DATA-001",
+        "reason": "缺少测试设备公司公告或订单披露的独立来源。",
+        "suggested_retrieval": "检索测试设备公司公告、财报和产业数据库中的订单与交付周期数据。"
+      },
+      {
+        "data_item_id": "DATA-003",
+        "reason": "热点扩产事件只有新闻摘要，缺少原始公告或公司发布。",
+        "suggested_retrieval": "回溯公司公告、交易所披露或公司官网新闻稿。"
+      }
+    ]
+  },
+  "data_driven_score_adjustments": {
+    "verifiability_boosted_by_data": {
+      "applicable": true,
+      "question_ids": [
+        "Q_TYPE_001"
+      ],
+      "baseline_score": 58,
+      "adjusted_score": 62,
+      "notes": "DATA-002 提供了 HBM 到先进封装扩产的时间线支撑，但测试设备订单信号仍未满足。"
+    },
+    "boundary_conditions_boosted_by_data": {
+      "applicable": false,
+      "question_ids": [],
+      "baseline_score": 62,
+      "adjusted_score": 62,
+      "notes": "边界条件相关数据仍不足，未做数据锚定提升。"
+    },
+    "hotspot_score_impact": {
+      "data_fulfilled_count": 0,
+      "total_hotspot_questions": 1,
+      "practical_readiness_delta": -3,
+      "notes": "热点题缺少原始来源，实战就绪度扣分但不作为 critical failure。"
+    },
+    "degraded_by_data_gap": [
+      {
+        "gap_reason": "高优先级测试设备订单信号未满足。",
+        "affected_dimensions": [
+          "verifiability",
+          "reasoning_chain_completeness"
+        ],
+        "downgrade_description": "数据缺口限制了可验证性评分锚定，发布判断保持有条件发布。"
+      }
+    ]
+  }
+}

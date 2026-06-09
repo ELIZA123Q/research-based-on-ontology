@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "投研本体核心规范变更建议输出",
+  "type": "object",
+  "required": [
+    "proposal_file_metadata",
+    "proposals"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "riskLevel": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "proposalType": {
+      "type": "string",
+      "enum": [
+        "object_type",
+        "relation_type",
+        "action_type",
+        "enum_value",
+        "core_field",
+        "state_machine",
+        "public_contract",
+        "metadata_contract"
+      ]
+    }
+  },
+  "properties": {
+    "proposal_file_metadata": {
+      "type": "object",
+      "required": [
+        "ontology_id",
+        "run_id",
+        "generated_at",
+        "proposal_count"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ontology_id": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "generated_at": {
+          "type": "string"
+        },
+        "proposal_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_ontology_version": {
+          "type": "string"
+        }
+      }
+    },
+    "proposals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "proposal_id",
+          "trigger_batch_id",
+          "source_gap_ids",
+          "original_suggestion",
+          "proposal_type",
+          "core_files_or_sections",
+          "affected_schema_elements",
+          "why_existing_schema_is_insufficient",
+          "suggested_core_change",
+          "impact_assessment",
+          "evidence_refs",
+          "risk_level",
+          "suggested_reviewer_role",
+          "not_applied_reason",
+          "downstream_handling"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "proposal_id": {
+            "type": "string"
+          },
+          "trigger_batch_id": {
+            "type": "string"
+          },
+          "source_gap_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "original_suggestion": {
+            "type": "string"
+          },
+          "proposal_type": {
+            "$ref": "#/$defs/proposalType"
+          },
+          "core_files_or_sections": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "affected_schema_elements": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "why_existing_schema_is_insufficient": {
+            "type": "string"
+          },
+          "suggested_core_change": {
+            "type": "string"
+          },
+          "impact_assessment": {
+            "type": "string"
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "risk_level": {
+            "$ref": "#/$defs/riskLevel"
+          },
+          "suggested_reviewer_role": {
+            "type": "string"
+          },
+          "not_applied_reason": {
+            "type": "string"
+          },
+          "downstream_handling": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

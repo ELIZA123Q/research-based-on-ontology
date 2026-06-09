@@ -1,0 +1,49 @@
+{
+  "optimization_delta": {
+    "delta_metadata": {
+      "base_ontology_version": "1.1.0",
+      "base_hash": "sha256:78e4cbd25745ae526dbe5d46c3af0e3709242495b1d370083723e5d6e7301247",
+      "batch_id": "BATCH-P1-002",
+      "round_number": 2,
+      "generated_at": "2026-06-05T12:30:00Z"
+    },
+    "delta_summary": {
+      "total_changes": 1,
+      "by_action": {
+        "add": 0,
+        "update": 1,
+        "strengthen": 0,
+        "keep": 0,
+        "deprecate": 0,
+        "reject": 0
+      },
+      "by_category": {
+        "objects": 1,
+        "relations": 0,
+        "state_variables": 0,
+        "state_observations": 0,
+        "propagation_templates": 0,
+        "signals": 0,
+        "blocking_conditions": 0,
+        "scenario_paths": 0,
+        "asset_impact_clues": 0
+      }
+    },
+    "delta_changes": {
+      "updated_objects": [
+        {
+          "object_id": "SV-RD-EXPENSE-RATIO",
+          "updated_fields": {
+            "operation": "update",
+            "fields": {
+              "description": "研发费用率，用于观察 AI 芯片公司研发投入强度与收入规模变化之间的匹配关系；本 patch 仅修正文案，不改变核心 schema。"
+            },
+            "reviewNote": "patch 模式样例：只覆盖实际修改字段，最终由 apply_optimization_delta.py 合并为完整 optimized_ontology。"
+          },
+          "action": "update",
+          "evidence_claim_ref": "CLM-20240328-001"
+        }
+      ]
+    }
+  }
+}

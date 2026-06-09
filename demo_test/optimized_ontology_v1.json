@@ -1,0 +1,58 @@
+{
+  "ontology_id": "lithium_battery_midstream_v1",
+  "version": "v1",
+  "generated_at": "2026-06-08T17:52:00",
+  "domain": "动力电池中游正极材料",
+  "objects": [
+    {
+      "id": "OBJ-001",
+      "name": "碳酸锂现货价格",
+      "type": "macro_variable",
+      "unit": "万元/吨",
+      "data_source": "上海有色网 SMM / 广期所"
+    },
+    {
+      "id": "OBJ-002",
+      "name": "磷酸铁锂正极材料企业毛利率",
+      "type": "financial_metric",
+      "unit": "%",
+      "data_source": "公司财报"
+    },
+    {
+      "id": "OBJ-003",
+      "name": "库存减值",
+      "type": "accounting_event",
+      "triggered_by": ["碳酸锂现货价格单边下跌 > 库存周转天数成本线"]
+    },
+    {
+      "id": "OBJ-004",
+      "name": "长协锁价比例",
+      "type": "business_parameter",
+      "unit": "%",
+      "modulates": ["碳酸锂现货价格→毛利率传导强度"]
+    }
+  ],
+  "conduction_chains": [
+    {
+      "id": "CHAIN-001",
+      "name": "碳酸锂现货价→正极毛利率传导",
+      "steps": [
+        "碳酸锂现货价变动",
+        "库存成本变动（滞后=库存周转天数）",
+        "产品定价调整（受长协比例调制）",
+        "毛利率变化"
+      ],
+      "reverse_path": "高价库存消耗→低价补库→毛利率修复（滞后=库存消耗周期）",
+      "evidence": ["SRC-001", "SRC-002"]
+    }
+  ],
+  "trigger_conditions": [
+    {
+      "id": "TRIG-001",
+      "condition": "碳酸锂跌幅 > 库存周转天数成本线",
+      "action": "触发存货减值测试",
+      "evidence": ["SRC-001", "case_2023_crash"]
+    }
+  ],
+  "unresolved": ["LFP/NCM成本结构差异（碳酸锂单耗数据待补充）"]
+}

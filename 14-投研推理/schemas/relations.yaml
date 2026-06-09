@@ -1,0 +1,1160 @@
+schema_name: relations
+schema_version: 0.1.0
+namespace: investment_ontology
+status: draft
+depends_on:
+  objects_schema: objects.yaml
+canonical_rule: YAML 是正式机器约束；Markdown 只负责解释和示例。
+description: 投研本体关系类型、端点、方向、关系属性和角色约束规范。
+
+relation_groups:
+  conceptual_relations:
+    zh_name: 概念定义类关系
+  research_target_relations:
+    zh_name: 研究标的类关系
+  business_structure_relations:
+    zh_name: 业务结构图谱类关系
+  observable_dimension_relations:
+    zh_name: 可观测维度类关系
+  research_reasoning_relations:
+    zh_name: 研究推理类关系
+  source_and_record_relations:
+    zh_name: 来源与记录类关系
+
+all_object_types:
+  - ConceptScheme
+  - Concept
+  - ConceptBoundary
+  - Industry
+  - Segment
+  - Company
+  - Product
+  - Material
+  - Asset
+  - StateVariable
+  - StateVariableObservation
+  - StateVariablePropagation
+  - Event
+  - StateHypothesis
+  - Signal
+  - JudgmentOutput
+  - AssetImpact
+  - InvestmentThesis
+  - SourceDocument
+  - EvidenceEpisode
+  - EvidenceClaim
+  - EvidenceFact
+  - PatchRequest
+  - PatchLedgerItem
+  - InferenceRun
+  - ActionAudit
+  - ReviewRecord
+
+relation_defaults:
+  direction: directed
+  history_policy: preserve_history
+  deletion_policy: no_physical_delete_without_migration
+  relation_instance_id_pattern: "REL-{YYYYMMDD}-{serial}"
+  relation_status_values: [candidate, confirmed, archived]
+  required_instance_fields: [id, type, sourceId, targetId, recordStatus]
+  inheritance_rule: 实例文件可在容器级声明默认 recordStatus；若关系实例未显式填写 recordStatus，可继承容器默认值。正式入库时系统应补齐为实例字段。
+
+relation_extraction_contract:
+  purpose: 指导 AI 从文档或案例中抽取关系实例。
+  output_shape:
+    id: 关系实例 ID，遵循 relation_instance_id_pattern。
+    type: relation_types 中的关系类型。
+    sourceId: 源对象实例 ID。
+    targetId: 目标对象实例 ID。
+    properties: 关系属性；无属性时为空对象。
+    evidenceRefs: 来源文档、段落或观测引用。
+    extractionConfidence: 0 到 1 的置信度。
+    recordStatus: candidate 或 confirmed。
+  rules:
+    - 不允许只用自然语言暗示关系；凡参与推理链的连接必须形成关系实例。
+    - 概念层的上位、包含、交叉、排除、边界裁定和对象映射必须形成概念关系实例；不得只写在说明文中。
+    - sourceId 和 targetId 必须先能解析到对象实例；无法解析时放入 unresolved_relations。
+    - Signal 的效果关系必须遵守 signalRole 约束。
+    - blocking 只能通过 blocksHypothesis 指向 StateHypothesis，不得直接指向 JudgmentOutput。
+    - StateVariablePropagation 的变量端点必须用 propagatesFrom 和 propagatesTo 两条关系表达。
+    - 业务结构图谱必须优先使用 business_structure_relations 中的显式关系；不得只用自然语言、排序或 positionInChain 暗示上下游、替代、依赖或公司关系。
+    - 业务结构关系的关系类型只负责约束端点类型，具体语义必须写入对应 relationType 属性；缺少端点或语义时放入 unresolved_relations 或材料缺口。
+
+relation_types:
+  conceptInScheme:
+    zh_name: 概念属于概念体系
+    group: conceptual_relations
+    source_types: [Concept]
+    target_types: [ConceptScheme]
+    direction: directed
+    cardinality: many_to_one
+    description: 概念属于某个行业、主题或研究范围的概念体系。
+    properties:
+      schemeRole:
+        zh_name: 体系角色
+        type: enum
+        enum: [root, primary, secondary, adjacent, excluded]
+        required: true
+
+  conceptBroaderThan:
+    zh_name: 概念上位于概念
+    group: conceptual_relations
+    source_types: [Concept]
+    target_types: [Concept]
+    direction: directed
+    cardinality: many_to_many
+    description: 源概念是目标概念的上位概念。
+    properties:
+      hierarchyBasis:
+        zh_name: 层级依据
+        type: string
+        required: false
+
+  conceptNarrowerThan:
+    zh_name: 概念下位于概念
+    group: conceptual_relations
+    source_types: [Concept]
+    target_types: [Concept]
+    direction: directed
+    cardinality: many_to_many
+    description: 源概念是目标概念的下位概念；可由 conceptBroaderThan 反向推导，但允许显式记录。
+    properties:
+      hierarchyBasis:
+        zh_name: 层级依据
+        type: string
+        required: false
+
+  conceptIncludes:
+    zh_name: 概念包含概念
+    group: conceptual_relations
+    source_types: [Concept]
+    target_types: [Concept]
+    direction: directed
+    cardinality: many_to_many
+    description: 源概念在当前本体口径下包含目标概念。
+    properties:
+      inclusionBasis:
+        zh_name: 包含依据
+        type: string
+        required: true
+
+  conceptOverlapsWith:
+    zh_name: 概念与概念交叉
+    group: conceptual_relations
+    source_types: [Concept]
+    target_types: [Concept]
+    direction: symmetric_single_edge
+    cardinality: many_to_many
+    description: 两个概念存在交叉范围，但任一方不完全包含另一方。
+    properties:
+      overlapBasis:
+        zh_name: 交叉依据
+        type: string
+        required: true
+      overlapScope:
+        zh_name: 交叉范围
+        type: string
+        required: true
+
+  conceptExcludes:
+    zh_name: 概念排除概念
+    group: conceptual_relations
+    source_types: [Concept]
+    target_types: [Concept]
+    direction: directed
+    cardinality: many_to_many
+    description: 源概念在当前本体口径下明确排除目标概念。
+    properties:
+      exclusionBasis:
+        zh_name: 排除依据
+        type: string
+        required: true
+
+  boundaryForConcept:
+    zh_name: 边界裁定对应概念
+    group: conceptual_relations
+    source_types: [ConceptBoundary]
+    target_types: [Concept]
+    direction: directed
+    cardinality: many_to_many
+    description: 概念边界裁定适用于某个概念。
+    properties:
+      boundaryRole:
+        zh_name: 边界角色
+        type: enum
+        enum: [subject, included, excluded, adjacent, overlap, deferred]
+        required: true
+
+  conceptMapsToObject:
+    zh_name: 概念映射到本体对象
+    group: conceptual_relations
+    source_types: [Concept]
+    target_types: [Industry, Segment, Company, Product, Material, Asset, Event, StateVariable]
+    direction: directed
+    cardinality: many_to_many
+    description: 概念映射到正式业务对象或变量；概念负责语义口径，业务对象负责图谱和推理。
+    properties:
+      mappingRole:
+        zh_name: 映射角色
+        type: enum
+        enum: [defines_scope, maps_to_industry, maps_to_segment, maps_to_product, maps_to_material, maps_to_company, maps_to_asset, maps_to_event, maps_to_variable, alias_only]
+        required: true
+      mappingBasis:
+        zh_name: 映射依据
+        type: string
+        required: true
+
+  subIndustryOf:
+    zh_name: 归属上级产业
+    group: research_target_relations
+    source_types: [Industry]
+    target_types: [Industry]
+    direction: directed
+    cardinality: many_to_one
+    description: 子产业属于上级产业。
+    properties:
+      hierarchyLevel:
+        zh_name: 层级
+        type: string
+        required: false
+
+  segmentBelongsToIndustry:
+    zh_name: 环节所属产业
+    group: research_target_relations
+    source_types: [Segment]
+    target_types: [Industry]
+    direction: directed
+    cardinality: many_to_one
+    description: 产业链环节属于某产业。
+    properties: {}
+
+  companyBelongsToIndustry:
+    zh_name: 公司所属产业
+    group: research_target_relations
+    source_types: [Company]
+    target_types: [Industry]
+    direction: directed
+    cardinality: many_to_many
+    description: 公司属于某产业。
+    properties:
+      classificationBasis:
+        zh_name: 分类依据
+        type: string
+        required: false
+
+  companyParticipatesInSegment:
+    zh_name: 公司参与环节
+    group: research_target_relations
+    source_types: [Company]
+    target_types: [Segment]
+    direction: directed
+    cardinality: many_to_many
+    description: 公司参与某产业链环节。
+    properties:
+      participationRole:
+        zh_name: 参与角色
+        type: string
+        required: true
+      exposureDescription:
+        zh_name: 敞口描述
+        type: string
+        required: false
+
+  productProducedBy:
+    zh_name: 产品由公司生产
+    group: research_target_relations
+    source_types: [Product]
+    target_types: [Company]
+    direction: directed
+    cardinality: many_to_one
+    description: 产品由某公司生产或经营。
+    properties:
+      productRole:
+        zh_name: 产品角色
+        type: string
+        required: false
+
+  productBelongsToSegment:
+    zh_name: 产品所属环节
+    group: research_target_relations
+    source_types: [Product]
+    target_types: [Segment]
+    direction: directed
+    cardinality: many_to_one
+    description: 产品属于某产业链环节。
+    properties: {}
+
+  materialBelongsToIndustry:
+    zh_name: 材料所属产业
+    group: research_target_relations
+    source_types: [Material]
+    target_types: [Industry]
+    direction: directed
+    cardinality: many_to_one
+    description: 材料属于某产业。
+    properties: {}
+
+  materialUsedInSegment:
+    zh_name: 材料用于环节
+    group: research_target_relations
+    source_types: [Material]
+    target_types: [Segment]
+    direction: directed
+    cardinality: many_to_many
+    description: 材料用于某产业链环节。
+    properties:
+      usageRole:
+        zh_name: 用途角色
+        type: string
+        required: false
+
+  companyLinkedToAsset:
+    zh_name: 公司对应资产
+    group: research_target_relations
+    source_types: [Company]
+    target_types: [Asset]
+    direction: directed
+    cardinality: many_to_many
+    description: 公司对应某资产标的。
+    properties:
+      listingRole:
+        zh_name: 上市角色
+        type: string
+        required: false
+
+  assetLinkedToIndustry:
+    zh_name: 资产对应产业
+    group: research_target_relations
+    source_types: [Asset]
+    target_types: [Industry]
+    direction: directed
+    cardinality: many_to_many
+    description: 资产标的对应某产业。
+    properties:
+      exposureBasis:
+        zh_name: 敞口依据
+        type: string
+        required: false
+
+  segmentConnectsToSegment:
+    zh_name: 环节连接环节
+    group: business_structure_relations
+    source_types: [Segment]
+    target_types: [Segment]
+    direction: directed
+    cardinality: many_to_many
+    description: 产业链环节之间的业务连接，用于显式表达上下游、使能、加工、组装、销售、替代、互补或竞争关系。
+    properties:
+      chainRelationType:
+        zh_name: 链条关系类型
+        type: enum
+        enum: [supplies_to, enables, processes_into, assembles_into, sells_to, substitutes, complements, competes_with]
+        required: true
+      relationBasis:
+        zh_name: 关系依据
+        type: string
+        required: false
+      directionNote:
+        zh_name: 方向说明
+        type: string
+        required: false
+
+  companyRelatesToCompany:
+    zh_name: 公司关联公司
+    group: business_structure_relations
+    source_types: [Company]
+    target_types: [Company]
+    direction: directed
+    cardinality: many_to_many
+    description: 公司之间的业务关系，用于显式表达供应、代工、渠道、合作、竞争、投资控制、授权等关系。
+    properties:
+      businessRelationType:
+        zh_name: 公司业务关系类型
+        type: enum
+        enum: [supplies_to, manufactures_for, distributes_for, partners_with, competes_with, invests_in, controls, licenses_to]
+        required: true
+      relationBasis:
+        zh_name: 关系依据
+        type: string
+        required: false
+      directionNote:
+        zh_name: 方向说明
+        type: string
+        required: false
+
+  productRelatesToProduct:
+    zh_name: 产品关联产品
+    group: business_structure_relations
+    source_types: [Product]
+    target_types: [Product]
+    direction: directed
+    cardinality: many_to_many
+    description: 产品之间的依赖、替代、互补、代际、部件、集成、竞争或使能关系。
+    properties:
+      productRelationType:
+        zh_name: 产品关系类型
+        type: enum
+        enum: [depends_on, substitutes, complements, next_generation_of, component_of, integrates_with, competes_with, enables]
+        required: true
+      relationBasis:
+        zh_name: 关系依据
+        type: string
+        required: false
+      comparableCondition:
+        zh_name: 可比条件
+        type: string
+        required: false
+
+  materialUsedInProduct:
+    zh_name: 材料用于产品
+    group: business_structure_relations
+    source_types: [Material]
+    target_types: [Product]
+    direction: directed
+    cardinality: many_to_many
+    description: 材料具体用于某产品，补充 materialUsedInSegment 的环节级表达。
+    properties:
+      usageRole:
+        zh_name: 用途角色
+        type: enum
+        enum: [core_input, auxiliary_input, process_material, packaging_material, consumable, substrate]
+        required: true
+      relationBasis:
+        zh_name: 关系依据
+        type: string
+        required: false
+
+  materialRelatesToMaterial:
+    zh_name: 材料关联材料
+    group: business_structure_relations
+    source_types: [Material]
+    target_types: [Material]
+    direction: directed
+    cardinality: many_to_many
+    description: 材料之间的替代、前驱、伴生、工艺互补或产能竞争关系。
+    properties:
+      materialRelationType:
+        zh_name: 材料关系类型
+        type: enum
+        enum: [substitutes, precursor_of, co_product_of, process_complement_of, capacity_competes_with]
+        required: true
+      relationBasis:
+        zh_name: 关系依据
+        type: string
+        required: false
+
+  assetExposedToTarget:
+    zh_name: 资产暴露到标的对象
+    group: business_structure_relations
+    source_types: [Asset]
+    target_types: [Industry, Segment, Company, Product, Material]
+    direction: directed
+    cardinality: many_to_many
+    description: 资产标的对产业、环节、公司、产品或材料的业务暴露关系。
+    properties:
+      exposureType:
+        zh_name: 敞口类型
+        type: string
+        required: true
+      exposureBasis:
+        zh_name: 敞口依据
+        type: string
+        required: true
+
+  eventRelatesToEvent:
+    zh_name: 事件关联事件
+    group: business_structure_relations
+    source_types: [Event]
+    target_types: [Event]
+    direction: directed
+    cardinality: many_to_many
+    description: 事件之间的触发、使能、缓解、替代、反向或共现关系。
+    properties:
+      eventRelationType:
+        zh_name: 事件关系类型
+        type: enum
+        enum: [triggers, enables, mitigates, supersedes, contradicts, co_occurs_with]
+        required: true
+      relationBasis:
+        zh_name: 关系依据
+        type: string
+        required: false
+
+  eventAffectsVariable:
+    zh_name: 事件影响变量
+    group: business_structure_relations
+    source_types: [Event]
+    target_types: [StateVariable]
+    direction: directed
+    cardinality: many_to_many
+    description: 事件对状态变量产生方向性影响，是事件图谱进入状态变量推理的显式入口。
+    properties:
+      effectDirection:
+        zh_name: 影响方向
+        type: enum
+        enum: [up, down, stable, divergent, unknown]
+        required: true
+      effectMechanism:
+        zh_name: 影响机制
+        type: string
+        required: false
+      lagDescription:
+        zh_name: 时间滞后
+        type: string
+        required: false
+
+  eventProducesObservation:
+    zh_name: 事件产生观测
+    group: business_structure_relations
+    source_types: [Event]
+    target_types: [StateVariableObservation]
+    direction: directed
+    cardinality: many_to_many
+    description: 事件产生或直接对应某条状态变量观测，用于追溯事实观测的事件来源。
+    properties:
+      observationRole:
+        zh_name: 观测角色
+        type: string
+        required: false
+
+  judgmentRelatesToJudgment:
+    zh_name: 判断关联判断
+    group: business_structure_relations
+    source_types: [JudgmentOutput]
+    target_types: [JudgmentOutput]
+    direction: directed
+    cardinality: many_to_many
+    description: 判断输出之间的依赖、替代、细化、更新或冲突关系。
+    properties:
+      judgmentRelationType:
+        zh_name: 判断关系类型
+        type: enum
+        enum: [depends_on, alternative_to, refines, supersedes, conflicts_with]
+        required: true
+      relationBasis:
+        zh_name: 关系依据
+        type: string
+        required: false
+
+  observedOn:
+    zh_name: 变量挂载对象
+    group: observable_dimension_relations
+    source_types: [StateVariable]
+    target_types: [Industry, Segment, Company, Product, Material, Asset]
+    direction: directed
+    cardinality: many_to_many
+    description: 状态变量挂载于某研究标的对象；宏观、政策类变量可不挂载。
+    properties:
+      observationScope:
+        zh_name: 观测范围
+        type: string
+        required: false
+
+  observationBindsVariable:
+    zh_name: 观测归属变量
+    group: observable_dimension_relations
+    source_types: [StateVariableObservation]
+    target_types: [StateVariable]
+    direction: directed
+    cardinality: many_to_one
+    description: 观测值归属于某状态变量。
+    properties: {}
+
+  propagatesFrom:
+    zh_name: 传导来源变量
+    group: observable_dimension_relations
+    source_types: [StateVariablePropagation]
+    target_types: [StateVariable]
+    direction: directed
+    cardinality: many_to_one
+    description: 状态传导逻辑的源变量。
+    properties: {}
+
+  propagatesTo:
+    zh_name: 传导目标变量
+    group: observable_dimension_relations
+    source_types: [StateVariablePropagation]
+    target_types: [StateVariable]
+    direction: directed
+    cardinality: many_to_one
+    description: 状态传导逻辑的目标变量。
+    properties: {}
+
+  anchoredOn:
+    zh_name: 事件挂载对象
+    group: research_reasoning_relations
+    source_types: [Event]
+    target_types: [Industry, Segment, Company, Product, Material, Asset]
+    direction: directed
+    cardinality: many_to_many
+    description: 事件挂载于某研究标的对象；宏观、政策类事件可不挂载。
+    properties:
+      anchorRole:
+        zh_name: 挂载角色
+        type: string
+        required: false
+
+  basedOnEvent:
+    zh_name: 假设由事件引发
+    group: research_reasoning_relations
+    source_types: [StateHypothesis]
+    target_types: [Event]
+    direction: directed
+    cardinality: many_to_many
+    description: 状态假设由某事件引发。
+    properties: {}
+
+  hypothesisBindsVariable:
+    zh_name: 假设绑定变量
+    group: research_reasoning_relations
+    source_types: [StateHypothesis]
+    target_types: [StateVariable]
+    direction: directed
+    cardinality: many_to_one
+    description: 状态假设绑定某状态变量。
+    properties: {}
+
+  competesWithHypothesis:
+    zh_name: 假设互为竞争
+    group: research_reasoning_relations
+    source_types: [StateHypothesis]
+    target_types: [StateHypothesis]
+    direction: symmetric_single_edge
+    cardinality: many_to_many
+    description: 两个假设互为竞争解释；只需在任一方向建立一条。
+    properties: {}
+
+  supersedesHypothesis:
+    zh_name: 新假设替代原假设
+    group: research_reasoning_relations
+    source_types: [StateHypothesis]
+    target_types: [StateHypothesis]
+    direction: directed
+    cardinality: many_to_many
+    description: 新假设替代原假设，原假设保留历史记录。
+    semantics:
+      source: new_hypothesis
+      target: old_hypothesis
+    properties: {}
+
+  dependsOnHypothesis:
+    zh_name: 假设依赖前提假设
+    group: research_reasoning_relations
+    source_types: [StateHypothesis]
+    target_types: [StateHypothesis]
+    direction: directed
+    cardinality: many_to_many
+    description: 当前假设以另一假设成立为前提。
+    semantics:
+      source: dependent_hypothesis
+      target: prerequisite_hypothesis
+    system_effect: 前提假设被阻断时，系统提示重新评估依赖它的假设和判断。
+    properties: {}
+
+  signalBasedOnObservation:
+    zh_name: 信号来源观测值
+    group: research_reasoning_relations
+    source_types: [Signal]
+    target_types: [StateVariableObservation]
+    direction: directed
+    cardinality: many_to_many
+    description: 信号直接基于某条状态变量观测值，用于来源追溯。
+    properties: {}
+
+  supportsHypothesis:
+    zh_name: 信号支持假设
+    group: research_reasoning_relations
+    source_types: [Signal]
+    target_types: [StateHypothesis]
+    direction: directed
+    cardinality: many_to_many
+    description: validation 信号支持某状态假设。
+    source_field_constraints:
+      signalRole: validation
+    effect_active_when:
+      signalStatus: active
+    properties:
+      supportStrength:
+        zh_name: 支持力度
+        type: enum
+        enum: [strong, medium, weak]
+        required: true
+      relevanceNote:
+        zh_name: 相关性说明
+        type: string
+        required: false
+
+  tracksHypothesis:
+    zh_name: 信号跟踪假设
+    group: research_reasoning_relations
+    source_types: [Signal]
+    target_types: [StateHypothesis]
+    direction: directed
+    cardinality: many_to_many
+    description: tracking 信号持续观察某状态假设。
+    source_field_constraints:
+      signalRole: tracking
+    effect_active_when:
+      signalStatus: active
+    properties: {}
+
+  weakensHypothesis:
+    zh_name: 信号削弱假设
+    group: research_reasoning_relations
+    source_types: [Signal]
+    target_types: [StateHypothesis]
+    direction: directed
+    cardinality: many_to_many
+    description: weakening 信号削弱某状态假设。
+    source_field_constraints:
+      signalRole: weakening
+    effect_active_when:
+      signalStatus: active
+    properties:
+      weakenStrength:
+        zh_name: 削弱强度
+        type: enum
+        enum: [strong, medium, weak]
+        required: true
+
+  blocksHypothesis:
+    zh_name: 信号阻断假设
+    group: research_reasoning_relations
+    source_types: [Signal]
+    target_types: [StateHypothesis]
+    direction: directed
+    cardinality: many_to_many
+    description: blocking 信号阻断某状态假设，使其中止。
+    source_field_constraints:
+      signalRole: blocking
+    effect_active_when:
+      signalStatus: active
+    properties:
+      blockReason:
+        zh_name: 阻断原因
+        type: string
+        required: true
+
+  judgmentAnchoredOn:
+    zh_name: 判断挂载对象
+    group: research_reasoning_relations
+    source_types: [JudgmentOutput]
+    target_types: [Industry, Segment, Company, Product, Material, Asset]
+    direction: directed
+    cardinality: many_to_many
+    description: 判断输出挂载于具体研究标的对象。
+    properties:
+      anchorRole:
+        zh_name: 挂载角色
+        type: string
+        required: false
+
+  basedOnHypothesis:
+    zh_name: 判断基于假设
+    group: research_reasoning_relations
+    source_types: [JudgmentOutput]
+    target_types: [StateHypothesis]
+    direction: directed
+    cardinality: many_to_many
+    description: 判断输出基于某状态假设。
+    properties: {}
+
+  supportsJudgment:
+    zh_name: 信号支持判断
+    group: research_reasoning_relations
+    source_types: [Signal]
+    target_types: [JudgmentOutput]
+    direction: directed
+    cardinality: many_to_many
+    description: validation 信号直接支持某判断输出。
+    source_field_constraints:
+      signalRole: validation
+    effect_active_when:
+      signalStatus: active
+    properties:
+      supportStrength:
+        zh_name: 支持力度
+        type: enum
+        enum: [strong, medium, weak]
+        required: true
+      relevanceNote:
+        zh_name: 相关性说明
+        type: string
+        required: false
+
+  catalyzesJudgment:
+    zh_name: 信号催化判断
+    group: research_reasoning_relations
+    source_types: [Signal]
+    target_types: [JudgmentOutput]
+    direction: directed
+    cardinality: many_to_many
+    description: catalyst 信号推动判断进入正式触发或缩短兑现窗口。
+    source_field_constraints:
+      signalRole: catalyst
+    effect_active_when:
+      signalStatus: active
+    properties:
+      catalystRole:
+        zh_name: 催化角色
+        type: string
+        required: true
+      expectedLeadTime:
+        zh_name: 预计前置时间
+        type: string
+        required: false
+
+  tracksJudgment:
+    zh_name: 信号跟踪判断
+    group: research_reasoning_relations
+    source_types: [Signal]
+    target_types: [JudgmentOutput]
+    direction: directed
+    cardinality: many_to_many
+    description: tracking 信号持续观察某判断输出。
+    source_field_constraints:
+      signalRole: tracking
+    effect_active_when:
+      signalStatus: active
+    properties: {}
+
+  weakensJudgment:
+    zh_name: 信号削弱判断
+    group: research_reasoning_relations
+    source_types: [Signal]
+    target_types: [JudgmentOutput]
+    direction: directed
+    cardinality: many_to_many
+    description: weakening 信号直接削弱某判断输出。
+    source_field_constraints:
+      signalRole: weakening
+    effect_active_when:
+      signalStatus: active
+    properties:
+      weakenStrength:
+        zh_name: 削弱强度
+        type: enum
+        enum: [strong, medium, weak]
+        required: true
+
+  impactDerivedFrom:
+    zh_name: 资产影响来源判断
+    group: research_reasoning_relations
+    source_types: [AssetImpact]
+    target_types: [JudgmentOutput]
+    direction: directed
+    cardinality: many_to_one
+    description: 资产影响来源于某判断输出。
+    properties: {}
+
+  impactsAsset:
+    zh_name: 资产影响作用资产
+    group: research_reasoning_relations
+    source_types: [AssetImpact]
+    target_types: [Asset]
+    direction: directed
+    cardinality: many_to_one
+    description: 资产影响作用于某资产标的。
+    properties: {}
+
+  thesisAnchoredOn:
+    zh_name: 命题挂载对象
+    group: research_reasoning_relations
+    source_types: [InvestmentThesis]
+    target_types: [Industry, Segment, Company, Product, Material, Asset]
+    direction: directed
+    cardinality: many_to_many
+    description: 投资命题挂载于具体研究标的对象。
+    properties:
+      anchorRole:
+        zh_name: 挂载角色
+        type: string
+        required: false
+
+  thesisContainsJudgment:
+    zh_name: 命题包含判断
+    group: research_reasoning_relations
+    source_types: [InvestmentThesis]
+    target_types: [JudgmentOutput]
+    direction: directed
+    cardinality: many_to_many
+    description: 投资命题包含某判断输出。
+    properties: {}
+
+  claimFromEpisode:
+    zh_name: 主张来自 Episode
+    group: source_and_record_relations
+    source_types: [EvidenceClaim]
+    target_types: [EvidenceEpisode]
+    direction: directed
+    cardinality: many_to_one
+    description: EvidenceClaim 从某次 EvidenceEpisode 摄入或整理中产生。
+    properties:
+      extractionMethod:
+        zh_name: 抽取方式
+        type: enum
+        enum: [manual, ai_extraction, structured_import, replay_feedback, inference_feedback]
+        required: true
+      textSpan:
+        zh_name: 文本范围
+        type: string
+        required: false
+
+  episodeMentionsObject:
+    zh_name: Episode 提及对象
+    group: source_and_record_relations
+    source_types: [EvidenceEpisode]
+    target_types:
+      - Industry
+      - ConceptScheme
+      - Concept
+      - ConceptBoundary
+      - Segment
+      - Company
+      - Product
+      - Material
+      - Asset
+      - StateVariable
+      - StateVariableObservation
+      - StateVariablePropagation
+      - Event
+      - StateHypothesis
+      - Signal
+      - JudgmentOutput
+      - AssetImpact
+      - InvestmentThesis
+      - SourceDocument
+      - EvidenceClaim
+      - EvidenceFact
+      - PatchRequest
+      - InferenceRun
+    direction: directed
+    cardinality: many_to_many
+    description: EvidenceEpisode 在原始材料或反馈中提及某个本体对象、证据对象或运行记录。
+    properties:
+      mentionRole:
+        zh_name: 提及角色
+        type: enum
+        enum: [subject, object, context, evidence, counter_evidence, candidate_target]
+        required: true
+      mentionText:
+        zh_name: 提及文本
+        type: string
+        required: false
+
+  claimSupportsObject:
+    zh_name: 主张支持对象
+    group: source_and_record_relations
+    source_types: [EvidenceClaim]
+    target_types:
+      - Industry
+      - ConceptScheme
+      - Concept
+      - ConceptBoundary
+      - Segment
+      - Company
+      - Product
+      - Material
+      - Asset
+      - StateVariable
+      - StateVariableObservation
+      - StateVariablePropagation
+      - Event
+      - StateHypothesis
+      - Signal
+      - JudgmentOutput
+      - AssetImpact
+      - InvestmentThesis
+      - EvidenceFact
+      - PatchRequest
+    direction: directed
+    cardinality: many_to_many
+    description: EvidenceClaim 支持某个正式对象、证据事实或候选补丁请求。
+    properties:
+      supportRole:
+        zh_name: 支持角色
+        type: enum
+        enum: [primary, evidence, cross_validation, contradiction, template_basis, candidate_basis]
+        required: true
+      supportStrength:
+        zh_name: 支持强度
+        type: enum
+        enum: [high, medium, low]
+        required: false
+
+  claimSupportsRelation:
+    zh_name: 主张支持关系候选
+    group: source_and_record_relations
+    source_types: [EvidenceClaim]
+    target_types: [PatchRequest, PatchLedgerItem]
+    direction: directed
+    cardinality: many_to_many
+    description: EvidenceClaim 支持某条关系实例、关系修订或关系补丁；具体关系实例 ID 写入 targetRelationId。
+    properties:
+      targetRelationId:
+        zh_name: 目标关系 ID
+        type: string
+        required: true
+      supportRole:
+        zh_name: 支持角色
+        type: enum
+        enum: [primary, evidence, cross_validation, contradiction, candidate_basis]
+        required: true
+
+  claimInvalidatesClaim:
+    zh_name: 主张使主张失效
+    group: source_and_record_relations
+    source_types: [EvidenceClaim]
+    target_types: [EvidenceClaim]
+    direction: directed
+    cardinality: many_to_many
+    description: 新 EvidenceClaim 证明旧 EvidenceClaim 不再适用、被替代或应降级。
+    properties:
+      invalidationType:
+        zh_name: 失效类型
+        type: enum
+        enum: [expired, contradicted, superseded, scope_changed, evidence_quality_downgraded]
+        required: true
+      invalidationReason:
+        zh_name: 失效理由
+        type: string
+        required: true
+
+  claimTriggersPatch:
+    zh_name: 主张触发补丁请求
+    group: source_and_record_relations
+    source_types: [EvidenceClaim]
+    target_types: [PatchRequest]
+    direction: directed
+    cardinality: many_to_many
+    description: EvidenceClaim 触发新增、修改、废弃、补证或延后的候选补丁请求。
+    properties:
+      triggerReason:
+        zh_name: 触发原因
+        type: enum
+        enum: [new_object, new_relation, new_signal, invalidation, evidence_gap, reasoning_feedback, replay_failure, evaluation_failure]
+        required: true
+      priorityHint:
+        zh_name: 优先级提示
+        type: enum
+        enum: [high, medium, low]
+        required: false
+
+  sourceOf:
+    zh_name: 文档是某对象来源
+    group: source_and_record_relations
+    source_types: [SourceDocument]
+    target_types:
+      - Industry
+      - ConceptScheme
+      - Concept
+      - ConceptBoundary
+      - Segment
+      - Company
+      - Product
+      - Material
+      - Asset
+      - StateVariable
+      - StateVariableObservation
+      - StateVariablePropagation
+      - Event
+      - StateHypothesis
+      - Signal
+      - JudgmentOutput
+      - AssetImpact
+      - InvestmentThesis
+      - EvidenceEpisode
+      - EvidenceClaim
+      - EvidenceFact
+      - PatchRequest
+      - PatchLedgerItem
+      - InferenceRun
+      - ActionAudit
+      - ReviewRecord
+    direction: directed
+    cardinality: many_to_many
+    description: 来源文档是某对象、动作记录或审核记录的信息来源。
+    properties:
+      sourceRole:
+        zh_name: 来源角色
+        type: enum
+        enum: [primary, evidence, cross_validation, audit_basis, review_basis, template_basis]
+        required: true
+      excerptLocation:
+        zh_name: 摘录位置
+        type: string
+        required: false
+
+  auditFor:
+    zh_name: 动作记录对应对象
+    group: source_and_record_relations
+    source_types: [ActionAudit]
+    target_types:
+      - Industry
+      - ConceptScheme
+      - Concept
+      - ConceptBoundary
+      - Segment
+      - Company
+      - Product
+      - Material
+      - Asset
+      - StateVariable
+      - StateVariableObservation
+      - StateVariablePropagation
+      - Event
+      - StateHypothesis
+      - Signal
+      - JudgmentOutput
+      - AssetImpact
+      - InvestmentThesis
+      - SourceDocument
+      - EvidenceEpisode
+      - EvidenceClaim
+      - EvidenceFact
+      - PatchRequest
+      - PatchLedgerItem
+      - InferenceRun
+      - ReviewRecord
+    direction: directed
+    cardinality: many_to_one
+    description: 动作记录针对被创建、修改或状态变更的对象。
+    properties:
+      changeScope:
+        zh_name: 变更范围
+        type: enum
+        enum: [create, update_field, update_state, create_relation, update_relation, review, retrospect]
+        required: true
+
+  reviewFor:
+    zh_name: 审核记录对应对象
+    group: source_and_record_relations
+    source_types: [ReviewRecord]
+    target_types:
+      - StateHypothesis
+      - Signal
+      - JudgmentOutput
+      - InvestmentThesis
+      - PatchRequest
+      - PatchLedgerItem
+      - InferenceRun
+      - ActionAudit
+    direction: directed
+    cardinality: many_to_one
+    description: 审核记录针对某对象、动作记录或复盘记录。
+    properties:
+      reviewScope:
+        zh_name: 审核范围
+        type: enum
+        enum: [admission, state_transition, signal_status_update, retrospect, supplement]
+        required: true
+
+machine_validation_rules:
+  - id: relation_endpoints_must_exist
+    description: 每个关系的 source_types 和 target_types 必须引用 objects.yaml 中存在的对象类型。
+  - id: relation_properties_have_required_flags
+    description: 每个关系属性必须声明 required。
+  - id: signal_role_relation_compatibility
+    description: Signal.signalRole 必须与该信号建立的效果关系匹配；catalyst 不得直接 supportsHypothesis，blocking 不得作用于 JudgmentOutput。
+  - id: source_document_is_not_sufficient_when_ai_summary
+    description: sourceForm=ai_summary 的 SourceDocument 不得作为正式入库对象的唯一 sourceOf 来源。

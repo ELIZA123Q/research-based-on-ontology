@@ -1,0 +1,976 @@
+{
+  "fixture_type": "ontology_optimization_delta",
+  "base": "01_本体优化输出样例.json",
+  "description": "缺口发现回灌优化的增量夹具。校验脚本基于 01 golden example 组装完整 v1.2 输出。",
+  "set": {
+    "optimized_ontology.ontology_metadata": {
+      "ontology_id": "ai_chip_product_track",
+      "ontology_version": "1.2.0",
+      "parent_version": "1.1.0",
+      "created_by": "touyan-hangye-chanye-bentilengqidong",
+      "updated_by": "touyan-benti-youhua",
+      "change_reason": "gap_discovery_optimization",
+      "ontology_quality": {
+        "coverage_score": 0.78,
+        "evidence_score": 0.79,
+        "consistency_score": 0.91,
+        "reasoning_score": 0.77
+      }
+    },
+    "optimized_ontology.industry_context": {
+      "primary_industry": "半导体",
+      "segments": [
+        "AI芯片设计",
+        "先进封装",
+        "高带宽内存"
+      ],
+      "companies": [
+        "寒武纪科技股份有限公司"
+      ],
+      "products": [
+        "AI加速芯片",
+        "先进封装产能",
+        "高带宽内存"
+      ],
+      "materials": [],
+      "assets": [
+        "688256.SH"
+      ],
+      "regions": [
+        "中国"
+      ],
+      "business_time_range": "2023年年度报告期至2026年缺口发现回灌样例期",
+      "themes": [
+        "研发费用率",
+        "盈利拐点",
+        "国产算力",
+        "上游瓶颈",
+        "交付周期"
+      ],
+      "research_question": "AI芯片设计公司的收入兑现是否受先进封装和高带宽内存等上游瓶颈影响，并如何与费用率收敛共同验证。",
+      "industry_calibration_loaded": [
+        "semiconductor_pack_v1"
+      ],
+      "confidence": 0.86,
+      "notes": "本轮承接缺口发现 Skill 的 optimization_plan，补齐上游瓶颈到交付周期和收入确认节奏的候选链条。"
+    },
+    "optimized_ontology.base_ontology_reference": {
+      "provided": true,
+      "version_or_name": "ai_chip_product_track v1.1.0",
+      "scope": "AI芯片设计、上游瓶颈、交付周期与收入确认节奏",
+      "source": "touyan-benti-quekou-faxian.optimization_plan",
+      "notes": "上一版本已有费用率收敛链路；缺口发现指出先进封装、高带宽内存和交付周期链路弱覆盖，本轮据此回灌优化。"
+    },
+    "optimized_ontology.quality_checks": [
+      {
+        "check": "是否先诊断基础本体缺口",
+        "result": "pass",
+        "note": "本轮目标来自基础本体中费用率观测和盈利拐点假设缺口。"
+      },
+      {
+        "check": "是否区分事实和判断",
+        "result": "pass",
+        "note": "研发费用率读数作为 observation，盈利拐点只作为待验证假设。"
+      },
+      {
+        "check": "是否生成投资建议",
+        "result": "pass",
+        "note": "未输出买卖建议、目标价或仓位。"
+      },
+      {
+        "check": "缺口发现回灌是否区分任务来源和事实证据",
+        "result": "pass",
+        "note": "SRC-GAP-OPT-001 只作为优化任务来源；新增上游瓶颈链路均保持 candidate 和 single_source_candidate。"
+      },
+      {
+        "check": "新增传导链是否披露缺失环节",
+        "result": "pass",
+        "note": "SVP-BOTTLENECK-DELIVERY-REVENUE 同时输出 verified_steps 与 missing_steps，避免把候选传导写成确定结论。"
+      }
+    ],
+    "optimized_ontology.missing_evidence": [
+      {
+        "gap": "缺少连续两个季度费用率下行证据",
+        "why_it_matters": "单篇年报只能形成单来源候选，不能确认趋势。",
+        "suggested_material": "后续季度财报"
+      },
+      {
+        "gap": "缺少市场预期和估值锚",
+        "why_it_matters": "没有预期锚就不能判断资产影响是否有预期差。",
+        "suggested_material": "一致预期、估值比较、市场价格表现"
+      },
+      {
+        "gap": "缺少封装产能、内存供给和交付周期的多来源事实材料",
+        "why_it_matters": "缺口发现只能说明本体表达能力不足，不能证明瓶颈传导已经真实发生。",
+        "suggested_material": "封装产能公告、供给周期数据、客户交付和验收材料、收入确认披露"
+      }
+    ],
+    "optimization_report.base_ontology_assessment": {
+      "provided": true,
+      "version_or_name": "AI芯片行业本体冷启动初版",
+      "scope": "AI芯片设计公司费用率收敛与盈利拐点",
+      "diagnosed_gaps": [
+        {
+          "gap": "研发费用率变量缺少事实观测",
+          "affected_items": [
+            "SV-RD-EXPENSE-RATIO"
+          ],
+          "severity": "high",
+          "why_it_matters": "没有观测值就无法验证费用率收敛假设。"
+        },
+        {
+          "gap": "盈利拐点假设缺少连续季度和收入兑现证据",
+          "affected_items": [
+            "SH-RD-EXPENSE-RATIO-DOWN"
+          ],
+          "severity": "high",
+          "why_it_matters": "单点费用率下降不能直接推出盈利拐点。"
+        },
+        {
+          "gap": "资产影响线索缺少市场预期和估值锚",
+          "affected_items": [
+            "688256.SH"
+          ],
+          "severity": "medium",
+          "why_it_matters": "没有预期锚，不能判断资产定价线索。"
+        }
+      ],
+      "overall_assessment": "上一版已能表达费用率收敛链路，但对先进封装、高带宽内存和交付周期等上游瓶颈仍为弱覆盖，需要按缺口发现任务单回灌候选链路。",
+      "cannot_optimize_reason": ""
+    },
+    "optimization_report.current_optimization_goal": {
+      "goal": "承接缺口发现 Skill 的 optimization_plan，补齐上游瓶颈到交付周期和收入确认节奏的候选链路。",
+      "round_focus": "第二轮：回灌缺口发现任务，新增上游瓶颈变量、传导模板和跟踪信号。",
+      "target_gaps": [
+        "先进封装产能紧张度变量缺失",
+        "高带宽内存供给紧张度变量缺失",
+        "上游瓶颈到交付周期和收入确认节奏传导缺失"
+      ],
+      "success_criteria": [
+        "新增上游瓶颈、交付周期和传导链候选项",
+        "明确每条候选链路的证据来源和缺失材料",
+        "不得把缺口发现任务单当作事实观测或正式判断"
+      ]
+    },
+    "optimization_report.material_search_and_assessment": {
+      "search_enabled": true,
+      "search_objective": "围绕基础本体中的费用率观测缺口，优先补充可追溯财报材料。",
+      "query_plan": [
+        {
+          "ontology_gap": "研发费用率变量缺少事实观测",
+          "query": "寒武纪 2023 年度报告 研发费用率 营业收入",
+          "target_material_type": "上市公司年报",
+          "purpose": "获取研发费用率、收入和公司基本信息事实来源。",
+          "priority": "P0"
+        },
+        {
+          "ontology_gap": "盈利拐点假设缺少连续季度验证",
+          "query": "寒武纪 2024 季度报告 研发费用率 收入",
+          "target_material_type": "上市公司季报",
+          "purpose": "验证费用率是否连续收敛。",
+          "priority": "P0"
+        },
+        {
+          "ontology_gap": "上游瓶颈到交付周期和收入确认节奏传导缺失",
+          "query": "缺口发现 optimization_plan OPT-GAP-001 先进封装 高带宽内存 交付周期",
+          "target_material_type": "缺口发现输出",
+          "purpose": "读取缺口发现任务单，转化为候选变量、传导模板和后续材料需求。",
+          "priority": "P0"
+        }
+      ],
+      "search_log": [
+        {
+          "query": "寒武纪 2023 年度报告 研发费用率 营业收入",
+          "result_count": 1,
+          "selected_source_ids": [
+            "SRC-20240328-001"
+          ],
+          "notes": "采用上市公司年度报告作为事实观测来源。"
+        },
+        {
+          "query": "缺口发现 optimization_plan OPT-GAP-001 先进封装 高带宽内存 交付周期",
+          "result_count": 1,
+          "selected_source_ids": [
+            "SRC-GAP-OPT-001"
+          ],
+          "notes": "采用缺口发现输出作为本轮优化任务来源；不作为事实观测来源。"
+        }
+      ],
+      "adopted_source_ids": [
+        "SRC-20240328-001",
+        "SRC-GAP-OPT-001"
+      ],
+      "rejected_sources": [
+        {
+          "title_or_url": "未追溯到原文的二次转述",
+          "reason": "缺少原始发布主体和证据位置，只能作为线索，不纳入正式材料。"
+        }
+      ],
+      "watchlist_sources": [
+        "2024Q1-Q3季度报告",
+        "封装产能扩张公告或产业数据",
+        "高带宽内存供给周期材料",
+        "客户交付和验收节奏材料"
+      ],
+      "quality_assessment": {
+        "source_reliability": "上市公司财报可靠性较高，可作为事实观测来源。",
+        "timeliness": "材料发布时间为2024-03-28，可用于2023年年报期观测。",
+        "evidence_granularity": "能覆盖公司整体费用和收入，但缺少产品线拆分。",
+        "source_independence": "财报和缺口发现任务来源角色不同；瓶颈链路仍缺多来源事实验证。",
+        "bias_or_limitation": "缺口发现任务单只能说明本体弱覆盖，不能替代封装、内存或交付周期事实证据。",
+        "overall_quality": "medium"
+      },
+      "limitations": [
+        "样例仅采纳一份年报，未形成多来源验证",
+        "缺口发现回灌链路仍需后续产业数据和公司披露材料补证"
+      ]
+    },
+    "optimization_report.evidence_claims_summary": [
+      {
+        "claimId": "CLM-20240328-001",
+        "summary": "2023年研发费用率下降至211%。",
+        "statement_type": "fact",
+        "evidence_level": "official_source_supported",
+        "ontology_mapping": "可映射为 StateVariableObservation 和 validation Signal。",
+        "restriction": "不得映射为 JudgmentOutput 或 AssetImpact。"
+      },
+      {
+        "claimId": "CLM-GAP-OPT-001",
+        "summary": "缺口发现指出先进封装、高带宽内存和交付周期应作为收入兑现链路的候选中介。",
+        "statement_type": "assumption",
+        "evidence_level": "single_source_candidate",
+        "ontology_mapping": "可映射为 StateVariable、StateVariablePropagation 和 tracking Signal 候选。",
+        "restriction": "不得映射为 StateVariableObservation、JudgmentOutput 或 AssetImpact。"
+      },
+      {
+        "claimId": "CLM-GAP-OPT-002",
+        "summary": "泛化的订单到收入链路应拆出上游瓶颈和交付周期中间环节。",
+        "statement_type": "assumption",
+        "evidence_level": "single_source_candidate",
+        "ontology_mapping": "可映射为候选传导模板和后续材料需求。",
+        "restriction": "缺少多来源事实前，只能保留为候选传导链。"
+      }
+    ],
+    "optimization_report.quality_checks": [
+      {
+        "check": "材料搜索是否由本体缺口驱动",
+        "result": "pass",
+        "note": "搜索目标来自研发费用率观测缺口和盈利拐点验证缺口。"
+      },
+      {
+        "check": "是否区分事实、判断和推荐语",
+        "result": "pass",
+        "note": "财报事实作为观测；盈利拐点和资产影响均未升级为结论。"
+      },
+      {
+        "check": "是否输出下一轮计划",
+        "result": "pass",
+        "note": "下一轮计划指向季度财报、订单收入传导和市场预期锚。"
+      },
+      {
+        "check": "缺口发现回灌是否保持候选边界",
+        "result": "pass",
+        "note": "上游瓶颈链路只新增为 candidate 和 single_source_candidate，后续仍需多来源材料验证。"
+      }
+    ],
+    "optimization_report.remaining_gaps": [
+      {
+        "gap": "缺少连续季度费用率下行证据",
+        "why_it_matters": "盈利拐点需要趋势而非单期数据。",
+        "required_materials": [
+          "2024Q1-Q3季度报告",
+          "2024年度报告"
+        ]
+      },
+      {
+        "gap": "缺少订单到收入传导证据",
+        "why_it_matters": "费用率下降是否有价值取决于收入放量是否可持续。",
+        "required_materials": [
+          "重大合同公告",
+          "招投标数据",
+          "业绩说明会纪要"
+        ]
+      },
+      {
+        "gap": "缺少市场预期和估值锚",
+        "why_it_matters": "资产影响线索不能直接变成投资结论。",
+        "required_materials": [
+          "一致预期",
+          "估值比较",
+          "市场价格表现"
+        ]
+      },
+      {
+        "gap": "缺少上游瓶颈到交付周期的多来源验证",
+        "why_it_matters": "缺口发现回灌链路目前只证明本体表达能力被补齐，尚不能证明瓶颈传导已发生。",
+        "required_materials": [
+          "封装产能扩张公告或产业数据",
+          "高带宽内存供给周期材料",
+          "客户交付和验收节奏材料",
+          "收入确认和订单兑现披露"
+        ]
+      }
+    ],
+    "optimization_report.next_optimization_plan": [
+      {
+        "next_round": "第二轮",
+        "optimization_goal": "补状态变量连续观测，验证研发费用率是否连续收敛。",
+        "target_gaps": [
+          "缺少连续季度费用率下行证据"
+        ],
+        "suggested_materials": [
+          "2024Q1季度报告",
+          "2024Q2季度报告",
+          "2024Q3季度报告"
+        ],
+        "owner_role": "researcher",
+        "continue_or_stop_condition": "若后续季度费用率不能连续下降，则降级费用率收敛假设；若连续下降，再进入传导链验证。",
+        "plan_id": "NEXT-OPT-001",
+        "suggested_operations": [
+          "supplement_evidence"
+        ],
+        "required_materials": [
+          "2024Q1季度报告",
+          "2024Q2季度报告",
+          "2024Q3季度报告"
+        ],
+        "minimum_evidence_level": "multi_source",
+        "priority": "medium",
+        "stop_condition": "若后续季度费用率不能连续下降，则降级费用率收敛假设；若连续下降，再进入传导链验证。"
+      },
+      {
+        "next_round": "第三轮",
+        "optimization_goal": "补订单到收入的商业转化链条。",
+        "target_gaps": [
+          "缺少订单到收入传导证据"
+        ],
+        "suggested_materials": [
+          "重大合同公告",
+          "客户采购或招投标数据",
+          "业绩说明会纪要"
+        ],
+        "owner_role": "researcher",
+        "continue_or_stop_condition": "若收入放量和毛利率不能配合验证，则不得升级盈利拐点假设。",
+        "plan_id": "NEXT-OPT-002",
+        "suggested_operations": [
+          "supplement_evidence"
+        ],
+        "required_materials": [
+          "重大合同公告",
+          "客户采购或招投标数据",
+          "业绩说明会纪要"
+        ],
+        "minimum_evidence_level": "multi_source",
+        "priority": "medium",
+        "stop_condition": "若收入放量和毛利率不能配合验证，则不得升级盈利拐点假设。"
+      },
+      {
+        "next_round": "第四轮",
+        "optimization_goal": "验证上游瓶颈到交付周期和收入确认节奏的候选传导链。",
+        "target_gaps": [
+          "缺少上游瓶颈到交付周期的多来源验证"
+        ],
+        "suggested_materials": [
+          "封装产能扩张公告或产业数据",
+          "高带宽内存供给周期材料",
+          "客户交付和验收节奏材料",
+          "收入确认和订单兑现披露"
+        ],
+        "owner_role": "researcher",
+        "continue_or_stop_condition": "若无法获得多来源材料支持，则保持 SVP-BOTTLENECK-DELIVERY-REVENUE 为候选传导并降低推理置信度。",
+        "plan_id": "NEXT-OPT-003",
+        "suggested_operations": [
+          "supplement_evidence"
+        ],
+        "required_materials": [
+          "封装产能扩张公告或产业数据",
+          "高带宽内存供给周期材料",
+          "客户交付和验收节奏材料",
+          "收入确认和订单兑现披露"
+        ],
+        "minimum_evidence_level": "multi_source",
+        "priority": "medium",
+        "stop_condition": "若无法获得多来源材料支持，则保持 SVP-BOTTLENECK-DELIVERY-REVENUE 为候选传导并降低推理置信度。"
+      }
+    ]
+  },
+  "upsert": {
+    "optimized_ontology.source_documents": {
+      "key": "id",
+      "items": [
+        {
+          "id": "SRC-GAP-OPT-001",
+          "title": "AI芯片上游瓶颈缺口发现回灌任务单",
+          "documentType": "缺口发现输出",
+          "publisher": "touyan-benti-quekou-faxian",
+          "publishTime": "2026-06-02",
+          "businessTime": "2026年缺口发现回灌样例期",
+          "sourceForm": "manual_input",
+          "sourceReliability": "medium",
+          "sourceLocation": "投研本体缺口发现Skill/examples/01_AI芯片研报逻辑缺口发现样例.json",
+          "evidenceLocations": [
+            "optimization_plan.OPT-GAP-001",
+            "gap_recommendations.GAP-001",
+            "gap_recommendations.GAP-002"
+          ],
+          "materialRole": "将缺口发现中的先进封装、高带宽内存和交付周期弱覆盖问题转成优化任务。",
+          "adoptionStatus": "adopted",
+          "adoptionReason": "可作为本轮优化任务来源，但不作为事实观测的最终证据。"
+        }
+      ]
+    },
+    "optimized_ontology.evidence_claims": {
+      "key": "id",
+      "items": [
+        {
+          "id": "CLM-GAP-OPT-001",
+          "sourceDocumentId": "SRC-GAP-OPT-001",
+          "evidenceLocation": "optimization_plan.OPT-GAP-001",
+          "source_statement": "补齐AI芯片需求到上游瓶颈、交付周期和收入确认节奏的中介链条。",
+          "statement_type": "assumption",
+          "normalized_claim": "先进封装产能紧张度、高带宽内存供给紧张度和交付周期应作为AI芯片收入兑现链路的候选中介变量。",
+          "evidence_level": "single_source_candidate",
+          "allowed_target_object_types": [
+            "StateVariable",
+            "StateVariablePropagation",
+            "Signal"
+          ],
+          "must_not_map_to": [
+            "StateVariableObservation",
+            "JudgmentOutput",
+            "AssetImpact"
+          ]
+        },
+        {
+          "id": "CLM-GAP-OPT-002",
+          "sourceDocumentId": "SRC-GAP-OPT-001",
+          "evidenceLocation": "gap_recommendations.GAP-002",
+          "source_statement": "把客户订单能见度到收入增速的泛化传导拆为上游瓶颈到交付周期再到收入确认节奏。",
+          "statement_type": "assumption",
+          "normalized_claim": "上游瓶颈缓解或加剧应通过交付周期影响收入确认节奏，该链路需后续多来源材料验证。",
+          "evidence_level": "single_source_candidate",
+          "allowed_target_object_types": [
+            "StateVariablePropagation",
+            "Signal"
+          ],
+          "must_not_map_to": [
+            "StateVariableObservation",
+            "JudgmentOutput",
+            "AssetImpact"
+          ]
+        }
+      ]
+    },
+    "optimized_ontology.objects": {
+      "key": "id",
+      "items": [
+        {
+          "operation": "add",
+          "id": "IND-AI-CHIP-001",
+          "type": "Industry",
+          "governanceLayer": "industry_extension",
+          "recordStatus": "candidate",
+          "fields": {
+            "name": "AI芯片产业",
+            "description": "围绕AI加速芯片设计、制造、封装、内存和服务器交付的产业范围。"
+          },
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#optimization_plan.OPT-GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.72,
+          "reviewNote": "用于承接上游瓶颈链路，不代表完整行业边界已确认。"
+        },
+        {
+          "operation": "add",
+          "id": "SEG-ADV-PACKAGING",
+          "type": "Segment",
+          "governanceLayer": "industry_extension",
+          "recordStatus": "candidate",
+          "fields": {
+            "name": "先进封装",
+            "positionInChain": "上游/制造配套",
+            "description": "影响AI芯片交付节奏的关键封装产能环节。"
+          },
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#gap_recommendations.GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.76,
+          "reviewNote": "来自缺口发现任务单，需后续公告或产业数据验证。"
+        },
+        {
+          "operation": "add",
+          "id": "SEG-HBM-SUPPLY",
+          "type": "Segment",
+          "governanceLayer": "industry_extension",
+          "recordStatus": "candidate",
+          "fields": {
+            "name": "高带宽内存供给",
+            "positionInChain": "上游配套",
+            "description": "影响AI芯片系统交付和服务器出货节奏的关键配套环节。"
+          },
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#gap_recommendations.GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.74,
+          "reviewNote": "来自缺口发现任务单，需后续供给周期和厂商披露材料验证。"
+        },
+        {
+          "operation": "add",
+          "id": "PRD-HBM-001",
+          "type": "Product",
+          "governanceLayer": "industry_extension",
+          "recordStatus": "candidate",
+          "fields": {
+            "name": "高带宽内存",
+            "description": "AI加速芯片系统常见关键配套产品，用于表达供给约束和交付节奏。"
+          },
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#gap_recommendations.GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.74,
+          "reviewNote": "仅作为候选产品锚点，不代表具体供应商或型号已确认。"
+        },
+        {
+          "operation": "add",
+          "id": "SV-ADV-PACKAGING-TIGHTNESS",
+          "type": "StateVariable",
+          "governanceLayer": "industry_extension",
+          "recordStatus": "candidate",
+          "fields": {
+            "name": "先进封装产能紧张度",
+            "variableType": "qualitative",
+            "category": "supply_demand_price",
+            "description": "先进封装产能供需紧张程度，用于判断AI芯片交付是否受封装环节约束。",
+            "observationFrequency": "月度或季度",
+            "sourceType": "industry_template"
+          },
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#optimization_plan.OPT-GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.78,
+          "reviewNote": "缺口发现建议新增的候选变量，需产业数据或公告验证。"
+        },
+        {
+          "operation": "add",
+          "id": "SV-HBM-SUPPLY-TIGHTNESS",
+          "type": "StateVariable",
+          "governanceLayer": "industry_extension",
+          "recordStatus": "candidate",
+          "fields": {
+            "name": "高带宽内存供给紧张度",
+            "variableType": "qualitative",
+            "category": "supply_demand_price",
+            "description": "高带宽内存供应约束程度，用于判断AI芯片系统交付是否受配套产品影响。",
+            "observationFrequency": "月度或季度",
+            "sourceType": "industry_template"
+          },
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#optimization_plan.OPT-GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.76,
+          "reviewNote": "缺口发现建议新增的候选变量，需供给周期和厂商披露材料验证。"
+        },
+        {
+          "operation": "add",
+          "id": "SV-DELIVERY-CYCLE",
+          "type": "StateVariable",
+          "governanceLayer": "industry_extension",
+          "recordStatus": "candidate",
+          "fields": {
+            "name": "交付周期",
+            "variableType": "quantitative",
+            "category": "operating_efficiency",
+            "description": "从订单到交付或验收的周期，用于连接上游瓶颈与收入确认节奏。",
+            "observationFrequency": "季度",
+            "sourceType": "industry_template",
+            "unit": "天或季度"
+          },
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#optimization_plan.OPT-GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.77,
+          "reviewNote": "作为订单兑现到收入确认的中介变量加入，需客户交付和验收材料验证。"
+        },
+        {
+          "operation": "add",
+          "id": "SVP-BOTTLENECK-DELIVERY-REVENUE",
+          "type": "StateVariablePropagation",
+          "governanceLayer": "industry_extension",
+          "recordStatus": "candidate",
+          "fields": {
+            "propagationLogic": "先进封装或高带宽内存供给紧张会拉长AI芯片系统交付周期，进而影响订单兑现和收入确认节奏；瓶颈缓解则可能改善交付和收入确认。",
+            "directionMapping": "上游瓶颈紧张度上行 -> 交付周期拉长 -> 收入确认节奏放缓；瓶颈缓解 -> 交付周期缩短 -> 收入确认节奏改善。"
+          },
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#gap_recommendations.GAP-002"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.73,
+          "reviewNote": "本轮只做候选传导链回灌，需多来源材料验证。"
+        },
+        {
+          "operation": "add",
+          "id": "SIG-BOTTLENECK-TRACKING",
+          "type": "Signal",
+          "governanceLayer": "application_workspace",
+          "recordStatus": "candidate",
+          "fields": {
+            "title": "上游瓶颈与交付周期跟踪信号",
+            "signalType": "缺口发现回灌信号",
+            "signalRole": "tracking",
+            "signalContent": "跟踪先进封装产能、高带宽内存供给、交付周期和客户验收节奏，验证上游瓶颈是否影响收入确认。",
+            "statementType": "assumption",
+            "observationTime": "2026",
+            "reliability": "medium",
+            "validityWindow": "2026-2027",
+            "signalStatus": "active"
+          },
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#optimization_plan.OPT-GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.75,
+          "reviewNote": "用于跟踪候选传导链，不作为事实观测。"
+        }
+      ]
+    },
+    "optimized_ontology.relations": {
+      "key": "id",
+      "items": [
+        {
+          "operation": "add",
+          "id": "REL-GAP-001",
+          "type": "segmentBelongsToIndustry",
+          "sourceId": "SEG-ADV-PACKAGING",
+          "targetId": "IND-AI-CHIP-001",
+          "properties": {},
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#gap_recommendations.GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.75
+        },
+        {
+          "operation": "add",
+          "id": "REL-GAP-002",
+          "type": "segmentBelongsToIndustry",
+          "sourceId": "SEG-HBM-SUPPLY",
+          "targetId": "IND-AI-CHIP-001",
+          "properties": {},
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#gap_recommendations.GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.73
+        },
+        {
+          "operation": "add",
+          "id": "REL-GAP-003",
+          "type": "productBelongsToSegment",
+          "sourceId": "PRD-HBM-001",
+          "targetId": "SEG-HBM-SUPPLY",
+          "properties": {},
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#gap_recommendations.GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.73
+        },
+        {
+          "operation": "add",
+          "id": "REL-GAP-004",
+          "type": "observedOn",
+          "sourceId": "SV-ADV-PACKAGING-TIGHTNESS",
+          "targetId": "SEG-ADV-PACKAGING",
+          "properties": {
+            "observationScope": "先进封装环节供需状态"
+          },
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#optimization_plan.OPT-GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.76
+        },
+        {
+          "operation": "add",
+          "id": "REL-GAP-005",
+          "type": "observedOn",
+          "sourceId": "SV-HBM-SUPPLY-TIGHTNESS",
+          "targetId": "PRD-HBM-001",
+          "properties": {
+            "observationScope": "高带宽内存供给状态"
+          },
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#optimization_plan.OPT-GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.74
+        },
+        {
+          "operation": "add",
+          "id": "REL-GAP-006",
+          "type": "observedOn",
+          "sourceId": "SV-DELIVERY-CYCLE",
+          "targetId": "COM-20240328-001",
+          "properties": {
+            "observationScope": "公司订单交付和验收节奏"
+          },
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#optimization_plan.OPT-GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.74
+        },
+        {
+          "operation": "add",
+          "id": "REL-GAP-007",
+          "type": "propagatesFrom",
+          "sourceId": "SVP-BOTTLENECK-DELIVERY-REVENUE",
+          "targetId": "SV-ADV-PACKAGING-TIGHTNESS",
+          "properties": {},
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#gap_recommendations.GAP-002"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.73
+        },
+        {
+          "operation": "add",
+          "id": "REL-GAP-008",
+          "type": "propagatesFrom",
+          "sourceId": "SVP-BOTTLENECK-DELIVERY-REVENUE",
+          "targetId": "SV-HBM-SUPPLY-TIGHTNESS",
+          "properties": {},
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#gap_recommendations.GAP-002"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.72
+        },
+        {
+          "operation": "add",
+          "id": "REL-GAP-009",
+          "type": "propagatesTo",
+          "sourceId": "SVP-BOTTLENECK-DELIVERY-REVENUE",
+          "targetId": "SV-DELIVERY-CYCLE",
+          "properties": {},
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#gap_recommendations.GAP-002"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.73
+        }
+      ]
+    },
+    "optimized_ontology.state_variables": {
+      "key": "objectId",
+      "items": [
+        {
+          "objectId": "SV-ADV-PACKAGING-TIGHTNESS",
+          "name": "先进封装产能紧张度",
+          "operation": "add",
+          "evidenceLevel": "single_source_candidate",
+          "currentStatus": "candidate",
+          "note": "缺口发现回灌新增的上游瓶颈变量，需产业数据或公告验证。"
+        },
+        {
+          "objectId": "SV-HBM-SUPPLY-TIGHTNESS",
+          "name": "高带宽内存供给紧张度",
+          "operation": "add",
+          "evidenceLevel": "single_source_candidate",
+          "currentStatus": "candidate",
+          "note": "缺口发现回灌新增的配套供给变量，需供给周期和厂商披露材料验证。"
+        },
+        {
+          "objectId": "SV-DELIVERY-CYCLE",
+          "name": "交付周期",
+          "operation": "add",
+          "evidenceLevel": "single_source_candidate",
+          "currentStatus": "candidate",
+          "note": "用于连接上游瓶颈与收入确认节奏，需客户交付和验收材料验证。"
+        }
+      ]
+    },
+    "optimized_ontology.propagation_templates": {
+      "key": "objectId",
+      "items": [
+        {
+          "objectId": "SVP-BOTTLENECK-DELIVERY-REVENUE",
+          "templateName": "上游瓶颈到交付周期和收入确认",
+          "operation": "add",
+          "evidenceLevel": "single_source_candidate",
+          "verified_steps": [
+            "缺口发现任务单指出当前本体弱覆盖先进封装、高带宽内存和交付周期中介。",
+            "本轮已建立候选变量和传导端点，避免从AI需求直接跳到收入确认。"
+          ],
+          "missing_steps": [
+            "缺少封装产能扩张公告或产业数据。",
+            "缺少高带宽内存供给周期和厂商披露材料。",
+            "缺少客户交付、验收节奏与收入确认的跨期样本。"
+          ]
+        }
+      ]
+    },
+    "optimized_ontology.signals": {
+      "key": "objectId",
+      "items": [
+        {
+          "objectId": "SIG-BOTTLENECK-TRACKING",
+          "title": "上游瓶颈与交付周期跟踪信号",
+          "signalRole": "tracking",
+          "operation": "add",
+          "evidenceLevel": "single_source_candidate",
+          "target": "SVP-BOTTLENECK-DELIVERY-REVENUE"
+        }
+      ]
+    },
+    "optimized_ontology.evidence_matrix": {
+      "key": "claim",
+      "items": [
+        {
+          "claim": "上游瓶颈会影响AI芯片交付周期和收入确认节奏",
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#optimization_plan.OPT-GAP-001"
+          ],
+          "sourceCount": 1,
+          "evidenceLevel": "single_source_candidate",
+          "optimizationAction": "add",
+          "verified_steps": [
+            "缺口发现已指出当前本体弱覆盖先进封装、高带宽内存和交付周期中介。",
+            "本轮已把弱覆盖逻辑拆成对象、状态变量、传导模板和跟踪信号。"
+          ],
+          "missing_steps": [
+            "缺少封装产能扩张公告或产业数据。",
+            "缺少高带宽内存供给周期材料。",
+            "缺少客户交付、验收和收入确认跨期样本。"
+          ],
+          "degradation_reason": "缺口发现任务单不是事实证据，因此只能新增候选链路并触发下一轮材料补证。",
+          "missingLinks": [
+            "需要多来源材料验证上游瓶颈到交付周期的传导。",
+            "需要收入确认材料验证交付周期是否真实影响财务兑现。"
+          ]
+        }
+      ]
+    },
+    "optimization_report.material_requirements": {
+      "key": "ontology_gap",
+      "items": [
+        {
+          "ontology_gap": "上游瓶颈到交付周期和收入确认节奏传导缺失",
+          "needed_material_type": "封装产能、内存供给周期、客户交付和验收材料",
+          "reason": "缺口发现指出当前本体无法表达上游瓶颈对收入兑现节奏的影响。",
+          "priority": "P0",
+          "acceptable_evidence_level": "multi_source_supported"
+        }
+      ]
+    },
+    "optimization_report.evidence_requirements": {
+      "key": "ontology_gap",
+      "items": [
+        {
+          "ontology_gap": "上游瓶颈到交付周期和收入确认节奏传导缺失",
+          "required_materials": [
+            "封装产能扩张公告或产业数据",
+            "高带宽内存供给周期材料",
+            "客户交付和验收节奏材料",
+            "收入确认和订单兑现披露"
+          ],
+          "minimum_evidence_level": "multi_source_supported",
+          "required_metadata": [
+            "发布主体",
+            "发布时间",
+            "业务期间",
+            "证据位置",
+            "原始来源"
+          ],
+          "forbidden_source_types": [
+            "无来源的研报观点",
+            "评级",
+            "目标价",
+            "AI 摘要"
+          ],
+          "playbook_rule": "缺口发现回灌链路只能作为候选传导，必须通过多来源材料验证封装、内存和交付周期的实际影响。"
+        }
+      ]
+    },
+    "optimization_report.optimization_changes": {
+      "key": "target",
+      "items": [
+        {
+          "operation": "add",
+          "target": "SV-ADV-PACKAGING-TIGHTNESS / SV-HBM-SUPPLY-TIGHTNESS / SV-DELIVERY-CYCLE",
+          "before": "上一版本只有泛化供应链占位，无法表达上游瓶颈到收入兑现的中介变量。",
+          "after": "新增先进封装产能紧张度、高带宽内存供给紧张度和交付周期三个候选变量。",
+          "reason": "缺口发现 Skill 指出当前本体对上游瓶颈链路为 weakly_covered。",
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#optimization_plan.OPT-GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate"
+        },
+        {
+          "operation": "add",
+          "target": "SVP-BOTTLENECK-DELIVERY-REVENUE",
+          "before": "客户订单能见度到收入确认节奏之间缺少上游瓶颈和交付周期中介链路。",
+          "after": "新增上游瓶颈到交付周期和收入确认节奏的候选传导模板。",
+          "reason": "缺口发现 Skill 将泛化传导拆解为可验证的中间环节。",
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#gap_recommendations.GAP-002"
+          ],
+          "evidenceLevel": "single_source_candidate"
+        },
+        {
+          "operation": "add",
+          "target": "SIG-BOTTLENECK-TRACKING",
+          "before": "缺少跟踪上游瓶颈、交付周期和客户验收节奏的信号。",
+          "after": "新增上游瓶颈与交付周期 tracking 信号候选。",
+          "reason": "推理链需要后续信号跟踪，防止从AI需求直接跳到收入确认。",
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#optimization_plan.OPT-GAP-001"
+          ],
+          "evidenceLevel": "single_source_candidate"
+        }
+      ]
+    },
+    "optimization_report.optimization_decision_basis": {
+      "key": "target",
+      "items": [
+        {
+          "operation": "add",
+          "target": "SVP-BOTTLENECK-DELIVERY-REVENUE",
+          "playbook_rule": "缺口发现回灌任务要求把优秀研报逻辑中的中间变量拆成可验证链路，避免从AI需求直接跳到收入确认或资产线索。",
+          "evidenceLevel": "single_source_candidate",
+          "decision_reason": "当前只有缺口发现任务单作为来源，因此新增为候选传导模板，并把封装产能、内存供给和交付周期材料写入后续计划。",
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#gap_recommendations.GAP-002"
+          ]
+        },
+        {
+          "operation": "add",
+          "target": "SIG-BOTTLENECK-TRACKING",
+          "playbook_rule": "传导链新增后必须配套 validation/tracking/blocking 信号，且缺事实证据时不得升级为判断输出。",
+          "evidenceLevel": "single_source_candidate",
+          "decision_reason": "该信号只提示后续应跟踪哪些材料，不构成事实观测或正式判断。",
+          "evidenceRefs": [
+            "SRC-GAP-OPT-001#optimization_plan.OPT-GAP-001"
+          ]
+        }
+      ]
+    }
+  }
+}

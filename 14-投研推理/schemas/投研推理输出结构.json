@@ -1,0 +1,509 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/touyan/ontology-reasoning-multimode.schema.json",
+  "title": "投研本体推理多模式输出结构",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "reasoning_result",
+    "scenario_output",
+    "ontology_feedback",
+    "compliance_check"
+  ],
+  "properties": {
+    "reasoning_result": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "metadata",
+        "ontology_context",
+        "query_understanding",
+        "evidence_pack",
+        "ontology_retrieval",
+        "reasoning_chains",
+        "key_assumptions",
+        "validation_signals",
+        "falsification_conditions",
+        "data_gaps",
+        "confidence"
+      ],
+      "properties": {
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["resultId", "generatedAt", "userQuestion", "taskMode", "status"],
+          "properties": {
+            "resultId": {"type": "string"},
+            "generatedAt": {"type": "string"},
+            "userQuestion": {"type": "string"},
+            "taskMode": {"$ref": "#/$defs/taskMode"},
+            "status": {
+              "type": "string",
+              "enum": ["candidate", "needs_supplement", "blocked_missing_ontology"]
+            }
+          }
+        },
+        "ontology_context": {"$ref": "#/$defs/ontologyContext"},
+        "query_understanding": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "rawInputType",
+            "detectedIntent",
+            "modeRoutingReason",
+            "targetRole",
+            "keyQuestion",
+            "scope",
+            "queryConfidence"
+          ],
+          "properties": {
+            "rawInputType": {
+              "type": "string",
+              "enum": ["event", "viewpoint", "report_or_memo", "target_or_portfolio", "client_question", "research_asset_request", "general_question"]
+            },
+            "detectedIntent": {"$ref": "#/$defs/taskMode"},
+            "modeRoutingReason": {"type": "string"},
+            "targetRole": {"$ref": "#/$defs/targetRole"},
+            "keyQuestion": {"type": "string"},
+            "scope": {"type": "array", "items": {"type": "string"}},
+            "timeSensitivity": {"type": "string"},
+            "queryConfidence": {"$ref": "#/$defs/confidenceLevel"}
+          }
+        },
+        "evidence_pack": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["adopted_sources", "rejected_sources", "evidence_quality_summary", "source_limitations"],
+          "properties": {
+            "adopted_sources": {
+              "type": "array",
+              "minItems": 1,
+              "items": {"$ref": "#/$defs/sourceItem"}
+            },
+            "rejected_sources": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["title_or_url", "reason"],
+                "properties": {
+                  "title_or_url": {"type": "string"},
+                  "reason": {"type": "string"}
+                }
+              }
+            },
+            "evidence_quality_summary": {"type": "string"},
+            "source_limitations": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "ontology_retrieval": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "retrieval_strategy",
+            "matched_objects",
+            "matched_relations",
+            "missing_nodes",
+            "missing_relations",
+            "retrieval_quality"
+          ],
+          "properties": {
+            "retrieval_strategy": {"type": "string"},
+            "matched_objects": {"type": "array", "items": {"$ref": "#/$defs/matchedObject"}},
+            "matched_relations": {"type": "array", "items": {"$ref": "#/$defs/matchedRelation"}},
+            "missing_nodes": {"type": "array", "items": {"type": "string"}},
+            "missing_relations": {"type": "array", "items": {"type": "string"}},
+            "retrieval_quality": {"$ref": "#/$defs/confidenceLevel"}
+          }
+        },
+        "reasoning_chains": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/reasoningChain"}
+        },
+        "key_assumptions": {"type": "array", "items": {"$ref": "#/$defs/assumptionItem"}},
+        "validation_signals": {"type": "array", "items": {"$ref": "#/$defs/signalItem"}},
+        "falsification_conditions": {"type": "array", "items": {"$ref": "#/$defs/conditionItem"}},
+        "data_gaps": {"type": "array", "items": {"$ref": "#/$defs/dataGapItem"}},
+        "data_logic": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "keyMetrics": {"type": "array", "items": {"$ref": "#/$defs/keyMetric"}},
+            "formulas": {"type": "array", "items": {"$ref": "#/$defs/formulaItem"}},
+            "sensitivity": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "confidence": {"$ref": "#/$defs/confidenceLevel"}
+      }
+    },
+    "scenario_output": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["mode", "target_role", "output_sections"],
+      "properties": {
+        "mode": {"$ref": "#/$defs/taskMode"},
+        "target_role": {"$ref": "#/$defs/targetRole"},
+        "output_sections": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["brief_answer", "main_content", "follow_up_questions", "risk_reminders"],
+          "properties": {
+            "brief_answer": {"type": "string"},
+            "main_content": {
+              "oneOf": [
+                {"type": "string"},
+                {"type": "array"},
+                {"type": "object"}
+              ]
+            },
+            "follow_up_questions": {"type": "array", "items": {"type": "string"}},
+            "risk_reminders": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      }
+    },
+    "ontology_feedback": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "ontology_gap_summary",
+        "missing_ontology_nodes",
+        "missing_relations",
+        "missing_object_feedback",
+        "missing_relation_feedback",
+        "weak_reasoning_feedback",
+        "false_positive_feedback",
+        "false_negative_feedback",
+        "suggested_ontology_updates",
+        "source_material_requests",
+        "priority",
+        "suggested_owner",
+        "feedback_routes"
+      ],
+      "properties": {
+        "ontology_gap_summary": {"type": "string"},
+        "missing_ontology_nodes": {"type": "array", "items": {"$ref": "#/$defs/ontologyGap"}},
+        "missing_relations": {"type": "array", "items": {"$ref": "#/$defs/ontologyGap"}},
+        "missing_object_feedback": {"type": "array", "items": {"$ref": "#/$defs/typedFeedbackItem"}},
+        "missing_relation_feedback": {"type": "array", "items": {"$ref": "#/$defs/typedFeedbackItem"}},
+        "weak_reasoning_feedback": {"type": "array", "items": {"$ref": "#/$defs/typedFeedbackItem"}},
+        "false_positive_feedback": {"type": "array", "items": {"$ref": "#/$defs/typedFeedbackItem"}},
+        "false_negative_feedback": {"type": "array", "items": {"$ref": "#/$defs/typedFeedbackItem"}},
+        "suggested_ontology_updates": {"type": "array", "items": {"$ref": "#/$defs/suggestedUpdate"}},
+        "source_material_requests": {"type": "array", "items": {"type": "string"}},
+        "priority": {"type": "string", "enum": ["high", "medium", "low", "none"]},
+        "suggested_owner": {
+          "type": "string",
+          "enum": ["ontology_owner", "researcher", "data_admin", "material_optimization_flow", "cold_start_flow", "manual_review", "unknown"]
+        },
+        "feedback_routes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["update_current_ontology", "run_material_optimization_skill", "run_cold_start_skill", "manual_review", "collect_more_sources", "no_action"]
+          }
+        },
+        "compatible_with_material_optimization_flow": {"type": "boolean"}
+      }
+    },
+    "compliance_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "noBuySellAdvice",
+        "noTargetPrice",
+        "noReturnForecast",
+        "noPositionAdvice",
+        "factEstimateForecastAssumptionJudgmentSeparated",
+        "noUnsupportedOntologyJump",
+        "missingEvidenceDisclosed",
+        "ontologyGapsFedBackToOwner"
+      ],
+      "properties": {
+        "noBuySellAdvice": {"type": "boolean", "const": true},
+        "noTargetPrice": {"type": "boolean", "const": true},
+        "noReturnForecast": {"type": "boolean", "const": true},
+        "noPositionAdvice": {"type": "boolean", "const": true},
+        "factEstimateForecastAssumptionJudgmentSeparated": {"type": "boolean", "const": true},
+        "noUnsupportedOntologyJump": {"type": "boolean", "const": true},
+        "missingEvidenceDisclosed": {"type": "boolean", "const": true},
+        "ontologyGapsFedBackToOwner": {"type": "boolean", "const": true}
+      }
+    }
+  },
+  "$defs": {
+    "taskMode": {
+      "type": "string",
+      "enum": [
+        "general_research_reasoning",
+        "event_impact",
+        "viewpoint_deconstruction",
+        "report_chain_extraction",
+        "pm_question_list",
+        "client_explanation",
+        "target_portfolio_exposure",
+        "research_asset_deposition",
+        "full_report"
+      ]
+    },
+    "targetRole": {
+      "type": "string",
+      "enum": [
+        "general_user",
+        "researcher",
+        "portfolio_manager",
+        "investment_advisor",
+        "client",
+        "research_lead",
+        "risk_manager",
+        "other"
+      ]
+    },
+    "confidenceLevel": {"type": "string", "enum": ["high", "medium", "low"]},
+    "ontologyContext": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["ontologyInputs", "governingSchema", "mergeStrategy", "scopeAlignment", "limitations"],
+      "properties": {
+        "ontologyInputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/ontologyInput"}
+        },
+        "governingSchema": {"type": "string"},
+        "mergeStrategy": {"type": "string"},
+        "scopeAlignment": {"type": "string"},
+        "conflictResolution": {"type": "array", "items": {"type": "string"}},
+        "limitations": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "ontologyInput": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["ontologyId", "ontologyName", "ontologySourceType", "conformsTo", "objectCount", "relationCount", "coverageNotes", "limitations"],
+      "properties": {
+        "ontologyId": {"type": "string"},
+        "ontologyName": {"type": "string"},
+        "ontologyVersion": {"type": "string"},
+        "ontologySourceType": {
+          "type": "string",
+          "enum": ["optimized_ontology", "cold_start_ontology", "curated_ontology", "manual_ontology", "ontology_bundle", "external_system", "other"]
+        },
+        "sourceSkill": {"type": "string"},
+        "conformsTo": {"type": "string"},
+        "sourceDocumentIds": {"type": "array", "items": {"type": "string"}},
+        "objectCount": {"type": "integer", "minimum": 0},
+        "relationCount": {"type": "integer", "minimum": 0},
+        "coverageNotes": {"type": "string"},
+        "limitations": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "sourceItem": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["sourceId", "title", "publisher", "publishTime", "sourceLocation", "sourceReliability", "sourceRole", "keyFacts"],
+      "properties": {
+        "sourceId": {"type": "string"},
+        "title": {"type": "string"},
+        "publisher": {"type": "string"},
+        "publishTime": {"type": "string"},
+        "sourceLocation": {"type": "string"},
+        "sourceReliability": {"type": "string", "enum": ["high", "medium", "low"]},
+        "sourceRole": {
+          "type": "string",
+          "enum": ["news_fact", "company_disclosure", "regulator", "industry_data", "financial_data", "market_data", "ontology_source", "analyst_material", "user_material", "other"]
+        },
+        "keyFacts": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "matchedObject": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["objectId", "objectType", "name", "matchReason", "relevance"],
+      "properties": {
+        "objectId": {"type": "string"},
+        "objectType": {"type": "string"},
+        "name": {"type": "string"},
+        "matchReason": {"type": "string"},
+        "relevance": {"$ref": "#/$defs/confidenceLevel"}
+      }
+    },
+    "matchedRelation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["relationId", "relationType", "sourceId", "targetId", "pathRole"],
+      "properties": {
+        "relationId": {"type": "string"},
+        "relationType": {"type": "string"},
+        "sourceId": {"type": "string"},
+        "targetId": {"type": "string"},
+        "pathRole": {"type": "string"}
+      }
+    },
+    "reasoningChain": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "chainId",
+        "title",
+        "chainType",
+        "chainSummary",
+        "pathSteps",
+        "mechanism",
+        "dataSupport",
+        "keyAssumptions",
+        "validationSignals",
+        "falsificationConditions",
+        "confidenceLevel",
+        "missingEvidence"
+      ],
+      "properties": {
+        "chainId": {"type": "string"},
+        "title": {"type": "string"},
+        "chainType": {
+          "type": "string",
+          "enum": ["direct", "propagation", "blocking", "second_order", "asset_impact", "policy", "financial", "technical_route", "supply_demand", "valuation_expectation", "questioning", "exposure"]
+        },
+        "chainSummary": {"type": "string"},
+        "pathSteps": {
+          "type": "array",
+          "minItems": 2,
+          "items": {"$ref": "#/$defs/pathStep"}
+        },
+        "mechanism": {"type": "string"},
+        "dataSupport": {"type": "string"},
+        "keyAssumptions": {"type": "array", "items": {"type": "string"}},
+        "validationSignals": {"type": "array", "items": {"type": "string"}},
+        "falsificationConditions": {"type": "array", "items": {"type": "string"}},
+        "confidenceLevel": {"$ref": "#/$defs/confidenceLevel"},
+        "missingEvidence": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "pathStep": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["step", "ontologyObjectId", "objectType", "claim", "evidenceRefs", "supportType", "confidenceLevel"],
+      "properties": {
+        "step": {"type": "integer", "minimum": 1},
+        "ontologyObjectId": {"type": "string"},
+        "objectType": {"type": "string"},
+        "relationId": {"type": "string"},
+        "relationType": {"type": "string"},
+        "claim": {"type": "string"},
+        "evidenceRefs": {"type": "array", "items": {"type": "string"}},
+        "supportType": {
+          "type": "string",
+          "enum": ["confirmed_by_ontology", "supported_by_new_evidence", "inferred_candidate", "missing_in_ontology", "contradicted", "assumption"]
+        },
+        "confidenceLevel": {"$ref": "#/$defs/confidenceLevel"}
+      }
+    },
+    "assumptionItem": {
+      "type": "object",
+      "required": ["assumption", "whyItMatters", "evidenceStatus"],
+      "properties": {
+        "assumption": {"type": "string"},
+        "whyItMatters": {"type": "string"},
+        "evidenceStatus": {"type": "string"}
+      }
+    },
+    "signalItem": {
+      "type": "object",
+      "required": ["signal", "metricOrEvidence", "expectedDirection", "sourceOrOwner"],
+      "properties": {
+        "signal": {"type": "string"},
+        "metricOrEvidence": {"type": "string"},
+        "expectedDirection": {"type": "string"},
+        "sourceOrOwner": {"type": "string"}
+      }
+    },
+    "conditionItem": {
+      "type": "object",
+      "required": ["condition", "impactOnChain", "monitoringSignal"],
+      "properties": {
+        "condition": {"type": "string"},
+        "impactOnChain": {"type": "string"},
+        "monitoringSignal": {"type": "string"}
+      }
+    },
+    "dataGapItem": {
+      "type": "object",
+      "required": ["gap", "neededFor", "suggestedSource"],
+      "properties": {
+        "gap": {"type": "string"},
+        "neededFor": {"type": "string"},
+        "suggestedSource": {"type": "string"}
+      }
+    },
+    "keyMetric": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["metricName", "baseline", "latestValue", "changeDirection", "sourceRefs", "relevance"],
+      "properties": {
+        "metricName": {"type": "string"},
+        "baseline": {"type": "string"},
+        "latestValue": {"type": "string"},
+        "changeDirection": {"type": "string"},
+        "timeWindow": {"type": "string"},
+        "sourceRefs": {"type": "array", "items": {"type": "string"}},
+        "relevance": {"type": "string"}
+      }
+    },
+    "formulaItem": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["formulaName", "expression", "variables", "interpretation"],
+      "properties": {
+        "formulaName": {"type": "string"},
+        "expression": {"type": "string"},
+        "variables": {"type": "array", "items": {"type": "string"}},
+        "interpretation": {"type": "string"},
+        "evidenceRefs": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "ontologyGap": {
+      "type": "object",
+      "required": ["gapType", "name", "reason", "priority"],
+      "properties": {
+        "gapType": {"type": "string", "enum": ["missing_node", "missing_relation", "missing_attribute", "missing_observation", "unclear_scope"]},
+        "name": {"type": "string"},
+        "reason": {"type": "string"},
+        "priority": {"type": "string", "enum": ["high", "medium", "low"]},
+        "target_file": {"type": "string"},
+        "target_path": {"type": "string"},
+        "target_id": {"type": "string"},
+        "legacy_path": {"type": "string"}
+      }
+    },
+    "typedFeedbackItem": {
+      "type": "object",
+      "required": ["feedbackType", "summary", "evidence", "suggestedRoute", "priority"],
+      "properties": {
+        "feedbackType": {
+          "type": "string",
+          "enum": ["missing_object", "missing_relation", "weak_reasoning", "false_positive", "false_negative"]
+        },
+        "summary": {"type": "string"},
+        "evidence": {"type": "string"},
+        "suggestedRoute": {
+          "type": "string",
+          "enum": ["run_gap_discovery_skill", "run_material_optimization_skill", "collect_more_sources", "manual_review", "no_action"]
+        },
+        "priority": {"type": "string", "enum": ["high", "medium", "low"]},
+        "target_file": {"type": "string"},
+        "target_path": {"type": "string"},
+        "target_id": {"type": "string"},
+        "legacy_path": {"type": "string"}
+      }
+    },
+    "suggestedUpdate": {
+      "type": "object",
+      "required": ["updateType", "description", "expectedBenefit"],
+      "properties": {
+        "updateType": {"type": "string", "enum": ["add_node", "add_relation", "add_observation", "revise_attribute", "split_variable", "merge_duplicate"]},
+        "description": {"type": "string"},
+        "expectedBenefit": {"type": "string"}
+      }
+    }
+  }
+}

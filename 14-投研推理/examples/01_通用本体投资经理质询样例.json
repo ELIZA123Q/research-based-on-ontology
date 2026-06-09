@@ -1,0 +1,629 @@
+{
+  "reasoning_result": {
+    "metadata": {
+      "resultId": "RSN-20260529-001",
+      "generatedAt": "2026-05-29T00:00:00+08:00",
+      "userQuestion": "核心产品扩产是不是利好关键设备供应商？研究员推荐关键设备公司，我该问什么？",
+      "taskMode": "pm_question_list",
+      "status": "candidate"
+    },
+    "ontology_context": {
+      "ontologyInputs": [
+        {
+          "ontologyId": "ONT-EXAMPLE-INDUSTRY-001",
+          "ontologyName": "示例行业关键设备本体",
+          "ontologyVersion": "example",
+          "ontologySourceType": "curated_ontology",
+          "sourceSkill": "external_or_manual",
+          "conformsTo": "投研本体核心规范",
+          "sourceDocumentIds": ["SRC-20260529-001"],
+          "objectCount": 22,
+          "relationCount": 34,
+          "coverageNotes": "本体已覆盖示例行业、核心产品、关键设备、资本开支、订单能见度、供应商份额和资产影响候选链路。",
+          "limitations": [
+            "示例不代表真实行业、公司或订单。",
+            "核心产品扩产到不同设备品类的分路线弹性仍需补充材料和本体维护。"
+          ]
+        },
+        {
+          "ontologyId": "ONT-EXAMPLE-COMPANY-001",
+          "ontologyName": "示例关键设备公司本体",
+          "ontologyVersion": "example",
+          "ontologySourceType": "manual_ontology",
+          "sourceSkill": "manual_input",
+          "conformsTo": "投研本体核心规范",
+          "sourceDocumentIds": ["SRC-20260529-002"],
+          "objectCount": 9,
+          "relationCount": 12,
+          "coverageNotes": "公司本体提供设备品类、客户导入、订单能见度和资产映射的局部信息。",
+          "limitations": [
+            "公司本体未覆盖完整行业竞争格局。",
+            "客户份额和收入确认节奏仍缺少观测值。"
+          ]
+        }
+      ],
+      "governingSchema": "投研本体核心规范",
+      "mergeStrategy": "以行业本体定义传导关系，以公司本体补充公司、产品、客户和资产敞口；冲突时标记为待核验，不覆盖原本体。",
+      "scopeAlignment": "两个本体共同覆盖核心产品扩产、关键设备订单和公司经营兑现问题。",
+      "conflictResolution": [
+        "若公司本体与行业本体的设备品类口径不同，先输出口径差异，不做合并假设。",
+        "若关系在任一本体中缺失，写入 ontology_feedback。"
+      ],
+      "limitations": [
+        "本示例只展示多本体推理上下文，不代表真实行业或公司。",
+        "缺少真实订单、份额和市场预期数据。"
+      ]
+    },
+    "query_understanding": {
+      "rawInputType": "general_question",
+      "detectedIntent": "pm_question_list",
+      "modeRoutingReason": "用户同时询问观点是否成立和应该质询研究员什么，输出应以投资经理质询清单为主，而不是完整研报。",
+      "targetRole": "portfolio_manager",
+      "keyQuestion": "核心产品扩产是否能沿本体链路传导到关键设备订单和资产影响候选；若研究员推荐相关设备公司，应追问哪些假设、数据和反证条件。",
+      "scope": ["示例行业", "核心产品", "关键设备", "资本开支", "订单能见度"],
+      "timeSensitivity": "需要结合最新扩产、资本开支、订单和交付节奏持续验证。",
+      "queryConfidence": "medium"
+    },
+    "evidence_pack": {
+      "adopted_sources": [
+        {
+          "sourceId": "SRC-20260529-001",
+          "title": "示例本体来源文档集合",
+          "publisher": "ontology_pipeline",
+          "publishTime": "2026-05-29",
+          "sourceLocation": "ontology_context:source_documents",
+          "sourceReliability": "medium",
+          "sourceRole": "ontology_source",
+          "keyFacts": [
+            "本体中已有核心产品扩产、关键设备资本开支、设备订单能见度和供应商份额相关变量。",
+            "本体中已有核心产品扩产变量向关键设备资本开支变量传导的候选关系。"
+          ]
+        },
+        {
+          "sourceId": "SRC-20260529-002",
+          "title": "用户输入：扩产与关键设备质询问题",
+          "publisher": "manual_input",
+          "publishTime": "2026-05-29",
+          "sourceLocation": "conversation:user_question",
+          "sourceReliability": "medium",
+          "sourceRole": "user_material",
+          "keyFacts": [
+            "用户关注核心产品扩产是否利好关键设备供应商。",
+            "用户需要面向投资经理场景的研究员质询清单。"
+          ]
+        }
+      ],
+      "rejected_sources": [
+        {
+          "title_or_url": "未标明出处的设备订单传闻",
+          "reason": "无法确认客户、订单金额、交付周期和供应商份额，不作为链路事实。"
+        }
+      ],
+      "evidence_quality_summary": "当前示例主要依赖本体上下文和用户问题；可形成候选推理链和质询方向，但不能直接确认真实订单、收入或资产定价影响。",
+      "source_limitations": [
+        "缺少真实扩产投资额和设备采购结构。",
+        "缺少设备供应商订单、份额、交付周期和收入确认数据。",
+        "缺少市场预期是否已反映的定价证据。"
+      ]
+    },
+    "ontology_retrieval": {
+      "retrieval_strategy": "以核心产品扩产和关键设备为入口，检索产业链环节、产品、状态变量、变量传导、假设、判断输出和资产影响候选。",
+      "matched_objects": [
+        {
+          "objectId": "IND-EXAMPLE-001",
+          "objectType": "Industry",
+          "name": "示例行业",
+          "matchReason": "用户问题所属行业本体。",
+          "relevance": "high"
+        },
+        {
+          "objectId": "SEG-CORE-PRODUCT-001",
+          "objectType": "Segment",
+          "name": "核心产品环节",
+          "matchReason": "扩产触发点所在环节。",
+          "relevance": "high"
+        },
+        {
+          "objectId": "SEG-KEY-EQUIPMENT-001",
+          "objectType": "Segment",
+          "name": "关键设备环节",
+          "matchReason": "用户关心的受益环节。",
+          "relevance": "high"
+        },
+        {
+          "objectId": "PRD-EQUIPMENT-A-001",
+          "objectType": "Product",
+          "name": "关键设备 A",
+          "matchReason": "扩产可能带来的设备采购品类。",
+          "relevance": "medium"
+        },
+        {
+          "objectId": "SV-CORE-CAPEX-001",
+          "objectType": "StateVariable",
+          "name": "核心产品扩产强度",
+          "matchReason": "用户问题中的核心触发变量。",
+          "relevance": "high"
+        },
+        {
+          "objectId": "SV-EQUIP-CAPEX-001",
+          "objectType": "StateVariable",
+          "name": "关键设备资本开支强度",
+          "matchReason": "扩产向设备供应商传导的中间变量。",
+          "relevance": "high"
+        },
+        {
+          "objectId": "SV-EQUIP-ORDER-001",
+          "objectType": "StateVariable",
+          "name": "关键设备订单能见度",
+          "matchReason": "设备供应商经营兑现需要验证的变量。",
+          "relevance": "high"
+        },
+        {
+          "objectId": "SH-CORE-EQUIP-001",
+          "objectType": "StateHypothesis",
+          "name": "核心产品扩产拉动关键设备需求",
+          "matchReason": "用户观点对应的候选状态假设。",
+          "relevance": "high"
+        },
+        {
+          "objectId": "JO-EQUIP-DEMAND-001",
+          "objectType": "JudgmentOutput",
+          "name": "关键设备景气度提升候选",
+          "matchReason": "研究员推荐可能依赖的判断输出。",
+          "relevance": "medium"
+        }
+      ],
+      "matched_relations": [
+        {
+          "relationId": "REL-SEG-IND-001",
+          "relationType": "segmentBelongsToIndustry",
+          "sourceId": "SEG-KEY-EQUIPMENT-001",
+          "targetId": "IND-EXAMPLE-001",
+          "pathRole": "确认关键设备环节属于当前行业本体。"
+        },
+        {
+          "relationId": "REL-PRD-SEG-001",
+          "relationType": "productBelongsToSegment",
+          "sourceId": "PRD-EQUIPMENT-A-001",
+          "targetId": "SEG-KEY-EQUIPMENT-001",
+          "pathRole": "确认设备品类与关键设备环节相关。"
+        },
+        {
+          "relationId": "REL-SV-CORE-OBS-001",
+          "relationType": "observedOn",
+          "sourceId": "SV-CORE-CAPEX-001",
+          "targetId": "SEG-CORE-PRODUCT-001",
+          "pathRole": "将核心产品扩产强度挂载到核心产品环节。"
+        },
+        {
+          "relationId": "REL-SV-EQUIP-OBS-001",
+          "relationType": "observedOn",
+          "sourceId": "SV-EQUIP-CAPEX-001",
+          "targetId": "SEG-KEY-EQUIPMENT-001",
+          "pathRole": "将关键设备资本开支强度挂载到关键设备环节。"
+        },
+        {
+          "relationId": "REL-PROP-FROM-001",
+          "relationType": "propagatesFrom",
+          "sourceId": "PROP-CORE-EQUIP-001",
+          "targetId": "SV-CORE-CAPEX-001",
+          "pathRole": "确认变量传导来源是核心产品扩产强度。"
+        },
+        {
+          "relationId": "REL-PROP-TO-001",
+          "relationType": "propagatesTo",
+          "sourceId": "PROP-CORE-EQUIP-001",
+          "targetId": "SV-EQUIP-CAPEX-001",
+          "pathRole": "确认变量传导目标是关键设备资本开支强度。"
+        },
+        {
+          "relationId": "REL-HYP-VAR-001",
+          "relationType": "hypothesisBindsVariable",
+          "sourceId": "SH-CORE-EQUIP-001",
+          "targetId": "SV-EQUIP-CAPEX-001",
+          "pathRole": "将扩产拉动设备需求假设绑定到资本开支变量。"
+        },
+        {
+          "relationId": "REL-JO-HYP-001",
+          "relationType": "basedOnHypothesis",
+          "sourceId": "JO-EQUIP-DEMAND-001",
+          "targetId": "SH-CORE-EQUIP-001",
+          "pathRole": "判断输出基于扩产拉动设备需求的假设。"
+        }
+      ],
+      "missing_nodes": [
+        "核心产品扩产投资额拆分观测值",
+        "关键设备分品类订单观测值",
+        "关键客户供应商份额观测值",
+        "市场预期是否已反映的定价信号"
+      ],
+      "missing_relations": [
+        "核心产品扩产强度到不同关键设备品类订单能见度的分路线传导强度关系缺失。",
+        "设备订单能见度到收入确认节奏的财务传导关系缺失。"
+      ],
+      "retrieval_quality": "medium"
+    },
+    "reasoning_chains": [
+      {
+        "chainId": "CHAIN-CORE-EQUIP-001",
+        "title": "核心产品扩产到关键设备订单能见度的主链路",
+        "chainType": "propagation",
+        "chainSummary": "核心产品扩产可以形成关键设备需求的候选利好，但必须经过投资额拆分、设备品类、供应商份额和交付确认验证。",
+        "pathSteps": [
+          {
+            "step": 1,
+            "ontologyObjectId": "SV-CORE-CAPEX-001",
+            "objectType": "StateVariable",
+            "relationId": "REL-SV-CORE-OBS-001",
+            "relationType": "observedOn",
+            "claim": "用户问题应先映射为核心产品扩产强度变量，而不是直接等同于设备供应商收入增长。",
+            "evidenceRefs": ["SRC-20260529-001#ontology", "SRC-20260529-002#question"],
+            "supportType": "confirmed_by_ontology",
+            "confidenceLevel": "high"
+          },
+          {
+            "step": 2,
+            "ontologyObjectId": "PROP-CORE-EQUIP-001",
+            "objectType": "StateVariablePropagation",
+            "relationId": "REL-PROP-FROM-001",
+            "relationType": "propagatesFrom",
+            "claim": "本体中存在从核心产品扩产强度出发的变量传导候选。",
+            "evidenceRefs": ["SRC-20260529-001#ontology"],
+            "supportType": "confirmed_by_ontology",
+            "confidenceLevel": "medium"
+          },
+          {
+            "step": 3,
+            "ontologyObjectId": "SV-EQUIP-CAPEX-001",
+            "objectType": "StateVariable",
+            "relationId": "REL-PROP-TO-001",
+            "relationType": "propagatesTo",
+            "claim": "传导目标是关键设备资本开支强度，但不同设备品类的弹性仍需拆分。",
+            "evidenceRefs": ["SRC-20260529-001#ontology"],
+            "supportType": "inferred_candidate",
+            "confidenceLevel": "medium"
+          },
+          {
+            "step": 4,
+            "ontologyObjectId": "JO-EQUIP-DEMAND-001",
+            "objectType": "JudgmentOutput",
+            "relationId": "REL-JO-HYP-001",
+            "relationType": "basedOnHypothesis",
+            "claim": "关键设备景气度提升只能作为候选判断，需订单和份额数据验证。",
+            "evidenceRefs": ["SRC-20260529-001#ontology"],
+            "supportType": "inferred_candidate",
+            "confidenceLevel": "medium"
+          }
+        ],
+        "mechanism": "核心产品需求上行可能推动扩产，扩产若落到新增产线、设备更新或工艺升级，会提升关键设备采购；设备供应商受益程度取决于品类弹性、客户验证、供应商份额、交付周期和收入确认。",
+        "dataSupport": "当前本体支持方向性链路，但缺少真实投资额拆分、订单、份额和交付节奏，因此不能直接推出财务兑现。",
+        "keyAssumptions": [
+          "核心产品扩产真实形成新增设备采购，而不是由存量产能消化。",
+          "相关设备供应商进入关键客户供应链并有可确认订单。",
+          "设备交付和验收节奏能转化为可确认收入。"
+        ],
+        "validationSignals": [
+          "客户资本开支指引上修。",
+          "关键设备招标、订单、出货或在手订单披露。",
+          "设备供应商客户结构和分品类收入占比改善。"
+        ],
+        "falsificationConditions": [
+          "扩产主要由存量设备或其他供应商满足。",
+          "关键技术路线绕开本体中的设备品类。",
+          "扩产节奏延后或客户订单取消。"
+        ],
+        "confidenceLevel": "medium",
+        "missingEvidence": [
+          "扩产投资额和关键设备资本开支占比",
+          "设备供应商分客户订单和份额",
+          "交付验收到收入确认周期",
+          "公告前后市场预期和估值变化"
+        ]
+      },
+      {
+        "chainId": "CHAIN-PM-QUESTION-001",
+        "title": "投资经理质询链",
+        "chainType": "questioning",
+        "chainSummary": "质询重点应从“主题热度”转向“本体链路是否闭合、关键数据是否可证、资产影响是否已被预期”。",
+        "pathSteps": [
+          {
+            "step": 1,
+            "ontologyObjectId": "SH-CORE-EQUIP-001",
+            "objectType": "StateHypothesis",
+            "claim": "先问研究员：核心产品扩产拉动关键设备需求的假设，绑定的是哪个变量和哪条传导关系。",
+            "evidenceRefs": ["SRC-20260529-001#ontology"],
+            "supportType": "confirmed_by_ontology",
+            "confidenceLevel": "medium"
+          },
+          {
+            "step": 2,
+            "ontologyObjectId": "SV-EQUIP-ORDER-001",
+            "objectType": "StateVariable",
+            "claim": "再问研究员：订单能见度是否有客户、金额、品类、交付周期和验收节奏支撑。",
+            "evidenceRefs": ["SRC-20260529-001#ontology"],
+            "supportType": "inferred_candidate",
+            "confidenceLevel": "medium"
+          },
+          {
+            "step": 3,
+            "ontologyObjectId": "GAP-EXPECTATION-001",
+            "objectType": "DataGap",
+            "claim": "最后问研究员：市场预期是否已经反映，若已反映，边际变化来自哪里。",
+            "evidenceRefs": ["SRC-20260529-002#question"],
+            "supportType": "missing_in_ontology",
+            "confidenceLevel": "medium"
+          }
+        ],
+        "mechanism": "投资经理质询不应停留在主题热度，而应检验传导关系、订单证据、财务兑现、预期差和反证信号。",
+        "dataSupport": "本体提供质询框架，真实质询结论依赖研究员补充数据。",
+        "keyAssumptions": [
+          "研究员推荐依赖扩产到设备订单的传导。",
+          "被推荐公司与关键设备品类有实际收入或订单敞口。"
+        ],
+        "validationSignals": [
+          "研究员能提供分品类订单或客户验证证据。",
+          "研究员能说明订单到收入的确认路径。",
+          "研究员能给出反证条件而非只给单向叙事。"
+        ],
+        "falsificationConditions": [
+          "研究员无法说明公司具体受益品类。",
+          "核心证据只来自市场传闻。",
+          "推荐逻辑没有区分行业景气和公司份额。"
+        ],
+        "confidenceLevel": "medium",
+        "missingEvidence": [
+          "公司级关键设备收入占比",
+          "关键客户导入进度",
+          "同业订单对比",
+          "市场预期数据"
+        ]
+      }
+    ],
+    "key_assumptions": [
+      {
+        "assumption": "核心产品扩产会带来新增关键设备资本开支。",
+        "whyItMatters": "这是从需求主题传导到设备订单的第一层前提。",
+        "evidenceStatus": "本体支持候选关系，但需要投资额拆分验证。"
+      },
+      {
+        "assumption": "被研究公司在相关设备品类中有供应份额。",
+        "whyItMatters": "行业扩产不等于单家公司受益。",
+        "evidenceStatus": "需要订单、客户验证或收入结构补证。"
+      },
+      {
+        "assumption": "订单能够按期交付并进入收入确认。",
+        "whyItMatters": "资产影响候选必须经过经营和财务兑现链路。",
+        "evidenceStatus": "需要交付周期、验收条件和会计确认口径。"
+      }
+    ],
+    "validation_signals": [
+      {
+        "signal": "客户资本开支上修",
+        "metricOrEvidence": "客户资本开支指引、扩产公告、设备招标信息",
+        "expectedDirection": "上修或新增项目",
+        "sourceOrOwner": "公司公告、财报、招投标、行业数据库"
+      },
+      {
+        "signal": "设备订单能见度改善",
+        "metricOrEvidence": "在手订单、合同负债、存货、发出商品、交付周期",
+        "expectedDirection": "订单与交付指标同步改善",
+        "sourceOrOwner": "设备公司财报、公告、调研纪要"
+      },
+      {
+        "signal": "供应商份额提升",
+        "metricOrEvidence": "关键客户认证、重复订单、分品类份额",
+        "expectedDirection": "份额或客户覆盖提升",
+        "sourceOrOwner": "公司披露、产业链验证"
+      }
+    ],
+    "falsification_conditions": [
+      {
+        "condition": "核心产品扩产没有带来新增关键设备采购。",
+        "impactOnChain": "削弱扩产到设备订单能见度的主链路。",
+        "monitoringSignal": "资本开支拆分、招标与设备订单未同步增长。"
+      },
+      {
+        "condition": "相关设备供应商未进入关键客户供应链。",
+        "impactOnChain": "行业景气无法传导为公司经营改善。",
+        "monitoringSignal": "客户认证、订单和收入结构没有改善。"
+      },
+      {
+        "condition": "市场已经充分反映扩产预期。",
+        "impactOnChain": "资产影响候选的边际弹性下降。",
+        "monitoringSignal": "估值、预期和订单数据之间缺少新增差异。"
+      }
+    ],
+    "data_gaps": [
+      {
+        "gap": "扩产投资额中关键设备资本开支占比",
+        "neededFor": "量化扩产到设备需求的传导强度。",
+        "suggestedSource": "客户资本开支指引、扩产公告、设备招标和行业数据库。"
+      },
+      {
+        "gap": "设备供应商分客户、分品类订单和份额",
+        "neededFor": "判断公司层面是否真正受益。",
+        "suggestedSource": "公司公告、财报附注、调研纪要、供应链验证。"
+      },
+      {
+        "gap": "市场预期与估值锚",
+        "neededFor": "判断资产影响候选是否仍有边际信息。",
+        "suggestedSource": "一致预期、估值区间、公告前后市场反应。"
+      }
+    ],
+    "data_logic": {
+      "keyMetrics": [
+        {
+          "metricName": "关键设备订单能见度",
+          "baseline": "历史在手订单、合同负债和发出商品基数需由财报补证。",
+          "latestValue": "示例未提供真实数据。",
+          "changeDirection": "unknown",
+          "timeWindow": "未来 2-6 个季度",
+          "sourceRefs": ["SRC-20260529-001#ontology"],
+          "relevance": "决定行业扩产能否进入公司经营兑现链。"
+        },
+        {
+          "metricName": "扩产到设备订单弹性",
+          "baseline": "需要历史扩产项目中设备采购结构作为参考。",
+          "latestValue": "待补充。",
+          "changeDirection": "unknown",
+          "timeWindow": "扩产公告至设备交付周期",
+          "sourceRefs": ["SRC-20260529-001#ontology"],
+          "relevance": "决定传导链的强弱和优先级。"
+        }
+      ],
+      "formulas": [
+        {
+          "formulaName": "设备订单弹性候选",
+          "expression": "设备订单弹性 = 扩产投资额 x 关键设备占比 x 目标供应商份额 x 交付确认比例",
+          "variables": ["扩产投资额", "关键设备占比", "目标供应商份额", "交付确认比例"],
+          "interpretation": "缺少任一变量时，只能形成质询清单，不能直接形成财务增量结论。",
+          "evidenceRefs": ["SRC-20260529-001#ontology"]
+        }
+      ],
+      "sensitivity": [
+        "若设备品类主要由其他供应商满足，目标公司的受益弹性下降。",
+        "若订单交付周期长，短期财务兑现弱于主题热度。",
+        "若市场已充分计入扩产预期，新增订单证据才是更关键变量。"
+      ]
+    },
+    "confidence": "medium"
+  },
+  "scenario_output": {
+    "mode": "pm_question_list",
+    "target_role": "portfolio_manager",
+    "output_sections": {
+      "brief_answer": "可以把核心产品扩产视为关键设备供应商的候选利好，但不能从主题热度直接跳到公司受益。投资经理应重点追问扩产投资如何拆到设备品类、公司是否有份额、订单能否转收入、以及市场是否已反映。",
+      "main_content": {
+        "pm_questions": [
+          "这条推荐依赖的本体链路是哪一条：核心产品扩产强度 -> 关键设备资本开支 -> 设备订单能见度 -> 公司收入确认，还是只是在讲主题热度？",
+          "扩产新增投资中，不同设备品类分别占多少？有没有客户项目或招标证据？",
+          "被推荐公司具体暴露在哪个设备品类？该品类与扩产的相关性有多强？",
+          "公司是否进入关键客户供应链？是验证、首单、批量订单，还是仍停留在样机阶段？",
+          "订单到收入确认需要多久？当前财报中的合同负债、存货、发出商品是否已经验证订单能见度？",
+          "如果其他供应商份额更高，目标公司受益弹性会被压到什么程度？",
+          "市场已经给了多少扩产预期？后续需要什么新增证据才能提高判断置信度？",
+          "什么数据出现会推翻推荐逻辑：扩产延后、技术路线变化、订单取消、验收慢，还是毛利率下行？"
+        ],
+        "pricing_and_risk_checks": [
+          "区分行业景气、公司份额、财务兑现和资产定价四层，不要混为一个结论。",
+          "要求研究员给出反证条件和跟踪指标，而不是只给单向催化叙事。"
+        ]
+      },
+      "follow_up_questions": [
+        "是否需要补充扩产项目清单、设备采购结构和供应商份额材料？",
+        "是否需要把这次质询沉淀成关键设备研究框架？",
+        "是否需要对组合持仓做共同变量暴露拆解？"
+      ],
+      "risk_reminders": [
+        "本输出是本体推理和质询框架，不构成交易建议。",
+        "缺少真实订单和预期数据前，结论应维持候选状态。",
+        "资产影响候选必须经过市场预期和估值锚校验。"
+      ]
+    }
+  },
+  "ontology_feedback": {
+    "ontology_gap_summary": "当前本体能支持核心产品扩产到关键设备的方向性推理，但缺少分设备品类、分客户份额、订单确认和资产预期差的细颗粒度节点与关系。",
+    "missing_ontology_nodes": [
+      {
+        "gapType": "missing_observation",
+        "name": "扩产投资额拆分观测值",
+        "reason": "用于量化扩产到不同设备品类的传导强度。",
+        "priority": "high"
+      },
+      {
+        "gapType": "missing_observation",
+        "name": "关键设备分客户订单观测值",
+        "reason": "用于判断公司层面的订单能见度。",
+        "priority": "high"
+      },
+      {
+        "gapType": "missing_node",
+        "name": "市场预期差信号",
+        "reason": "用于判断资产影响候选是否已被定价。",
+        "priority": "medium"
+      }
+    ],
+    "missing_relations": [
+      {
+        "gapType": "missing_relation",
+        "name": "核心产品扩产强度 -> 分设备品类订单能见度",
+        "reason": "当前链路只到关键设备资本开支，缺少到具体设备品类的传导强度。",
+        "priority": "high"
+      },
+      {
+        "gapType": "missing_relation",
+        "name": "设备订单能见度 -> 收入确认节奏",
+        "reason": "需要把经营信号和财务兑现连接起来。",
+        "priority": "medium"
+      }
+    ],
+    "missing_object_feedback": [
+      {
+        "feedbackType": "missing_object",
+        "summary": "缺少分设备品类和客户份额对象，导致扩产逻辑无法落到具体供应商暴露。",
+        "evidence": "ontology_retrieval.missing_nodes 包含分设备品类、客户份额和市场预期差信号。",
+        "suggestedRoute": "run_gap_discovery_skill",
+        "priority": "high"
+      }
+    ],
+    "missing_relation_feedback": [
+      {
+        "feedbackType": "missing_relation",
+        "summary": "缺少核心产品扩产强度到分设备品类订单能见度的关系。",
+        "evidence": "推理链只能从扩产强度跳到关键设备资本开支，无法区分品类弹性。",
+        "suggestedRoute": "run_gap_discovery_skill",
+        "priority": "high"
+      }
+    ],
+    "weak_reasoning_feedback": [
+      {
+        "feedbackType": "weak_reasoning",
+        "summary": "订单到收入确认链路依赖泛化假设，缺少交付、验收和收入确认节奏中间变量。",
+        "evidence": "reasoning_chains 中缺少订单兑现后的财务确认步骤。",
+        "suggestedRoute": "run_gap_discovery_skill",
+        "priority": "medium"
+      }
+    ],
+    "false_positive_feedback": [],
+    "false_negative_feedback": [
+      {
+        "feedbackType": "false_negative",
+        "summary": "若某类设备供应商真实受益但本体无法命中，可能来自缺少分品类供应链关系。",
+        "evidence": "当前本体只保留关键设备泛化节点。",
+        "suggestedRoute": "run_gap_discovery_skill",
+        "priority": "medium"
+      }
+    ],
+    "suggested_ontology_updates": [
+      {
+        "updateType": "add_observation",
+        "description": "补充扩产项目、投资额拆分、设备采购结构、供应商份额和交付周期观测。",
+        "expectedBenefit": "提高扩产到关键设备链路的可验证性。"
+      },
+      {
+        "updateType": "add_relation",
+        "description": "为不同设备品类建立分路线传导关系。",
+        "expectedBenefit": "避免把所有关键设备统一视为同等受益。"
+      }
+    ],
+    "source_material_requests": [
+      "客户扩产公告、资本开支指引、设备招标信息。",
+      "设备供应商订单、合同负债、存货、发出商品、客户认证和分品类收入材料。",
+      "一致预期、估值区间和公告前后市场反应数据。"
+    ],
+    "priority": "high",
+    "suggested_owner": "ontology_owner",
+    "feedback_routes": ["update_current_ontology", "collect_more_sources", "manual_review"],
+    "compatible_with_material_optimization_flow": true
+  },
+  "compliance_check": {
+    "noBuySellAdvice": true,
+    "noTargetPrice": true,
+    "noReturnForecast": true,
+    "noPositionAdvice": true,
+    "factEstimateForecastAssumptionJudgmentSeparated": true,
+    "noUnsupportedOntologyJump": true,
+    "missingEvidenceDisclosed": true,
+    "ontologyGapsFedBackToOwner": true
+  }
+}

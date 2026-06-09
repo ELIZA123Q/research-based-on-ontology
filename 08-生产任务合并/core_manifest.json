@@ -1,0 +1,16 @@
+{
+  "canonical_core_root": "../../spec/投研本体核心规范",
+  "canonical_reference_files": {
+    "../../spec/投研本体核心规范/references/01_投研本体核心说明.md": "476a4abe53abf57e00c7c66cbeb3828aafc75b6528aa555733c41c16f789bee6",
+    "../../spec/投研本体核心规范/references/02_投研本体建模规格说明.md": "1943ed3a5732781b22219bc4a9f80522ec816dece02ce1ec7f882eaa55210302",
+    "../../spec/投研本体核心规范/references/03_本体Bundle文件契约.md": "be951ea1a4c765663cb1e23fc534c1f2c3ada9de570f4049f181c266471e5f7d"
+  },
+  "core_name": "touyan-bentiguifan-hexin",
+  "core_version": "2026-06-09.2",
+  "managed_files": {
+    "schemas/actions.yaml": "5248aee48d80e93b2a44623a5147bdc6e4cf9b4553f224eff0b1f196f371e607",
+    "schemas/objects.yaml": "ab4395bd7814c3a995f04858e2af1b4a381684c31be83f56ebca0a671168d7e3",
+    "schemas/relations.yaml": "ecdd2e7adcade7ecbb354e8b3a9b297fc25a5fbb0f44cc2106934b6a4b7825b3"
+  },
+  "manifest_type": "touyan_core_manifest"
+}

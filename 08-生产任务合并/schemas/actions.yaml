@@ -1,0 +1,1064 @@
+schema_name: actions
+schema_version: 0.1.0
+namespace: investment_ontology
+status: draft
+depends_on:
+  objects_schema: objects.yaml
+  relations_schema: relations.yaml
+canonical_rule: YAML 是正式机器约束；Markdown 只负责解释和示例。
+description: 投研本体动作类型、输入输出、状态流转、权限、审核、审计与状态机约束。本文件是状态机的权威承载位置：state_machine_summary 定义各对象类型的生命周期状态转换，machine_validation_rules 约束动作与对象字段、枚举值和审计要求的一致性。
+
+actor_roles:
+  researcher:
+    zh_name: 研究员
+    responsibilities: 创建假设、判断和复盘结论；确认 AI 候选对象；提交需审核内容。
+  reviewer:
+    zh_name: 审核人
+    responsibilities: 对关键状态变更、信号状态更新和复盘记录执行流程确认。
+  industry_owner:
+    zh_name: 行业负责人
+    responsibilities: 审核假设激活、判断升级、替代假设和阻断信号。
+  data_admin:
+    zh_name: 数据管理员
+    responsibilities: 维护主数据、数据映射、字段质量和权限配置。
+  system:
+    zh_name: 系统
+    responsibilities: 检测前置条件、自动触发动作、生成动作记录、候选记录和推理链视图。
+
+trigger_types:
+  system_auto: 前置条件由系统检测，满足后自动执行。
+  system_auto_with_researcher_confirmation: 系统或 AI 生成候选，研究员确认后入库。
+  system_prompt_industry_owner_confirm: 系统检测到条件后提示，行业负责人确认后生效。
+  system_prompt_reviewer_confirm: 系统检测到条件后提示，审核人确认后生效。
+  researcher_initiated: 研究员主动发起。
+  researcher_initiated_reviewer_confirm: 研究员发起，审核人确认后生效。
+  researcher_initiated_industry_owner_confirm: 研究员发起，行业负责人确认后生效。
+
+action_groups:
+  create:
+    zh_name: 创建类动作
+  state_transition:
+    zh_name: 状态变更类动作
+  review:
+    zh_name: 审核类动作
+  retrospect:
+    zh_name: 复盘类动作
+
+audit_policy:
+  create_action_audit_for_every_action: true
+  action_audit_object: ActionAudit
+  action_audit_is_immutable: true
+  direct_state_field_editing_allowed: false
+  direct_relation_mutation_without_action_allowed: false
+  action_instance_id_pattern: "ACT-{YYYYMMDD}-{serial}"
+
+ai_action_contract:
+  purpose: 指导 AI 在抽取材料或案例时输出建议动作，而不是直接改状态字段。
+  output_shape:
+    suggestedActionId: 建议动作 ID。
+    actionType: actions 中定义的动作类型。
+    targetObjectId: 被操作对象实例 ID；创建类动作可为空。
+    actorRole: 建议执行角色。
+    fieldInputs: 动作所需字段输入。
+    relationInputs: 动作所需关系端点输入。
+    evidenceRefs: 支撑该动作的来源引用。
+    preconditionCheck:
+      status: pass / fail / unknown
+      notes: 前置条件检查说明。
+    extractionConfidence: 0 到 1 的置信度。
+  rules:
+    - AI 只能输出 suggested_actions；除 system_auto 动作外，不得宣称动作已经生效。
+    - 涉及 hypothesisStatus、judgmentStatus、signalStatus、thesisStatus 的变化，必须通过本文件定义的状态变更动作。
+    - 前置条件 unknown 时，动作不得自动执行，只能进入人工确认队列。
+    - 所有执行后的动作都必须生成 ActionAudit；需要审核的动作还必须生成 ReviewRecord。
+
+actions:
+  CreateConceptScheme:
+    zh_name: 创建概念体系
+    group: create
+    actor_roles: [system, industry_owner]
+    trigger: system_auto_with_researcher_confirmation
+    creates_object: ConceptScheme
+    target_type: ConceptScheme
+    field_inputs:
+      required: [name, scopeName, schemeVersion, description, authorityPolicy]
+      optional: [language]
+    relation_inputs:
+      optional:
+        sourceOf:
+          input: sourceDocumentId
+          direction_note: SourceDocument -> ConceptScheme
+    preconditions:
+      - type: scope_identified
+        description: 已识别行业、主题或研究范围，需要建立概念口径集合。
+    outputs:
+      create_relations_if_inputs_present: [sourceOf]
+      create_action_audit: true
+
+  CreateConcept:
+    zh_name: 创建概念
+    group: create
+    actor_roles: [system, researcher, industry_owner]
+    trigger: system_auto_with_researcher_confirmation
+    creates_object: Concept
+    target_type: Concept
+    field_inputs:
+      required: [name, definition, conceptType, scopeStatus, definitionStatus]
+      optional: [aliases, englishName, inclusionRationale, exclusionRationale, sourceRequirement]
+    relation_inputs:
+      required:
+        conceptInScheme:
+          input: conceptSchemeId
+      optional:
+        sourceOf:
+          input: sourceDocumentId
+          direction_note: SourceDocument -> Concept
+    preconditions:
+      - type: object_exists
+        object_type: ConceptScheme
+        input: conceptSchemeId
+      - type: definition_has_scope_role
+        description: 概念必须说明在当前本体中的范围状态。
+    outputs:
+      create_relations: [conceptInScheme]
+      create_relations_if_inputs_present: [sourceOf]
+      create_action_audit: true
+
+  DecideConceptBoundary:
+    zh_name: 记录概念边界裁定
+    group: create
+    actor_roles: [system, researcher, industry_owner]
+    trigger: system_auto_with_researcher_confirmation
+    creates_object: ConceptBoundary
+    target_type: ConceptBoundary
+    field_inputs:
+      required: [title, decisionType, decisionText, appliesToScope]
+      optional: [boundaryCondition, reviewNote]
+    relation_inputs:
+      required:
+        boundaryForConcept:
+          input: conceptId
+      optional:
+        sourceOf:
+          input: sourceDocumentId
+          direction_note: SourceDocument -> ConceptBoundary
+    preconditions:
+      - type: object_exists
+        object_type: Concept
+        input: conceptId
+      - type: boundary_decision_explained
+        description: 边界裁定必须说明纳入、排除、相邻、交叉或延后的理由。
+    outputs:
+      create_relations: [boundaryForConcept]
+      create_relations_if_inputs_present: [sourceOf]
+      create_action_audit: true
+
+  CreateEvent:
+    zh_name: 记录事件
+    group: create
+    actor_roles: [system, researcher]
+    trigger: system_auto_with_researcher_confirmation
+    creates_object: Event
+    target_type: Event
+    field_inputs:
+      required: [title, eventType, eventTime, description, eventEvidenceType]
+      optional: []
+      system_generated: [recordedAt]
+    relation_inputs:
+      optional:
+        anchoredOn:
+          input: anchorObjectId
+        sourceOf:
+          input: sourceDocumentId
+          direction_note: SourceDocument -> Event
+    preconditions:
+      - type: source_fact_detected
+        description: 来源文档或数据流中存在可识别的外部事实。
+    outputs:
+      create_relations_if_inputs_present: [anchoredOn, sourceOf]
+      create_action_audit: true
+
+  CreateStateVariable:
+    zh_name: 定义状态变量
+    group: create
+    actor_roles: [researcher, system]
+    trigger: researcher_initiated
+    creates_object: StateVariable
+    target_type: StateVariable
+    field_inputs:
+      required: [name, variableType, category, description, observationFrequency, sourceType]
+      optional: [unit, variableScope, referenceBaseline]
+    relation_inputs:
+      optional:
+        observedOn:
+          input: anchorObjectId
+    preconditions:
+      - type: pass_granularity_rule
+        description: 变量必须能持续观察、能时间比较、能形成假设、能参与传导。
+    outputs:
+      create_relations_if_inputs_present: [observedOn]
+      create_action_audit: true
+
+  CreateStateObservation:
+    zh_name: 记录观测值
+    group: create
+    actor_roles: [system, researcher]
+    trigger: system_auto
+    creates_object: StateVariableObservation
+    target_type: StateVariableObservation
+    field_inputs:
+      required: [observedValue, valueType, observationTime, observationSourceName, sourceStatementType]
+      optional: [observationScope, observationNote]
+      system_generated: [recordedAt]
+    relation_inputs:
+      required:
+        observationBindsVariable:
+          input: stateVariableId
+      optional:
+        sourceOf:
+          input: sourceDocumentId
+          direction_note: SourceDocument -> StateVariableObservation
+    preconditions:
+      - type: object_exists
+        object_type: StateVariable
+        input: stateVariableId
+      - type: observation_is_fact_or_estimate
+        description: 观测值不得混入 forecast、guidance、recommendation 或方向性判断。
+    outputs:
+      create_relations: [observationBindsVariable]
+      create_relations_if_inputs_present: [sourceOf]
+      create_action_audit: true
+
+  CreateEvidenceEpisode:
+    zh_name: 创建证据 Episode
+    group: create
+    actor_roles: [system, researcher]
+    trigger: system_auto
+    creates_object: EvidenceEpisode
+    target_type: EvidenceEpisode
+    field_inputs:
+      required: [title, episodeType, ingestedAt, sourceReliability, episodeStatus]
+      optional: [sourceDocumentId, sourcePathOrUrl, publishTime, businessTime, originalLocation, textSpan, limitations, groupId]
+    relation_inputs:
+      optional:
+        sourceOf:
+          input: sourceDocumentId
+          direction_note: SourceDocument -> EvidenceEpisode
+        episodeMentionsObject:
+          input: mentionedObjectId
+    preconditions:
+      - type: source_or_feedback_detected
+        description: 存在可追溯材料、历史案例、推理反馈、评测反馈或结构化数据输入。
+    outputs:
+      create_relations_if_inputs_present: [sourceOf, episodeMentionsObject]
+      create_action_audit: true
+
+  CreateEvidenceClaim:
+    zh_name: 创建证据主张
+    group: create
+    actor_roles: [system, researcher]
+    trigger: system_auto_with_researcher_confirmation
+    creates_object: EvidenceClaim
+    target_type: EvidenceClaim
+    field_inputs:
+      required: [claimText, normalizedClaim, claimType, claimStatus]
+      optional: [sourceStatementType, evidenceLocation, confidence, allowedTargetObjectTypes, mustNotMapTo, scope, restrictions]
+    initial_values:
+      claimStatus: candidate
+    relation_inputs:
+      required:
+        claimFromEpisode:
+          input: evidenceEpisodeId
+      optional:
+        claimSupportsObject:
+          input: supportedObjectId
+        claimSupportsRelation:
+          input: patchRequestId
+        claimInvalidatesClaim:
+          input: invalidatedClaimId
+        claimTriggersPatch:
+          input: patchRequestId
+        sourceOf:
+          input: sourceDocumentId
+          direction_note: SourceDocument -> EvidenceClaim
+    preconditions:
+      - type: object_exists
+        object_type: EvidenceEpisode
+        input: evidenceEpisodeId
+      - type: claim_has_source_location
+        description: 证据主张必须能追溯 episode、来源文档或原文位置；无法追溯时只能 quarantined 或 rejected。
+    outputs:
+      create_relations: [claimFromEpisode]
+      create_relations_if_inputs_present: [claimSupportsObject, claimSupportsRelation, claimInvalidatesClaim, claimTriggersPatch, sourceOf]
+      create_action_audit: true
+
+  CreateEvidenceFact:
+    zh_name: 创建证据事实
+    group: create
+    actor_roles: [system, researcher]
+    trigger: system_auto_with_researcher_confirmation
+    creates_object: EvidenceFact
+    target_type: EvidenceFact
+    field_inputs:
+      required: [factText, normalizedFact, factStatus, sourceClaimIds]
+      optional: [factScope, confidence]
+    initial_values:
+      factStatus: candidate
+    relation_inputs:
+      optional:
+        sourceOf:
+          input: sourceDocumentId
+          direction_note: SourceDocument -> EvidenceFact
+    preconditions:
+      - type: source_claims_exist
+        description: sourceClaimIds 必须能解析到 EvidenceClaim。
+    outputs:
+      create_relations_if_inputs_present: [sourceOf]
+      create_action_audit: true
+
+  CreatePatchRequest:
+    zh_name: 创建补丁请求
+    group: create
+    actor_roles: [system, researcher]
+    trigger: system_auto_with_researcher_confirmation
+    creates_object: PatchRequest
+    target_type: PatchRequest
+    field_inputs:
+      required: [patchRequestTitle, operation, targetLayer, reason, semanticRisk, reviewStatus]
+      optional: [targetFile, targetPath, targetId, evidenceEpisodeIds, evidenceClaimIds, mergePrecondition]
+    initial_values:
+      reviewStatus: pending
+    relation_inputs:
+      optional:
+        sourceOf:
+          input: sourceDocumentId
+          direction_note: SourceDocument -> PatchRequest
+    preconditions:
+      - type: patch_has_reason
+        description: 补丁请求必须说明来源、理由、目标层和风险；证据不足时只能 pending 或 supplementRequired。
+    outputs:
+      create_relations_if_inputs_present: [sourceOf]
+      create_action_audit: true
+
+  AppendPatchLedgerItem:
+    zh_name: 追加补丁账本项
+    group: create
+    actor_roles: [system]
+    trigger: system_auto
+    creates_object: PatchLedgerItem
+    target_type: PatchLedgerItem
+    field_inputs:
+      required: [patchId, baseOntologyVersion, operation, mergeStatus, mergeReason]
+      optional: [patchRequestId, baseHash, mergedAt, targetFile, targetPath, targetId, evidenceEpisodeIds, evidenceClaimIds]
+    relation_inputs:
+      optional:
+        sourceOf:
+          input: sourceDocumentId
+          direction_note: SourceDocument -> PatchLedgerItem
+    preconditions:
+      - type: optimizer_decision_exists
+        description: 只有本体优化 Skill 的合并、拒绝、延后或失败决策才能追加 patch ledger。
+    outputs:
+      create_relations_if_inputs_present: [sourceOf]
+      create_action_audit: true
+
+  CreateInferenceRun:
+    zh_name: 创建推理运行记录
+    group: create
+    actor_roles: [system]
+    trigger: system_auto
+    creates_object: InferenceRun
+    target_type: InferenceRun
+    field_inputs:
+      required: [question, ontologyVersion, runStatus, runAt]
+      optional: [businessTime, centerObjects, usedRelationIds, usedEvidenceClaimIds, excludedInvalidClaimIds, reasoningChain, confidence, ontologyFeedback, candidatePatchRequestIds]
+    relation_inputs:
+      optional:
+        sourceOf:
+          input: sourceDocumentId
+          direction_note: SourceDocument -> InferenceRun
+    preconditions:
+      - type: ontology_bundle_available
+        description: 推理运行必须记录所使用的本体版本；无法读取本体时 runStatus=blocked 或 failed。
+    outputs:
+      create_relations_if_inputs_present: [sourceOf]
+      create_action_audit: true
+
+  CreateStateHypothesis:
+    zh_name: 创建状态假设
+    group: create
+    actor_roles: [researcher]
+    trigger: researcher_initiated
+    creates_object: StateHypothesis
+    target_type: StateHypothesis
+    field_inputs:
+      required: [title, hypothesisContent, direction, basis, falsificationCriteria, timeHorizon, proposedBy]
+      optional: [magnitude, requiredValidationCriteria, keyRisks]
+      system_generated: [hypothesisStatus, proposedAt]
+    initial_values:
+      hypothesisStatus: proposed
+    relation_inputs:
+      required:
+        hypothesisBindsVariable:
+          input: stateVariableId
+      optional:
+        basedOnEvent:
+          input: eventId
+        sourceOf:
+          input: sourceDocumentId
+          direction_note: SourceDocument -> StateHypothesis
+    preconditions:
+      - type: object_exists
+        object_type: StateVariable
+        input: stateVariableId
+    outputs:
+      create_relations: [hypothesisBindsVariable]
+      create_relations_if_inputs_present: [basedOnEvent, sourceOf]
+      create_action_audit: true
+
+  CreatePropagation:
+    zh_name: 定义传导逻辑
+    group: create
+    actor_roles: [system, researcher, industry_owner]
+    trigger: system_auto_with_researcher_confirmation
+    creates_object: StateVariablePropagation
+    target_type: StateVariablePropagation
+    field_inputs:
+      required: [propagationLogic, directionMapping]
+      optional: [lagDescription, boundaryConditions, causalConfidence, historicalSupport]
+    relation_inputs:
+      required:
+        propagatesFrom:
+          input: sourceVariableId
+        propagatesTo:
+          input: targetVariableId
+    preconditions:
+      - type: object_exists
+        object_type: StateVariable
+        input: sourceVariableId
+      - type: object_exists
+        object_type: StateVariable
+        input: targetVariableId
+    outputs:
+      create_relations: [propagatesFrom, propagatesTo]
+      create_action_audit: true
+
+  AddSignal:
+    zh_name: 添加信号
+    group: create
+    actor_roles: [system, researcher]
+    trigger: system_auto_with_researcher_confirmation
+    creates_object: Signal
+    target_type: Signal
+    field_inputs:
+      required: [title, signalType, signalRole, signalContent, statementType, observationTime, reliability, validityWindow]
+      optional: []
+      system_generated: [signalStatus, recordedAt]
+    initial_values:
+      signalStatus: active
+    relation_inputs:
+      required_one_of:
+        - supportsHypothesis
+        - supportsJudgment
+        - catalyzesJudgment
+        - tracksHypothesis
+        - tracksJudgment
+        - weakensHypothesis
+        - blocksHypothesis
+        - weakensJudgment
+      optional:
+        signalBasedOnObservation:
+          input: observationId
+        sourceOf:
+          input: sourceDocumentId
+          direction_note: SourceDocument -> Signal
+    role_relation_map:
+      validation: [supportsHypothesis, supportsJudgment]
+      catalyst: [catalyzesJudgment]
+      tracking: [tracksHypothesis, tracksJudgment]
+      weakening: [weakensHypothesis, weakensJudgment]
+      blocking: [blocksHypothesis]
+    preconditions:
+      - type: target_exists
+        description: targetHypothesisId 或 targetJudgmentId 指向的对象必须存在。
+      - type: signal_role_matches_relation
+        description: signalRole 必须与建立的效果关系匹配。
+    automatic_followup:
+      when:
+        signalRole: blocking
+        relation: blocksHypothesis
+      action_prompt: BlockHypothesis
+    outputs:
+      create_role_compatible_relation: true
+      create_relations_if_inputs_present: [signalBasedOnObservation, sourceOf]
+      create_action_audit: true
+
+  UpdateSignal:
+    zh_name: 修改信号内容
+    group: create
+    actor_roles: [researcher]
+    trigger: researcher_initiated
+    target_type: Signal
+    field_inputs:
+      updatable: [signalContent, reliability, validityWindow]
+    preconditions:
+      - type: target_state_is
+        field: signalStatus
+        value: active
+    outputs:
+      update_target_fields: true
+      create_action_audit: true
+
+  LinkHypotheses:
+    zh_name: 建立假设间关系
+    group: create
+    actor_roles: [researcher]
+    trigger: researcher_initiated
+    target_type: StateHypothesis
+    field_inputs:
+      required: [relationshipType]
+    relation_inputs:
+      required_one_of: [dependsOnHypothesis, competesWithHypothesis]
+    allowed_relationshipType_values: [dependsOn, competesWith]
+    preconditions:
+      - type: object_exists
+        object_type: StateHypothesis
+        input: sourceHypothesisId
+      - type: object_exists
+        object_type: StateHypothesis
+        input: targetHypothesisId
+    outputs:
+      create_relation: dependsOnHypothesis_or_competesWithHypothesis
+      create_action_audit: true
+
+  CreateJudgmentOutput:
+    zh_name: 创建判断输出
+    group: create
+    actor_roles: [researcher]
+    trigger: researcher_initiated
+    creates_object: JudgmentOutput
+    target_type: JudgmentOutput
+    field_inputs:
+      required: [title, judgmentContent]
+      optional: [competingExplanations, scenarioTag, confidenceLevel, nextValidationCheckpoint, expectedEvidenceDate, timeHorizon]
+      system_generated: [judgmentStatus, createdAt, lastUpdatedAt]
+    initial_values:
+      judgmentStatus: candidate
+    relation_inputs:
+      required:
+        judgmentAnchoredOn:
+          input: anchorObjectId
+        basedOnHypothesis:
+          input: basisHypothesisIds
+      optional:
+        sourceOf:
+          input: sourceDocumentId
+          direction_note: SourceDocument -> JudgmentOutput
+    preconditions:
+      - type: at_least_one_related_hypothesis_has_state
+        relation: basedOnHypothesis
+        state_field: hypothesisStatus
+        state_values: [active]
+    automatic_followup:
+      when:
+        relations_exist_any: [basedOnHypothesis]
+      action: UpgradeJudgmentToWatchlist
+    outputs:
+      create_relations: [judgmentAnchoredOn, basedOnHypothesis]
+      create_relations_if_inputs_present: [sourceOf]
+      create_action_audit: true
+
+  CreateAssetImpact:
+    zh_name: 创建资产影响
+    group: create
+    actor_roles: [system, researcher]
+    trigger: system_auto_with_researcher_confirmation
+    creates_object: AssetImpact
+    target_type: AssetImpact
+    field_inputs:
+      required: [impactDirection, impactMagnitude, timeHorizon]
+      optional: [impactDescription, pricedInAssessment, consensusGap, valuationAnchor, marketExpectationNote]
+      system_generated: [assessedAt]
+    relation_inputs:
+      required:
+        impactDerivedFrom:
+          input: judgmentId
+        impactsAsset:
+          input: assetId
+    preconditions:
+      - type: object_exists
+        object_type: JudgmentOutput
+        input: judgmentId
+      - type: object_exists
+        object_type: Asset
+        input: assetId
+    outputs:
+      create_relations: [impactDerivedFrom, impactsAsset]
+      create_action_audit: true
+
+  CreateInvestmentThesis:
+    zh_name: 创建投资命题
+    group: create
+    actor_roles: [researcher]
+    trigger: researcher_initiated
+    creates_object: InvestmentThesis
+    target_type: InvestmentThesis
+    field_inputs:
+      required: [title, summary, thesisStatus]
+      optional: []
+      system_generated: [createdAt]
+    relation_inputs:
+      required:
+        thesisAnchoredOn:
+          input: anchorObjectId
+      optional:
+        thesisContainsJudgment:
+          input: judgmentIds
+        sourceOf:
+          input: sourceDocumentId
+          direction_note: SourceDocument -> InvestmentThesis
+    preconditions:
+      - type: stable_long_term_logic_exists
+        description: 围绕同一标的存在多条判断，研究员认为有长期跟踪价值。
+    outputs:
+      create_relations: [thesisAnchoredOn]
+      create_relations_if_inputs_present: [thesisContainsJudgment, sourceOf]
+      create_action_audit: true
+
+  ActivateHypothesis:
+    zh_name: 激活假设
+    group: state_transition
+    actor_roles: [industry_owner]
+    trigger: system_prompt_industry_owner_confirm
+    target_type: StateHypothesis
+    state_transition:
+      field: hypothesisStatus
+      from: [proposed, blocked]
+      to: active
+    preconditions:
+      - type: fields_present
+        fields: [direction, basis, falsificationCriteria]
+      - type: validation_criteria_checked
+        field: requiredValidationCriteria
+        description: 若 requiredValidationCriteria 已填写，行业负责人需确认门槛已满足或说明豁免理由。
+      - type: no_active_blocking_signal
+        relation: blocksHypothesis
+        signalStatus: active
+    outputs:
+      update_target_state: true
+      create_action_audit: true
+
+  BlockHypothesis:
+    zh_name: 阻断假设
+    group: state_transition
+    actor_roles: [industry_owner]
+    trigger: system_prompt_industry_owner_confirm
+    target_type: StateHypothesis
+    state_transition:
+      field: hypothesisStatus
+      from: [proposed, active]
+      to: blocked
+    preconditions:
+      - type: active_blocking_signal_exists
+        relation: blocksHypothesis
+        signalRole: blocking
+        signalStatus: active
+    outputs:
+      update_target_state: true
+      create_action_audit: true
+      system_prompts:
+        - 重新评估依赖该假设的 StateHypothesis。
+        - 重新评估基于该假设的 JudgmentOutput。
+
+  UpdateSignalStatus:
+    zh_name: 更新信号状态
+    group: state_transition
+    actor_roles: [researcher, reviewer]
+    trigger: researcher_initiated_reviewer_confirm
+    target_type: Signal
+    state_transition:
+      field: signalStatus
+      from: [active]
+      to: [weakened, withdrawn, invalidated]
+    field_inputs:
+      required: [actionReason]
+    preconditions:
+      - type: evidence_or_reason_present
+        description: 必须说明信号强度下降、来源失效或影响消除的依据。
+    outputs:
+      update_target_state: true
+      create_action_audit: true
+      create_review_record: true
+      system_prompts:
+        - 重新评估相关 StateHypothesis。
+        - 重新评估相关 JudgmentOutput。
+
+  SupersedeHypothesis:
+    zh_name: 新假设替代原假设
+    group: state_transition
+    actor_roles: [industry_owner]
+    trigger: system_prompt_industry_owner_confirm
+    target_type: StateHypothesis
+    state_transition:
+      field: hypothesisStatus
+      from: [active, blocked]
+      to: deprecated
+    relation_inputs:
+      required:
+        supersedesHypothesis:
+          input: newHypothesisId_to_oldHypothesisId
+    preconditions:
+      - type: replacing_hypothesis_is_active
+        object_type: StateHypothesis
+        input: newHypothesisId
+      - type: target_is_old_hypothesis
+        input: oldHypothesisId
+    outputs:
+      update_old_hypothesis_state: true
+      create_relation: supersedesHypothesis
+      create_action_audit: true
+
+  DeprecateHypothesis:
+    zh_name: 废弃假设
+    group: state_transition
+    actor_roles: [researcher]
+    trigger: researcher_initiated
+    target_type: StateHypothesis
+    state_transition:
+      field: hypothesisStatus
+      from: [proposed, active, blocked, deprecated]
+      to: deprecated
+    field_inputs:
+      required: [actionReason]
+    preconditions: []
+    outputs:
+      update_target_state: true
+      create_action_audit: true
+
+  UpgradeJudgmentToWatchlist:
+    zh_name: 升级判断：候选到观察中
+    action_family: UpgradeJudgment
+    group: state_transition
+    actor_roles: [system]
+    trigger: system_auto
+    target_type: JudgmentOutput
+    state_transition:
+      field: judgmentStatus
+      from: [candidate]
+      to: watchlist
+    preconditions:
+      - type: relation_exists_any
+        relations: [basedOnHypothesis, judgmentAnchoredOn]
+    outputs:
+      update_target_state: true
+      create_action_audit: true
+
+  UpgradeJudgmentToActive:
+    zh_name: 升级判断：观察中到有效
+    action_family: UpgradeJudgment
+    group: state_transition
+    actor_roles: [industry_owner]
+    trigger: system_prompt_industry_owner_confirm
+    target_type: JudgmentOutput
+    state_transition:
+      field: judgmentStatus
+      from: [watchlist]
+      to: active
+    preconditions:
+      - type: active_validation_signal_count
+        relation: supportsJudgment
+        minimum_count: 2
+        independent_sources_required: true
+        alternative_rule: 一条核心 validation 信号加一条独立来源交叉验证。
+      - type: field_present
+        field: competingExplanations
+      - type: at_least_one_basis_hypothesis_active
+        relation: basedOnHypothesis
+    outputs:
+      update_target_state: true
+      create_action_audit: true
+      create_review_record: true
+
+  UpgradeJudgmentToFormalTrigger:
+    zh_name: 升级判断：有效到正式触发
+    action_family: UpgradeJudgment
+    group: state_transition
+    actor_roles: [industry_owner]
+    trigger: system_prompt_industry_owner_confirm
+    target_type: JudgmentOutput
+    state_transition:
+      field: judgmentStatus
+      from: [active]
+      to: formalTrigger
+    preconditions:
+      - type: active_catalyst_signal_exists
+        relation: catalyzesJudgment
+        signalRole: catalyst
+        signalStatus: active
+    outputs:
+      update_target_state: true
+      create_action_audit: true
+      create_review_record: true
+
+  DowngradeJudgment:
+    zh_name: 降级判断
+    group: state_transition
+    actor_roles: [researcher]
+    trigger: researcher_initiated
+    target_type: JudgmentOutput
+    state_transition:
+      field: judgmentStatus
+      from: [active, formalTrigger]
+      to: [watchlist, expired, pricedIn, deprecated]
+    field_inputs:
+      required: [actionReason]
+    preconditions:
+      - type: reason_present
+        description: 研究员判断信号减弱或条件不再成立。
+    outputs:
+      update_target_state: true
+      create_action_audit: true
+
+  ResolveJudgment:
+    zh_name: 结束判断
+    group: state_transition
+    actor_roles: [researcher, reviewer]
+    trigger: researcher_initiated_reviewer_confirm
+    target_type: JudgmentOutput
+    state_transition:
+      field: judgmentStatus
+      from: [active, formalTrigger]
+      to: [resolved, expired, pricedIn]
+    field_inputs:
+      required: [actionReason]
+    preconditions:
+      - type: time_window_ended_or_researcher_started_review
+    outputs:
+      update_target_state: true
+      create_action_audit: true
+      create_review_record: true
+      followup_action: RecordReviewOutcome
+
+  DeprecateJudgment:
+    zh_name: 废弃判断
+    group: state_transition
+    actor_roles: [researcher]
+    trigger: researcher_initiated
+    target_type: JudgmentOutput
+    state_transition:
+      field: judgmentStatus
+      from: [candidate, watchlist, active, formalTrigger, resolved, expired, pricedIn, deprecated]
+      to: deprecated
+    field_inputs:
+      required: [actionReason]
+    preconditions: []
+    outputs:
+      update_target_state: true
+      create_action_audit: true
+
+  UpdateThesisStatus:
+    zh_name: 更新命题状态
+    group: state_transition
+    actor_roles: [researcher]
+    trigger: researcher_initiated
+    target_type: InvestmentThesis
+    state_transition:
+      field: thesisStatus
+      from: [watchlist, active, deprecated]
+      to: [watchlist, active, deprecated]
+    field_inputs:
+      required: [actionReason]
+    preconditions: []
+    outputs:
+      update_target_state: true
+      create_action_audit: true
+
+  ApproveReview:
+    zh_name: 审核通过
+    group: review
+    actor_roles: [reviewer]
+    trigger: system_prompt_reviewer_confirm
+    target_type: ReviewRecord
+    reviewed_object_types: [JudgmentOutput, InvestmentThesis, StateHypothesis, Signal, PatchRequest, PatchLedgerItem, InferenceRun, ActionAudit]
+    state_transition:
+      field: reviewResult
+      from: [pending, supplementRequired]
+      to: approved
+    field_inputs:
+      optional: [reviewNotes]
+    preconditions:
+      - type: review_record_exists
+    outputs:
+      update_review_record: true
+      trigger_corresponding_state_transition_if_any: true
+      create_action_audit: true
+
+  RejectReview:
+    zh_name: 审核拒绝
+    group: review
+    actor_roles: [reviewer]
+    trigger: system_prompt_reviewer_confirm
+    target_type: ReviewRecord
+    reviewed_object_types: [JudgmentOutput, InvestmentThesis, StateHypothesis, Signal, PatchRequest, PatchLedgerItem, InferenceRun, ActionAudit]
+    state_transition:
+      field: reviewResult
+      from: [pending, supplementRequired]
+      to: rejected
+    field_inputs:
+      required: [reviewNotes]
+      optional: [rejectReason]
+    preconditions:
+      - type: review_record_exists
+    outputs:
+      update_review_record: true
+      keep_reviewed_object_state_unchanged: true
+      create_action_audit: true
+
+  RequestSupplement:
+    zh_name: 要求补充材料
+    group: review
+    actor_roles: [reviewer]
+    trigger: system_prompt_reviewer_confirm
+    target_type: ReviewRecord
+    reviewed_object_types: [JudgmentOutput, InvestmentThesis, StateHypothesis, Signal, PatchRequest, PatchLedgerItem, InferenceRun, ActionAudit]
+    state_transition:
+      field: reviewResult
+      from: [pending]
+      to: supplementRequired
+    field_inputs:
+      required: [supplementRequest]
+    preconditions:
+      - type: review_record_exists
+    outputs:
+      update_review_record: true
+      create_action_audit: true
+
+  RecordReviewOutcome:
+    zh_name: 记录复盘结论
+    group: retrospect
+    actor_roles: [researcher, reviewer]
+    trigger: researcher_initiated_reviewer_confirm
+    creates_object: ReviewRecord
+    target_type: ReviewRecord
+    reviewed_object_types: [JudgmentOutput, InvestmentThesis]
+    field_inputs:
+      required: [fundamentalCorrect, timingCorrect, catalystEffective, assetImpactRealized, reviewedBy]
+      optional: [expectationGapReviewed, pricingReviewed, scenarioReviewed, reviewNotes]
+      system_generated: [reviewType, reviewResult, reviewedAt]
+    initial_values:
+      reviewType: retrospect
+      reviewResult: approved
+    relation_inputs:
+      required:
+        reviewFor:
+          input: reviewedObjectId
+    preconditions:
+      - type: reviewed_object_has_terminal_or_formal_state
+        object_types: [JudgmentOutput, InvestmentThesis]
+      - type: four_retrospect_dimensions_present
+        fields: [fundamentalCorrect, timingCorrect, catalystEffective, assetImpactRealized]
+    outputs:
+      create_review_record: true
+      create_relation: reviewFor
+      create_action_audit: true
+
+state_machine_summary:
+  StateHypothesis:
+    field: hypothesisStatus
+    initial: proposed
+    transitions:
+      - action: ActivateHypothesis
+        from: [proposed, blocked]
+        to: active
+      - action: BlockHypothesis
+        from: [proposed, active]
+        to: blocked
+      - action: SupersedeHypothesis
+        from: [active, blocked]
+        to: deprecated
+      - action: DeprecateHypothesis
+        from: [proposed, active, blocked, deprecated]
+        to: deprecated
+  Signal:
+    field: signalStatus
+    initial: active
+    transitions:
+      - action: UpdateSignalStatus
+        from: [active]
+        to: [weakened, withdrawn, invalidated]
+  JudgmentOutput:
+    field: judgmentStatus
+    initial: candidate
+    transitions:
+      - action: UpgradeJudgmentToWatchlist
+        from: [candidate]
+        to: watchlist
+      - action: UpgradeJudgmentToActive
+        from: [watchlist]
+        to: active
+      - action: UpgradeJudgmentToFormalTrigger
+        from: [active]
+        to: formalTrigger
+      - action: DowngradeJudgment
+        from: [active, formalTrigger]
+        to: [watchlist, expired, pricedIn, deprecated]
+      - action: ResolveJudgment
+        from: [active, formalTrigger]
+        to: [resolved, expired, pricedIn]
+      - action: DeprecateJudgment
+        from: [candidate, watchlist, active, formalTrigger, resolved, expired, pricedIn, deprecated]
+        to: deprecated
+  InvestmentThesis:
+    field: thesisStatus
+    transitions:
+      - action: UpdateThesisStatus
+        from: [watchlist, active, deprecated]
+        to: [watchlist, active, deprecated]
+  EvidenceClaim:
+    field: claimStatus
+    initial: candidate
+    transitions:
+      - action: CreateEvidenceClaim
+        from: []
+        to: candidate
+      - action: CreateEvidenceClaim
+        from: [candidate]
+        to: [active, invalidated, superseded, rejected, quarantined]
+  EvidenceFact:
+    field: factStatus
+    initial: candidate
+    transitions:
+      - action: CreateEvidenceFact
+        from: []
+        to: candidate
+      - action: CreateEvidenceFact
+        from: [candidate]
+        to: [active, invalidated, superseded, rejected]
+  PatchRequest:
+    field: reviewStatus
+    initial: pending
+    transitions:
+      - action: CreatePatchRequest
+        from: []
+        to: pending
+      - action: CreatePatchRequest
+        from: [pending, supplementRequired]
+        to: [approved, rejected, supplementRequired, merged, superseded]
+  InferenceRun:
+    field: runStatus
+    transitions:
+      - action: CreateInferenceRun
+        from: []
+        to: [completed, partial, blocked, failed]
+
+machine_validation_rules:
+  - id: action_target_type_must_exist
+    description: 每个 action.target_type 必须引用 objects.yaml 中存在的对象类型。
+  - id: state_transition_field_must_exist
+    description: 每个 state_transition.field 必须是 target_type 的字段。
+  - id: action_input_fields_must_exist_or_be_action_local
+    description: field_inputs 中对象字段必须存在；actionReason、rejectReason、supplementRequest 是动作本地输入。
+  - id: state_transition_values_must_be_allowed
+    description: from/to 状态值必须落在对象生命周期字段的 enum 内。
+  - id: every_action_creates_audit
+    description: 除非显式声明豁免，每个动作输出必须 create_action_audit=true。

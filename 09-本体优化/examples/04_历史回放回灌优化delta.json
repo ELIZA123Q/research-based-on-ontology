@@ -1,0 +1,682 @@
+{
+  "fixture_type": "ontology_optimization_delta",
+  "base": "03_缺口发现回灌优化delta.json",
+  "description": "历史回放回灌优化的增量夹具。校验脚本基于组装后的 v1.2 输出继续组装完整 v1.3 输出。",
+  "set": {
+    "optimized_ontology.ontology_metadata": {
+      "ontology_id": "ai_chip_product_track",
+      "ontology_version": "1.3.0",
+      "parent_version": "1.2.0",
+      "created_by": "touyan-hangye-chanye-bentilengqidong",
+      "updated_by": "touyan-benti-youhua",
+      "change_reason": "historical_validation_optimization",
+      "ontology_quality": {
+        "coverage_score": 0.8,
+        "evidence_score": 0.82,
+        "consistency_score": 0.94,
+        "reasoning_score": 0.83
+      }
+    },
+    "optimized_ontology.base_ontology_reference": {
+      "provided": true,
+      "version_or_name": "ai_chip_product_track v1.1.0",
+      "scope": "AI芯片设计、上游瓶颈、交付周期与收入确认节奏",
+      "source": "touyan-benti-lishi-huifang-xiaoyan.optimization_plan",
+      "notes": "本轮承接历史回放校验 Skill 的 optimization_plan，补充上游瓶颈链路的阻断条件和适用边界。"
+    },
+    "optimization_report.base_ontology_assessment": {
+      "provided": true,
+      "version_or_name": "AI芯片行业本体冷启动初版",
+      "scope": "AI芯片设计公司费用率收敛与盈利拐点",
+      "diagnosed_gaps": [
+        {
+          "gap": "研发费用率变量缺少事实观测",
+          "affected_items": [
+            "SV-RD-EXPENSE-RATIO"
+          ],
+          "severity": "high",
+          "why_it_matters": "没有观测值就无法验证费用率收敛假设。"
+        },
+        {
+          "gap": "盈利拐点假设缺少连续季度和收入兑现证据",
+          "affected_items": [
+            "SH-RD-EXPENSE-RATIO-DOWN"
+          ],
+          "severity": "high",
+          "why_it_matters": "单点费用率下降不能直接推出盈利拐点。"
+        },
+        {
+          "gap": "资产影响线索缺少市场预期和估值锚",
+          "affected_items": [
+            "688256.SH"
+          ],
+          "severity": "medium",
+          "why_it_matters": "没有预期锚，不能判断资产定价线索。"
+        }
+      ],
+      "overall_assessment": "上一版已补齐上游瓶颈链路，本轮根据历史回放校验任务单补充阻断条件和适用边界。",
+      "cannot_optimize_reason": ""
+    },
+    "optimization_report.current_optimization_goal": {
+      "goal": "承接历史回放校验 Skill 的 optimization_plan，补充上游瓶颈到交付周期链路的阻断条件。",
+      "round_focus": "第三轮：历史回放校验回灌，新增阻断假设、blocking signal 和后续材料需求。",
+      "target_gaps": [
+        "扩产或需求到交付链路缺少阻断条件",
+        "存量改造和技术路线切换未被结构化表达"
+      ],
+      "success_criteria": [
+        "新增阻断信号和阻断关系候选",
+        "明确历史回放任务单不能被当作事实观测",
+        "形成下一轮材料验证计划"
+      ]
+    },
+    "optimization_report.material_search_and_assessment": {
+      "search_enabled": true,
+      "search_objective": "围绕基础本体中的费用率观测缺口，优先补充可追溯财报材料。",
+      "query_plan": [
+        {
+          "ontology_gap": "研发费用率变量缺少事实观测",
+          "query": "寒武纪 2023 年度报告 研发费用率 营业收入",
+          "target_material_type": "上市公司年报",
+          "purpose": "获取研发费用率、收入和公司基本信息事实来源。",
+          "priority": "P0"
+        },
+        {
+          "ontology_gap": "盈利拐点假设缺少连续季度验证",
+          "query": "寒武纪 2024 季度报告 研发费用率 收入",
+          "target_material_type": "上市公司季报",
+          "purpose": "验证费用率是否连续收敛。",
+          "priority": "P0"
+        },
+        {
+          "ontology_gap": "上游瓶颈到交付周期和收入确认节奏传导缺失",
+          "query": "缺口发现 optimization_plan OPT-GAP-001 先进封装 高带宽内存 交付周期",
+          "target_material_type": "缺口发现输出",
+          "purpose": "读取缺口发现任务单，转化为候选变量、传导模板和后续材料需求。",
+          "priority": "P0"
+        }
+      ],
+      "search_log": [
+        {
+          "query": "寒武纪 2023 年度报告 研发费用率 营业收入",
+          "result_count": 1,
+          "selected_source_ids": [
+            "SRC-20240328-001"
+          ],
+          "notes": "采用上市公司年度报告作为事实观测来源。"
+        },
+        {
+          "query": "缺口发现 optimization_plan OPT-GAP-001 先进封装 高带宽内存 交付周期",
+          "result_count": 1,
+          "selected_source_ids": [
+            "SRC-GAP-OPT-001"
+          ],
+          "notes": "采用缺口发现输出作为本轮优化任务来源；不作为事实观测来源。"
+        }
+      ],
+      "adopted_source_ids": [
+        "SRC-20240328-001",
+        "SRC-GAP-OPT-001",
+        "SRC-HIST-OPT-001"
+      ],
+      "rejected_sources": [
+        {
+          "title_or_url": "未追溯到原文的二次转述",
+          "reason": "缺少原始发布主体和证据位置，只能作为线索，不纳入正式材料。"
+        }
+      ],
+      "watchlist_sources": [
+        "2024Q1-Q3季度报告",
+        "封装产能扩张公告或产业数据",
+        "高带宽内存供给周期材料",
+        "客户交付和验收节奏材料"
+      ],
+      "quality_assessment": {
+        "source_reliability": "上市公司财报可靠性较高，可作为事实观测来源。",
+        "timeliness": "材料发布时间为2024-03-28，可用于2023年年报期观测。",
+        "evidence_granularity": "能覆盖公司整体费用和收入，但缺少产品线拆分。",
+        "source_independence": "财报和缺口发现任务来源角色不同；瓶颈链路仍缺多来源事实验证。",
+        "bias_or_limitation": "缺口发现任务单只能说明本体弱覆盖，不能替代封装、内存或交付周期事实证据。",
+        "overall_quality": "medium"
+      },
+      "limitations": [
+        "样例仅采纳一份年报，未形成多来源验证",
+        "缺口发现回灌链路仍需后续产业数据和公司披露材料补证"
+      ]
+    },
+    "optimization_report.evidence_claims_summary": [
+      {
+        "claimId": "CLM-20240328-001",
+        "summary": "2023年研发费用率下降至211%。",
+        "statement_type": "fact",
+        "evidence_level": "official_source_supported",
+        "ontology_mapping": "可映射为 StateVariableObservation 和 validation Signal。",
+        "restriction": "不得映射为 JudgmentOutput 或 AssetImpact。"
+      },
+      {
+        "claimId": "CLM-GAP-OPT-001",
+        "summary": "缺口发现指出先进封装、高带宽内存和交付周期应作为收入兑现链路的候选中介。",
+        "statement_type": "assumption",
+        "evidence_level": "single_source_candidate",
+        "ontology_mapping": "可映射为 StateVariable、StateVariablePropagation 和 tracking Signal 候选。",
+        "restriction": "不得映射为 StateVariableObservation、JudgmentOutput 或 AssetImpact。"
+      },
+      {
+        "claimId": "CLM-GAP-OPT-002",
+        "summary": "泛化的订单到收入链路应拆出上游瓶颈和交付周期中间环节。",
+        "statement_type": "assumption",
+        "evidence_level": "single_source_candidate",
+        "ontology_mapping": "可映射为候选传导模板和后续材料需求。",
+        "restriction": "缺少多来源事实前，只能保留为候选传导链。"
+      },
+      {
+        "claimId": "CLM-HIST-OPT-001",
+        "summary": "历史回放提示存量改造和技术路线切换会阻断扩产到订单或交付链路。",
+        "statement_type": "assumption",
+        "evidence_level": "single_source_candidate",
+        "ontology_mapping": "映射为候选阻断假设和 blocking signal。",
+        "restriction": "不得映射为事实观测，不得确认当前阻断已经发生。"
+      },
+      {
+        "claimId": "CLM-HIST-OPT-002",
+        "summary": "历史回放诊断指出传导关系适用范围过宽。",
+        "statement_type": "judgment",
+        "evidence_level": "single_source_candidate",
+        "ontology_mapping": "映射为关系收窄和下一轮材料需求。",
+        "restriction": "需要多来源历史样本和当前材料验证。"
+      }
+    ],
+    "optimization_report.quality_checks": [
+      {
+        "check": "材料搜索是否由本体缺口驱动",
+        "result": "pass",
+        "note": "搜索目标来自研发费用率观测缺口和盈利拐点验证缺口。"
+      },
+      {
+        "check": "是否区分事实、判断和推荐语",
+        "result": "pass",
+        "note": "财报事实作为观测；盈利拐点和资产影响均未升级为结论。"
+      },
+      {
+        "check": "是否输出下一轮计划",
+        "result": "pass",
+        "note": "下一轮计划指向季度财报、订单收入传导和市场预期锚。"
+      },
+      {
+        "check": "缺口发现回灌是否保持候选边界",
+        "result": "pass",
+        "note": "上游瓶颈链路只新增为 candidate 和 single_source_candidate，后续仍需多来源材料验证。"
+      },
+      {
+        "check": "historical_validation_plan_boundary",
+        "result": "pass",
+        "note": "历史回放任务单只映射为候选阻断条件、关系边界和材料需求，未转换为事实观测。"
+      }
+    ],
+    "optimization_report.remaining_gaps": [
+      {
+        "gap": "缺少连续季度费用率下行证据",
+        "why_it_matters": "盈利拐点需要趋势而非单期数据。",
+        "required_materials": [
+          "2024Q1-Q3季度报告",
+          "2024年度报告"
+        ]
+      },
+      {
+        "gap": "缺少订单到收入传导证据",
+        "why_it_matters": "费用率下降是否有价值取决于收入放量是否可持续。",
+        "required_materials": [
+          "重大合同公告",
+          "招投标数据",
+          "业绩说明会纪要"
+        ]
+      },
+      {
+        "gap": "缺少市场预期和估值锚",
+        "why_it_matters": "资产影响线索不能直接变成投资结论。",
+        "required_materials": [
+          "一致预期",
+          "估值比较",
+          "市场价格表现"
+        ]
+      },
+      {
+        "gap": "缺少上游瓶颈到交付周期的多来源验证",
+        "why_it_matters": "缺口发现回灌链路目前只证明本体表达能力被补齐，尚不能证明瓶颈传导已发生。",
+        "required_materials": [
+          "封装产能扩张公告或产业数据",
+          "高带宽内存供给周期材料",
+          "客户交付和验收节奏材料",
+          "收入确认和订单兑现披露"
+        ]
+      },
+      {
+        "gap": "阻断条件仍缺当前多来源验证",
+        "why_it_matters": "历史回放只能提示本体边界，不能确认当前公司链路被阻断。",
+        "required_materials": [
+          "客户技术路线和存量改造材料",
+          "供应商订单和设备采购结构材料",
+          "交付周期和收入确认披露"
+        ]
+      }
+    ],
+    "optimization_report.next_optimization_plan": [
+      {
+        "next_round": "第二轮",
+        "optimization_goal": "补状态变量连续观测，验证研发费用率是否连续收敛。",
+        "target_gaps": [
+          "缺少连续季度费用率下行证据"
+        ],
+        "suggested_materials": [
+          "2024Q1季度报告",
+          "2024Q2季度报告",
+          "2024Q3季度报告"
+        ],
+        "owner_role": "researcher",
+        "continue_or_stop_condition": "若后续季度费用率不能连续下降，则降级费用率收敛假设；若连续下降，再进入传导链验证。",
+        "plan_id": "NEXT-OPT-001",
+        "suggested_operations": [
+          "supplement_evidence"
+        ],
+        "required_materials": [
+          "2024Q1季度报告",
+          "2024Q2季度报告",
+          "2024Q3季度报告"
+        ],
+        "minimum_evidence_level": "multi_source",
+        "priority": "medium",
+        "stop_condition": "若后续季度费用率不能连续下降，则降级费用率收敛假设；若连续下降，再进入传导链验证。"
+      },
+      {
+        "next_round": "第三轮",
+        "optimization_goal": "补订单到收入的商业转化链条。",
+        "target_gaps": [
+          "缺少订单到收入传导证据"
+        ],
+        "suggested_materials": [
+          "重大合同公告",
+          "客户采购或招投标数据",
+          "业绩说明会纪要"
+        ],
+        "owner_role": "researcher",
+        "continue_or_stop_condition": "若收入放量和毛利率不能配合验证，则不得升级盈利拐点假设。",
+        "plan_id": "NEXT-OPT-002",
+        "suggested_operations": [
+          "supplement_evidence"
+        ],
+        "required_materials": [
+          "重大合同公告",
+          "客户采购或招投标数据",
+          "业绩说明会纪要"
+        ],
+        "minimum_evidence_level": "multi_source",
+        "priority": "medium",
+        "stop_condition": "若收入放量和毛利率不能配合验证，则不得升级盈利拐点假设。"
+      },
+      {
+        "next_round": "第四轮",
+        "optimization_goal": "验证上游瓶颈到交付周期和收入确认节奏的候选传导链。",
+        "target_gaps": [
+          "缺少上游瓶颈到交付周期的多来源验证"
+        ],
+        "suggested_materials": [
+          "封装产能扩张公告或产业数据",
+          "高带宽内存供给周期材料",
+          "客户交付和验收节奏材料",
+          "收入确认和订单兑现披露"
+        ],
+        "owner_role": "researcher",
+        "continue_or_stop_condition": "若无法获得多来源材料支持，则保持 SVP-BOTTLENECK-DELIVERY-REVENUE 为候选传导并降低推理置信度。",
+        "plan_id": "NEXT-OPT-003",
+        "suggested_operations": [
+          "supplement_evidence"
+        ],
+        "required_materials": [
+          "封装产能扩张公告或产业数据",
+          "高带宽内存供给周期材料",
+          "客户交付和验收节奏材料",
+          "收入确认和订单兑现披露"
+        ],
+        "minimum_evidence_level": "multi_source",
+        "priority": "medium",
+        "stop_condition": "若无法获得多来源材料支持，则保持 SVP-BOTTLENECK-DELIVERY-REVENUE 为候选传导并降低推理置信度。"
+      },
+      {
+        "plan_id": "HIST-NEXT-001",
+        "next_round": "第五轮",
+        "source_diagnostic_ids": [
+          "FIND-001",
+          "FIND-002"
+        ],
+        "optimization_goal": "验证历史回放新增阻断条件是否适用于当前链路。",
+        "target_gaps": [
+          "阻断条件当前多来源验证不足"
+        ],
+        "suggested_operations": [
+          "supplement_evidence"
+        ],
+        "suggested_materials": [
+          "客户技术路线切换材料",
+          "存量改造和新增采购拆分材料",
+          "供应商订单披露"
+        ],
+        "required_materials": [
+          "客户技术路线切换材料",
+          "存量改造和新增采购拆分材料",
+          "供应商订单披露"
+        ],
+        "minimum_evidence_level": "multi_source",
+        "priority": "high",
+        "owner_role": "researcher",
+        "stop_condition": "若缺少当前材料验证，则保持阻断信号为 low confidence candidate。",
+        "continue_or_stop_condition": "获得多来源验证后强化阻断信号，否则保留为下一轮证据缺口。",
+        "quality_expected_delta": {
+          "coverage_score": 0.02,
+          "evidence_score": 0.04,
+          "consistency_score": 0.04,
+          "reasoning_score": 0.06
+        }
+      }
+    ]
+  },
+  "upsert": {
+    "optimized_ontology.source_documents": {
+      "key": "id",
+      "items": [
+        {
+          "id": "SRC-HIST-OPT-001",
+          "title": "扩产到订单链路历史回放校验任务单",
+          "documentType": "历史回放校验输出",
+          "publisher": "touyan-benti-lishi-huifang-xiaoyan",
+          "publishTime": "2026-06-01",
+          "businessTime": "2022-2025",
+          "sourceForm": "manual_input",
+          "sourceReliability": "medium",
+          "sourceLocation": "投研本体历史回放校验Skill/examples/01_历史回放校验样例.json",
+          "evidenceLocations": [
+            "optimization_plan.HIST-OPT-001",
+            "ontology_diagnostics.FIND-002"
+          ],
+          "materialRole": "将历史回放校验中的误触发、阻断条件和变量颗粒度问题转成优化任务。",
+          "adoptionStatus": "adopted",
+          "adoptionReason": "可作为本轮优化任务来源，但不作为事实观测的最终证据。"
+        }
+      ]
+    },
+    "optimized_ontology.evidence_claims": {
+      "key": "id",
+      "items": [
+        {
+          "id": "CLM-HIST-OPT-001",
+          "sourceDocumentId": "SRC-HIST-OPT-001",
+          "evidenceLocation": "optimization_plan.HIST-OPT-001",
+          "source_statement": "历史回放显示扩产到设备订单链路在存量改造和技术路线切换场景下可能被阻断。",
+          "statement_type": "assumption",
+          "normalized_claim": "存量改造和技术路线切换应作为扩产到订单或交付兑现链路的候选阻断条件。",
+          "evidence_level": "single_source_candidate",
+          "allowed_target_object_types": [
+            "StateHypothesis",
+            "Signal"
+          ],
+          "must_not_map_to": [
+            "StateVariableObservation",
+            "AssetImpact"
+          ]
+        },
+        {
+          "id": "CLM-HIST-OPT-002",
+          "sourceDocumentId": "SRC-HIST-OPT-001",
+          "evidenceLocation": "ontology_diagnostics.FIND-001/FIND-002",
+          "source_statement": "历史回放诊断指出传导关系适用范围过宽且缺少阻断信号。",
+          "statement_type": "judgment",
+          "normalized_claim": "上游瓶颈到交付周期链路需要补充适用边界、阻断条件和后续验证材料。",
+          "evidence_level": "single_source_candidate",
+          "allowed_target_object_types": [
+            "StateVariablePropagation",
+            "Signal"
+          ],
+          "must_not_map_to": [
+            "StateVariableObservation"
+          ]
+        }
+      ]
+    },
+    "optimized_ontology.objects": {
+      "key": "id",
+      "items": [
+        {
+          "operation": "add",
+          "id": "SH-UPSTREAM-BOTTLENECK-REVENUE-DELAY",
+          "type": "StateHypothesis",
+          "governanceLayer": "industry_extension",
+          "recordStatus": "candidate",
+          "fields": {
+            "title": "上游瓶颈导致收入兑现延迟假设",
+            "hypothesisContent": "若先进封装或高带宽内存供给受限，AI芯片订单可能转化为更长交付周期和更慢收入确认。",
+            "direction": "up",
+            "timeHorizon": "未来2-4个季度",
+            "basis": "缺口发现回灌已补齐上游瓶颈链路，历史回放进一步提示存量改造和技术路线切换会改变链路适用范围。",
+            "falsificationCriteria": "若封装、内存和客户交付材料显示供给充足且交付周期未拉长，则降级该假设。",
+            "hypothesisStatus": "proposed",
+            "proposedBy": "system"
+          },
+          "evidenceRefs": [
+            "SRC-HIST-OPT-001#optimization_plan.HIST-OPT-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.74,
+          "reviewNote": "历史回放来源只能支持候选阻断/延迟假设，不能确认瓶颈已经发生。"
+        },
+        {
+          "operation": "add",
+          "id": "SIG-TECH-ROUTE-SWITCH-BLOCKER",
+          "type": "Signal",
+          "governanceLayer": "industry_extension",
+          "recordStatus": "candidate",
+          "fields": {
+            "title": "技术路线切换或存量改造阻断信号",
+            "signalType": "历史回放诊断",
+            "signalRole": "blocking",
+            "signalContent": "当客户扩产主要由存量产线改造、设备更新或技术路线切换消化时，订单到交付和收入确认链路可能被削弱或阻断。",
+            "statementType": "assumption",
+            "observationTime": "2022-2025历史样本",
+            "reliability": "medium",
+            "validityWindow": "未来2-4个季度",
+            "signalStatus": "active"
+          },
+          "evidenceRefs": [
+            "SRC-HIST-OPT-001#ontology_diagnostics.FIND-002"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.73,
+          "reviewNote": "作为阻断信号候选加入，需要后续客户工艺路线、设备采购结构和订单材料验证。"
+        }
+      ]
+    },
+    "optimized_ontology.relations": {
+      "key": "id",
+      "items": [
+        {
+          "operation": "add",
+          "id": "REL-HIST-001",
+          "type": "hypothesisBindsVariable",
+          "sourceId": "SH-UPSTREAM-BOTTLENECK-REVENUE-DELAY",
+          "targetId": "SV-DELIVERY-CYCLE",
+          "properties": {},
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "SRC-HIST-OPT-001#optimization_plan.HIST-OPT-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.72
+        },
+        {
+          "operation": "add",
+          "id": "REL-HIST-002",
+          "type": "blocksHypothesis",
+          "sourceId": "SIG-TECH-ROUTE-SWITCH-BLOCKER",
+          "targetId": "SH-UPSTREAM-BOTTLENECK-REVENUE-DELAY",
+          "properties": {
+            "blockReason": "历史回放显示存量改造和技术路线切换可能使扩产或需求不直接转化为新增设备订单、交付拉长或收入确认。"
+          },
+          "recordStatus": "candidate",
+          "evidenceRefs": [
+            "SRC-HIST-OPT-001#ontology_diagnostics.FIND-002"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "extractionConfidence": 0.74
+        }
+      ]
+    },
+    "optimized_ontology.hypotheses": {
+      "key": "objectId",
+      "items": [
+        {
+          "objectId": "SH-UPSTREAM-BOTTLENECK-REVENUE-DELAY",
+          "title": "上游瓶颈导致收入兑现延迟假设",
+          "operation": "add",
+          "evidenceLevel": "single_source_candidate",
+          "status": "candidate",
+          "supportingSignals": [
+            "SIG-BOTTLENECK-TRACKING",
+            "SIG-TECH-ROUTE-SWITCH-BLOCKER"
+          ],
+          "reviewNote": "历史回放校验仅支持候选阻断假设，需多来源事实材料验证后才能升级。"
+        }
+      ]
+    },
+    "optimized_ontology.signals": {
+      "key": "objectId",
+      "items": [
+        {
+          "objectId": "SIG-TECH-ROUTE-SWITCH-BLOCKER",
+          "title": "技术路线切换或存量改造阻断信号",
+          "signalRole": "blocking",
+          "operation": "add",
+          "evidenceLevel": "single_source_candidate",
+          "target": "SH-UPSTREAM-BOTTLENECK-REVENUE-DELAY"
+        }
+      ]
+    },
+    "optimized_ontology.evidence_matrix": {
+      "key": "claim",
+      "items": [
+        {
+          "claim": "历史回放提示上游瓶颈链路需要阻断条件",
+          "sourceCount": 1,
+          "evidenceRefs": [
+            "SRC-HIST-OPT-001#optimization_plan.HIST-OPT-001"
+          ],
+          "evidenceLevel": "single_source_candidate",
+          "verified_steps": [
+            "识别历史失败样本中的存量改造和技术路线切换阻断因素",
+            "将阻断因素映射为 blocking signal 候选"
+          ],
+          "missing_steps": [
+            "缺少当前公司客户技术路线和设备采购结构验证",
+            "缺少多来源历史样本扩展"
+          ],
+          "degradation_reason": "历史回放输出属于诊断任务单，不能直接升级为已确认事实。",
+          "missingLinks": [
+            "当前样本事实观测",
+            "多来源历史案例复核",
+            "客户技术路线与采购结构验证"
+          ],
+          "optimizationAction": "add"
+        }
+      ]
+    },
+    "optimization_report.material_requirements": {
+      "key": "ontology_gap",
+      "items": [
+        {
+          "ontology_gap": "历史回放发现的阻断条件缺口",
+          "needed_material_type": "客户技术路线、存量改造、设备采购结构和订单验证材料",
+          "reason": "验证历史回放提出的阻断条件是否适用于当前上游瓶颈链路。",
+          "priority": "P0",
+          "acceptable_evidence_level": "multi_source_supported"
+        }
+      ]
+    },
+    "optimization_report.evidence_requirements": {
+      "key": "ontology_gap",
+      "items": [
+        {
+          "ontology_gap": "阻断条件验证材料缺失",
+          "required_materials": [
+            "客户技术路线切换材料",
+            "存量改造和新增采购拆分材料",
+            "设备采购结构和供应商订单材料"
+          ],
+          "minimum_evidence_level": "multi_source_supported",
+          "required_metadata": [
+            "发布主体",
+            "发布时间",
+            "业务时间",
+            "证据位置",
+            "原始事实来源"
+          ],
+          "forbidden_source_types": [
+            "无来源观点",
+            "评级",
+            "目标价",
+            "AI 摘要"
+          ],
+          "playbook_rule": "阻断条件必须由历史回放和当前多来源材料共同支持，不能由单一任务单确认。"
+        }
+      ]
+    },
+    "optimization_report.optimization_changes": {
+      "key": "target",
+      "items": [
+        {
+          "operation": "add",
+          "target": "SH-UPSTREAM-BOTTLENECK-REVENUE-DELAY",
+          "before": "上一版只有传导模板，缺少可被阻断的状态假设。",
+          "after": "新增上游瓶颈导致收入兑现延迟候选假设。",
+          "reason": "历史回放任务单要求把链路适用边界显式化。",
+          "evidenceRefs": [
+            "SRC-HIST-OPT-001#optimization_plan.HIST-OPT-001"
+          ],
+          "evidenceLevel": "single_source_candidate"
+        },
+        {
+          "operation": "add",
+          "target": "SIG-TECH-ROUTE-SWITCH-BLOCKER",
+          "before": "上一版缺少技术路线切换或存量改造阻断信号。",
+          "after": "新增 blocking signal 候选，并用 blocksHypothesis 连接到候选假设。",
+          "reason": "历史失败样本显示这些因素会削弱扩产到订单/交付链路。",
+          "evidenceRefs": [
+            "SRC-HIST-OPT-001#ontology_diagnostics.FIND-002"
+          ],
+          "evidenceLevel": "single_source_candidate"
+        }
+      ]
+    },
+    "optimization_report.optimization_decision_basis": {
+      "key": "target",
+      "items": [
+        {
+          "target": "SH-UPSTREAM-BOTTLENECK-REVENUE-DELAY",
+          "operation": "add",
+          "evidenceLevel": "single_source_candidate",
+          "playbook_rule": "supply_chain_bottleneck_margin_v1 要求瓶颈链路必须同时表达阻断条件和兑现边界。",
+          "decision_reason": "历史回放任务单显示原链路缺少可被阻断的假设节点。",
+          "evidenceRefs": [
+            "SRC-HIST-OPT-001#optimization_plan.HIST-OPT-001"
+          ]
+        },
+        {
+          "target": "SIG-TECH-ROUTE-SWITCH-BLOCKER",
+          "operation": "add",
+          "evidenceLevel": "single_source_candidate",
+          "playbook_rule": "blocking 信号只能通过 blocksHypothesis 指向 StateHypothesis。",
+          "decision_reason": "将存量改造和技术路线切换显式化为阻断信号，避免推理链自动补齐。",
+          "evidenceRefs": [
+            "SRC-HIST-OPT-001#ontology_diagnostics.FIND-002"
+          ]
+        }
+      ]
+    }
+  }
+}

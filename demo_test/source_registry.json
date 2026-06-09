@@ -1,0 +1,71 @@
+{
+  "search_id": "SRCH-20260608-001",
+  "research_topic": "碳酸锂价格波动对动力电池中游材料企业的影响",
+  "generated_at": "2026-06-08T17:45:00",
+  "data_sources_used": ["wind-mcp-skill"],
+  "sources": [
+    {
+      "source_id": "SRC-001",
+      "source_type": "news",
+      "title": "磷酸铁锂正极材料销量增长 龙蟠科技2025年同比大幅减亏",
+      "source_origin": "Wind 金融新闻",
+      "date": "2026-04-01",
+      "relevance_score": 0.542,
+      "key_content_summary": "龙蟠科技2025磷酸铁锂正极材料毛利率从0.01%提升至8.1%，受碳酸锂等原材料价格下跌利好",
+      "reliability": "high",
+      "has_restricted_content": false,
+      "file_path": "source_materials/news/SRC-001.md",
+      "used_in_sections": ["optimization_report"],
+      "limitations": [],
+      "restricted_items": []
+    },
+    {
+      "source_id": "SRC-002",
+      "source_type": "news",
+      "title": "碳酸锂价格回升 产业链进入盈利修复周期",
+      "source_origin": "Wind 金融新闻",
+      "date": "2026-05-14",
+      "relevance_score": 0.455,
+      "key_content_summary": "德方纳米表示磷酸铁锂正极材料对碳酸锂价格敏感度高；宁德时代表示成本传导压力",
+      "reliability": "high",
+      "has_restricted_content": true,
+      "file_path": "source_materials/news/SRC-002.md",
+      "used_in_sections": ["gap_report", "optimization_report"],
+      "limitations": ["直接引用公司表述，未经独立验证"],
+      "restricted_items": [
+        {"type": "analyst_forecast", "detail": "碳酸锂价格预期不构成事实观测", "disposition": "quarantined"}
+      ]
+    },
+    {
+      "source_id": "SRC-003",
+      "source_type": "news",
+      "title": "碳酸锂价格异动成新能源产业高质量发展不稳定因素",
+      "source_origin": "Wind 金融新闻",
+      "date": "2026-05-20",
+      "relevance_score": 0.416,
+      "key_content_summary": "电池占整车成本比重极高，锂价每涨10万元整车成本涨3000-5000元；储能项目收益率跌破6%",
+      "reliability": "high",
+      "has_restricted_content": false,
+      "file_path": "source_materials/news/SRC-003.md",
+      "used_in_sections": ["gap_report"],
+      "limitations": [],
+      "restricted_items": []
+    }
+  ],
+  "search_coverage": {
+    "policies": 0,
+    "announcements": 0,
+    "financial_reports": 0,
+    "industry_data": 0,
+    "reports": 0,
+    "news": 3,
+    "data_extracts": 0
+  },
+  "quality_summary": {
+    "high_reliability_count": 3,
+    "medium_reliability_count": 0,
+    "low_reliability_count": 0,
+    "total_material_count": 3,
+    "rejected_count": 0
+  }
+}

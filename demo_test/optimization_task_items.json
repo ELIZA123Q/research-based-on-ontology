@@ -1,0 +1,67 @@
+{
+  "merge_id": "MERGE-20260608-001",
+  "merged_at": "2026-06-08T17:50:00",
+  "input_sources": ["gap_items.json", "replay_report.md"],
+  "total_candidates": 5,
+  "merged": 4,
+  "rejected": 1,
+  "rejected_items": [
+    {
+      "rejection_id": "REJ-001",
+      "source": "gap_items.json",
+      "reason": "证据不足：LFP/NCM成本结构差异化缺乏具体碳酸锂单耗数据",
+      "follow_up": "标记为补证任务，交给6-1重新搜索行业数据"
+    }
+  ],
+  "tasks": [
+    {
+      "task_id": "TASK-001",
+      "priority": "P0",
+      "type": "conduction_add",
+      "target_object": "碳酸锂价格→磷酸铁锂正极毛利率传导链",
+      "description": "新增传导链: 碳酸锂现货价变动→库存成本变动→产品定价调整→毛利率变化",
+      "evidence_sources": ["SRC-001", "SRC-002"],
+      "acceptance_criteria": "传导链包含至少3个中间变量，含滞后时间参数",
+      "source_gaps": ["GAP-001"],
+      "source_replays": [],
+      "feed_dependencies": []
+    },
+    {
+      "task_id": "TASK-002",
+      "priority": "P0",
+      "type": "condition_add",
+      "target_object": "库存减值触发条件",
+      "description": "新增触发条件: 碳酸锂跌幅>库存周转天数成本线→减值测试→跌价准备计提",
+      "evidence_sources": ["SRC-001"],
+      "acceptance_criteria": "触发条件含量化阈值和验证窗口",
+      "source_gaps": ["GAP-002"],
+      "source_replays": ["case_2023_crash"],
+      "feed_dependencies": []
+    },
+    {
+      "task_id": "TASK-003",
+      "priority": "P1",
+      "type": "object_modify",
+      "target_object": "碳酸锂价格→毛利率传导链—反向路径",
+      "description": "在传导链中新增'高价库存消耗→低价补库→毛利率修复'反向路径",
+      "evidence_sources": ["SRC-001", "SRC-003"],
+      "acceptance_criteria": "反向路径包含库存消耗周期参数",
+      "source_gaps": [],
+      "source_replays": ["case_2023_crash"],
+      "feed_dependencies": ["TASK-001"]
+    },
+    {
+      "task_id": "TASK-004",
+      "priority": "P2",
+      "type": "object_add",
+      "target_object": "LFP/NCM 成本结构子对象",
+      "description": "新增 LFP_cost_structure 和 NCM_cost_structure 子对象，区分碳酸锂单耗",
+      "evidence_sources": [],
+      "acceptance_criteria": "子对象含碳酸锂单耗(吨/吨产品)和原材料成本占比",
+      "source_gaps": ["GAP-003"],
+      "source_replays": ["case_2024_q1_recovery"],
+      "feed_dependencies": [],
+      "pending_evidence": "需要6-1补证获取碳酸锂单耗数据"
+    }
+  ]
+}

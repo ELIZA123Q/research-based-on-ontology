@@ -1,0 +1,26 @@
+[
+  {
+    "gap_id": "GAP-001",
+    "category": "conduction_chain_missing",
+    "severity": "P0",
+    "description": "碳酸锂价格→正极毛利率传导链缺失",
+    "affected_objects": ["碳酸锂现货价格", "磷酸铁锂正极材料企业毛利率"],
+    "suggested_fix": "新增传导链：碳酸锂现货价变动 → 库存成本变动 → 产品定价调整 → 毛利率变化"
+  },
+  {
+    "gap_id": "GAP-002",
+    "category": "trigger_condition_missing",
+    "severity": "P1",
+    "description": "库存减值触发条件缺失",
+    "affected_objects": ["库存减值", "存货跌价准备"],
+    "suggested_fix": "新增触发条件：碳酸锂跌幅 > 库存周转天数成本线 → 减值测试触发"
+  },
+  {
+    "gap_id": "GAP-003",
+    "category": "granularity_insufficient",
+    "severity": "P1",
+    "description": "LFP/NCM 成本结构未区分",
+    "affected_objects": ["磷酸铁锂", "三元材料"],
+    "suggested_fix": "新增子对象 LFP_cost_structure、NCM_cost_structure，区分碳酸锂单耗"
+  }
+]
